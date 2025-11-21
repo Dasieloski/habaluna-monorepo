@@ -7,8 +7,10 @@ import { cn } from '@/lib/utils';
 interface ProductVariant {
   id: string;
   name: string;
-  price: number | string;
-  comparePrice?: number | string;
+  priceUSD?: number | string | null;
+  priceMNs?: number | string | null;
+  comparePriceUSD?: number | string | null;
+  comparePriceMNs?: number | string | null;
   stock: number;
   weight?: number | string;
   unit?: string;

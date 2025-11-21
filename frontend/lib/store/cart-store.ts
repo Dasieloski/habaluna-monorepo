@@ -8,9 +8,16 @@ export interface CartItem {
     id: string;
     name: string;
     slug: string;
-    price: number | string;
+    priceUSD?: number | string | null;
+    priceMNs?: number | string | null;
     images: string[];
   };
+  productVariant?: {
+    id: string;
+    name: string;
+    priceUSD?: number | string | null;
+    priceMNs?: number | string | null;
+  } | null;
   quantity: number;
 }
 

@@ -1,36 +1,34 @@
 'use client';
 
 import { formatPrice } from '@/lib/utils';
-import { useCurrencyStore } from '@/lib/store/currency-store';
 
 interface PriceDisplayProps {
-  price: number | string;
-  comparePrice?: number | string;
-  showSecondary?: boolean;
+  priceUSD?: number | string | null;
+  priceMNs?: number | string | null;
+  comparePriceUSD?: number | string | null;
+  comparePriceMNs?: number | string | null;
   className?: string;
   compareClassName?: string;
 }
 
 export function PriceDisplay({ 
-  price, 
-  comparePrice, 
-  showSecondary = true,
+  priceUSD, 
+  priceMNs,
+  comparePriceUSD,
+  comparePriceMNs,
   className = '',
   compareClassName = '',
 }: PriceDisplayProps) {
-  const { secondaryCurrency } = useCurrencyStore();
-  
   return (
     <div>
       <span className={className}>
-        {formatPrice(price, undefined, showSecondary && !!secondaryCurrency)}
+        {formatPrice(priceUSD, priceMNs)}
       </span>
-      {comparePrice && (
+      {comparePriceUSD || comparePriceMNs ? (
         <span className={compareClassName}>
-          {formatPrice(comparePrice, undefined, showSecondary && !!secondaryCurrency)}
+          {formatPrice(comparePriceUSD, comparePriceMNs)}
         </span>
-      )}
+      ) : null}
     </div>
   );
 }
-

@@ -48,11 +48,11 @@ export function formatPrice(
   
   // Mostrar solo uno
   if (hasUSD) {
-    const usd = typeof priceUSD === 'string' ? parseFloat(priceUSD) : priceUSD;
+    const usd = typeof priceUSD === 'string' ? parseFloat(priceUSD) : (priceUSD || 0);
     return formatPriceWithCurrency(usd, 'USD');
   }
   
-  const mns = typeof priceMNs === 'string' ? parseFloat(priceMNs) : priceMNs;
+  const mns = typeof priceMNs === 'string' ? parseFloat(priceMNs) : (priceMNs || 0);
   return formatPriceWithCurrency(mns, 'MNs');
 }
 

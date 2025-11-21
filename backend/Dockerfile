@@ -5,7 +5,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm ci
+# Instalar todas las dependencias (incluyendo dev para build)
+RUN npm install
 
 COPY . .
 
@@ -23,5 +24,9 @@ COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 4000
 
-CMD ["npm", "run", "start:prod"]
+# Copiar script de inicio
+COPY start.sh ./
+RUN chmod +x start.sh
+
+CMD ["./start.sh"]
 

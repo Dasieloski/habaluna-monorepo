@@ -48,3 +48,7 @@ yarn-error.log*
 .cache/
 .turbo/
 
+# Railway
+.railway/
+railway.json
+
