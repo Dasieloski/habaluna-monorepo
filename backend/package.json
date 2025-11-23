@@ -8,11 +8,11 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "prestart": "prisma generate && (npx prisma db push --accept-data-loss || npx prisma migrate deploy || true)",
+    "prestart": "prisma generate && (npx prisma db push --accept-data-loss || npx prisma migrate deploy || true) && (npx prisma db seed || true)",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "prestart:prod": "prisma generate && (npx prisma db push --accept-data-loss || npx prisma migrate deploy || true)",
+    "prestart:prod": "prisma generate && (npx prisma db push --accept-data-loss || npx prisma migrate deploy || true) && (npx prisma db seed || true)",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
