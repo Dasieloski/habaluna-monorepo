@@ -26,22 +26,30 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.email, loginDto.password);
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    try {
+      const user = await this.validateUser(loginDto.email, loginDto.password);
+      if (!user) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
 
-    const tokens = await this.generateTokens(user.id, user.email, user.role);
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-      },
-      ...tokens,
-    };
+      const tokens = await this.generateTokens(user.id, user.email, user.role);
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        },
+        ...tokens,
+      };
+    } catch (error) {
+      console.error('❌ Error en login:', error);
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new Error(`Login failed: ${error.message}`);
+    }
   }
 
   async register(registerDto: RegisterDto) {
@@ -92,29 +100,58 @@ export class AuthService {
   }
 
   private async generateTokens(userId: string, email: string, role: string) {
-    const payload = { sub: userId, email, role };
+    try {
+      // Verificar que las variables de entorno estén configuradas
+      const jwtSecret = this.config.get('JWT_SECRET');
+      const jwtRefreshSecret = this.config.get('JWT_REFRESH_SECRET');
+      
+      if (!jwtSecret) {
+        console.error('❌ JWT_SECRET no está configurado');
+        throw new Error('JWT_SECRET is not configured');
+      }
+      
+      if (!jwtRefreshSecret) {
+        console.error('❌ JWT_REFRESH_SECRET no está configurado');
+        throw new Error('JWT_REFRESH_SECRET is not configured');
+      }
 
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: this.config.get('JWT_REFRESH_SECRET'),
-      expiresIn: this.config.get('JWT_REFRESH_EXPIRATION') || '7d',
-    });
+      const payload = { sub: userId, email, role };
 
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
+      const accessToken = this.jwtService.sign(payload);
+      const refreshToken = this.jwtService.sign(payload, {
+        secret: jwtRefreshSecret,
+        expiresIn: this.config.get('JWT_REFRESH_EXPIRATION') || '7d',
+      });
 
-    await this.prisma.refreshToken.create({
-      data: {
-        token: refreshToken,
-        userId,
-        expiresAt,
-      },
-    });
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
 
-    return {
-      accessToken,
-      refreshToken,
-    };
+      // Intentar crear el refresh token en la base de datos
+      try {
+        await this.prisma.refreshToken.create({
+          data: {
+            token: refreshToken,
+            userId,
+            expiresAt,
+          },
+        });
+      } catch (dbError) {
+        console.error('❌ Error al crear refreshToken en la base de datos:', dbError);
+        // Si la tabla no existe, puede ser que las migraciones no se hayan ejecutado
+        if (dbError.code === 'P2001' || dbError.message?.includes('table') || dbError.message?.includes('does not exist')) {
+          throw new Error('Database table refreshToken does not exist. Please run migrations.');
+        }
+        throw dbError;
+      }
+
+      return {
+        accessToken,
+        refreshToken,
+      };
+    } catch (error) {
+      console.error('❌ Error al generar tokens:', error);
+      throw error;
+    }
   }
 
   async logout(refreshToken: string) {
