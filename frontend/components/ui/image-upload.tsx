@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Upload, X } from 'lucide-react';
 import { api } from '@/lib/api';
+import { getImageUrl } from '@/lib/image-utils';
 
 interface ImageUploadProps {
   value?: string[];
@@ -89,7 +90,7 @@ export function ImageUpload({ value = [], onChange, multiple = false, maxFiles =
           <div key={index} className="relative group">
             <div className="w-32 h-32 rounded-lg overflow-hidden border-2 border-gray-200">
               <img 
-                src={url.startsWith('http') ? url : (url.startsWith('/uploads/') ? `http://localhost:4000${url}` : url)} 
+                src={getImageUrl(url) || url} 
                 alt={`Preview ${index + 1}`} 
                 className="w-full h-full object-cover" 
               />

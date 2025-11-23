@@ -15,7 +15,9 @@ export function getImageUrl(imagePath: string | null | undefined): string | null
 
   // Si es una ruta de uploads, construir la URL del backend
   if (imagePath.startsWith('/uploads/')) {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:4000';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+    // Remover /api del final para obtener la URL base del backend
+    const backendUrl = apiUrl.replace(/\/api\/?$/, '');
     return `${backendUrl}${imagePath}`;
   }
 
@@ -33,7 +35,9 @@ export function getImageUrl(imagePath: string | null | undefined): string | null
   }
 
   // Si no tiene prefijo, asumimos que es una ruta de uploads
-  const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:4000';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+  // Remover /api del final para obtener la URL base del backend
+  const backendUrl = apiUrl.replace(/\/api\/?$/, '');
   return `${backendUrl}/uploads/${imagePath}`;
 }
 
