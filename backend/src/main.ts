@@ -20,6 +20,17 @@ async function bootstrap() {
   // CORS - Configuración flexible para producción
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   
+  // Función para normalizar dominio (extraer dominio base sin www)
+  const getBaseDomain = (url: string): string => {
+    try {
+      const urlObj = new URL(url);
+      let hostname = urlObj.hostname.replace(/^www\./, ''); // Remover www
+      return hostname;
+    } catch {
+      return url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+    }
+  };
+  
   app.enableCors({
     origin: (origin, callback) => {
       // Permitir requests sin origin (mobile apps, Postman, curl, etc.)
@@ -34,23 +45,37 @@ async function bootstrap() {
         }
       }
       
-      // Normalizar URLs (sin trailing slash)
-      const normalizedOrigin = origin.replace(/\/$/, '');
-      const normalizedFrontendUrl = frontendUrl.replace(/\/$/, '');
+      // Normalizar URLs (sin trailing slash y sin protocolo para comparación)
+      const normalizedOrigin = origin.replace(/\/$/, '').toLowerCase();
+      const normalizedFrontendUrl = frontendUrl.replace(/\/$/, '').toLowerCase();
       
       // Verificar coincidencia exacta
       if (normalizedOrigin === normalizedFrontendUrl) {
+        console.log(`✅ CORS: Origen permitido (exacto): ${origin}`);
+        return callback(null, true);
+      }
+      
+      // Verificar si es el mismo dominio (con/sin www)
+      const originDomain = getBaseDomain(normalizedOrigin);
+      const frontendDomain = getBaseDomain(normalizedFrontendUrl);
+      
+      if (originDomain === frontendDomain) {
+        console.log(`✅ CORS: Origen permitido (mismo dominio): ${origin}`);
         return callback(null, true);
       }
       
       // Permitir dominios de Railway (para desarrollo/testing)
       if (normalizedOrigin.includes('.railway.app')) {
+        console.log(`✅ CORS: Origen permitido (Railway): ${origin}`);
         return callback(null, true);
       }
       
       // Log para debugging
       console.log(`⚠️ CORS: Origen bloqueado: ${origin}`);
-      console.log(`✅ Origen esperado: ${normalizedFrontendUrl}`);
+      console.log(`   Origen normalizado: ${normalizedOrigin}`);
+      console.log(`   Dominio origen: ${originDomain}`);
+      console.log(`   Frontend esperado: ${normalizedFrontendUrl}`);
+      console.log(`   Dominio frontend: ${frontendDomain}`);
       callback(new Error('No permitido por CORS'));
     },
     credentials: true,
