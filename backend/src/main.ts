@@ -35,12 +35,14 @@ async function bootstrap() {
     origin: (origin, callback) => {
       // Permitir requests sin origin (mobile apps, Postman, curl, etc.)
       if (!origin) {
+        console.log('✅ CORS: Request sin origin permitido');
         return callback(null, true);
       }
       
       // En desarrollo, permitir cualquier origen localhost
       if (process.env.NODE_ENV !== 'production') {
         if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+          console.log(`✅ CORS: Origen localhost permitido: ${origin}`);
           return callback(null, true);
         }
       }
@@ -60,7 +62,7 @@ async function bootstrap() {
       const frontendDomain = getBaseDomain(normalizedFrontendUrl);
       
       if (originDomain === frontendDomain) {
-        console.log(`✅ CORS: Origen permitido (mismo dominio): ${origin}`);
+        console.log(`✅ CORS: Origen permitido (mismo dominio): ${origin} (${originDomain})`);
         return callback(null, true);
       }
       
@@ -79,8 +81,20 @@ async function bootstrap() {
       callback(new Error('No permitido por CORS'));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+      'Access-Control-Request-Method',
+      'Access-Control-Request-Headers',
+    ],
+    exposedHeaders: ['Authorization'],
+    maxAge: 86400, // 24 horas
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   // Global prefix

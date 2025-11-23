@@ -135,11 +135,24 @@ export class AuthService {
             expiresAt,
           },
         });
-      } catch (dbError) {
-        console.error('❌ Error al crear refreshToken en la base de datos:', dbError);
-        // Si la tabla no existe, puede ser que las migraciones no se hayan ejecutado
-        if (dbError.code === 'P2001' || dbError.message?.includes('table') || dbError.message?.includes('does not exist')) {
-          throw new Error('Database table refreshToken does not exist. Please run migrations.');
+      } catch (dbError: any) {
+        console.error('❌ Error al crear refreshToken en la base de datos:');
+        console.error('   Code:', dbError.code);
+        console.error('   Message:', dbError.message);
+        console.error('   Meta:', JSON.stringify(dbError.meta, null, 2));
+        
+        // Errores comunes de Prisma
+        if (dbError.code === 'P2001') {
+          throw new Error('Database table refresh_tokens does not exist. Please run: npx prisma migrate deploy');
+        }
+        if (dbError.code === 'P2002') {
+          throw new Error('Refresh token already exists (duplicate). This should not happen.');
+        }
+        if (dbError.code === 'P1001') {
+          throw new Error('Cannot reach database server. Check DATABASE_URL configuration.');
+        }
+        if (dbError.message?.includes('table') || dbError.message?.includes('does not exist')) {
+          throw new Error('Database table refresh_tokens does not exist. Please run: npx prisma migrate deploy');
         }
         throw dbError;
       }
