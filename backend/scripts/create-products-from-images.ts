@@ -206,7 +206,28 @@ async function getCategoryBySlug(slug: string) {
     where: { slug },
   });
   if (!category) {
-    throw new Error(`Categoría no encontrada: ${slug}`);
+    // Intentar crear la categoría si no existe
+    console.log(`   ⚠️  Categoría ${slug} no encontrada, creándola...`);
+    const categoryNames: Record<string, string> = {
+      'aceites-vinagres': 'Aceites y Vinagres',
+      'conservas': 'Conservas',
+      'especias-condimentos': 'Especias y Condimentos',
+      'miel-mermeladas': 'Miel y Mermeladas',
+      'pastas-arroces': 'Pastas y Arroces',
+      'dulces-postres': 'Dulces y Postres',
+    };
+    
+    const category = await prisma.category.create({
+      data: {
+        name: categoryNames[slug] || slug,
+        slug: slug,
+        description: `Categoría ${categoryNames[slug] || slug}`,
+        isActive: true,
+        order: 1,
+      },
+    });
+    console.log(`   ✅ Categoría creada: ${category.name}`);
+    return category;
   }
   return category;
 }
@@ -237,24 +258,33 @@ async function createProduct(
       return existing;
     }
 
+    const productPayload: any = {
+      name: productData.name,
+      slug,
+      description: productData.description,
+      categoryId: category.id,
+      stock: 0, // Sin stock en modo catálogo
+      isActive: true,
+      isFeatured: false,
+      images: productData.images || [],
+      allergens: [],
+    };
+
+    // Campos opcionales
+    if (productData.shortDescription) {
+      productPayload.shortDescription = productData.shortDescription;
+    }
+    if (productData.sku) {
+      productPayload.sku = productData.sku;
+    }
+
     const response = await axios.post(
       `${API_URL}/products`,
-      {
-        name: productData.name,
-        slug,
-        description: productData.description,
-        shortDescription: productData.shortDescription,
-        categoryId: category.id,
-        sku: productData.sku,
-        stock: 0, // Sin stock en modo catálogo
-        isActive: true,
-        isFeatured: false,
-        images: productData.images,
-        allergens: [],
-      },
+      productPayload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       }
     );
