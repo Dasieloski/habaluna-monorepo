@@ -246,30 +246,20 @@ async function createProduct(
 ) {
   let productPayload: any;
   try {
-    const category = await getCategoryBySlug(productData.categorySlug);
+    const category = await getCategoryBySlug(productData.categorySlug, token);
     const slug = generateSlug(productData.name);
 
-    // Verificar si el producto ya existe por slug
-    const existingBySlug = await prisma.product.findUnique({
-      where: { slug },
-    });
-
-    if (existingBySlug) {
-      console.log(`⚠️  Producto ya existe (slug): ${productData.name}`);
-      return existingBySlug;
-    }
-
-    // Verificar si el SKU ya existe
-    if (productData.sku) {
-      const existingBySku = await prisma.product.findUnique({
-        where: { sku: productData.sku },
-      });
-
-      if (existingBySku) {
-        console.log(`⚠️  Producto ya existe (SKU): ${productData.name} (SKU: ${productData.sku})`);
-        // Generar un nuevo SKU único
-        productData.sku = `${productData.sku}-${Date.now()}`;
-        console.log(`   🔄 Nuevo SKU generado: ${productData.sku}`);
+    // Verificar si el producto ya existe usando la API
+    try {
+      const existingResponse = await axios.get(`${API_URL}/products/slug/${slug}`);
+      if (existingResponse.data) {
+        console.log(`⚠️  Producto ya existe (slug): ${productData.name}`);
+        return existingResponse.data;
+      }
+    } catch (error: any) {
+      // Si no existe, continuar
+      if (error.response?.status !== 404) {
+        throw error;
       }
     }
 
