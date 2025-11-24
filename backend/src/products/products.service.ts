@@ -18,12 +18,52 @@ export class ProductsService {
         allergens: createProductDto.allergens?.length || 0,
       });
 
+      // Preparar datos asegurando que los arrays estén presentes
+      const productData: any = {
+        name: createProductDto.name,
+        slug: createProductDto.slug,
+        description: createProductDto.description,
+        categoryId: createProductDto.categoryId,
+        stock: createProductDto.stock ?? 0,
+        isActive: createProductDto.isActive ?? true,
+        isFeatured: createProductDto.isFeatured ?? false,
+        allergens: Array.isArray(createProductDto.allergens) ? createProductDto.allergens : [],
+        images: Array.isArray(createProductDto.images) ? createProductDto.images : [],
+      };
+
+      // Campos opcionales
+      if (createProductDto.shortDescription) {
+        productData.shortDescription = createProductDto.shortDescription;
+      }
+      if (createProductDto.sku) {
+        productData.sku = createProductDto.sku;
+      }
+      if (createProductDto.priceUSD !== undefined && createProductDto.priceUSD !== null) {
+        productData.priceUSD = createProductDto.priceUSD;
+      }
+      if (createProductDto.priceMNs !== undefined && createProductDto.priceMNs !== null) {
+        productData.priceMNs = createProductDto.priceMNs;
+      }
+      if (createProductDto.comparePriceUSD !== undefined && createProductDto.comparePriceUSD !== null) {
+        productData.comparePriceUSD = createProductDto.comparePriceUSD;
+      }
+      if (createProductDto.comparePriceMNs !== undefined && createProductDto.comparePriceMNs !== null) {
+        productData.comparePriceMNs = createProductDto.comparePriceMNs;
+      }
+      if (createProductDto.weight !== undefined && createProductDto.weight !== null) {
+        productData.weight = createProductDto.weight;
+      }
+      if (createProductDto.nutritionalInfo) {
+        productData.nutritionalInfo = createProductDto.nutritionalInfo;
+      }
+
+      console.log('📦 Datos preparados para Prisma:', {
+        ...productData,
+        description: productData.description?.substring(0, 50) + '...',
+      });
+
       const product = await this.prisma.product.create({
-        data: {
-          ...createProductDto,
-          allergens: createProductDto.allergens || [],
-          images: createProductDto.images || [],
-        },
+        data: productData,
         include: { category: true },
       });
 
@@ -34,7 +74,7 @@ export class ProductsService {
         message: error.message,
         code: error.code,
         meta: error.meta,
-        stack: error.stack,
+        cause: error.cause,
       });
       throw error;
     }
