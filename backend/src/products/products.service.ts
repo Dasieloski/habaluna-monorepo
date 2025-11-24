@@ -9,10 +9,35 @@ export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createProductDto: CreateProductDto) {
-    return this.prisma.product.create({
-      data: createProductDto,
-      include: { category: true },
-    });
+    try {
+      console.log('📦 Creando producto:', {
+        name: createProductDto.name,
+        slug: createProductDto.slug,
+        categoryId: createProductDto.categoryId,
+        images: createProductDto.images?.length || 0,
+        allergens: createProductDto.allergens?.length || 0,
+      });
+
+      const product = await this.prisma.product.create({
+        data: {
+          ...createProductDto,
+          allergens: createProductDto.allergens || [],
+          images: createProductDto.images || [],
+        },
+        include: { category: true },
+      });
+
+      console.log('✅ Producto creado exitosamente:', product.id);
+      return product;
+    } catch (error: any) {
+      console.error('❌ Error al crear producto:', {
+        message: error.message,
+        code: error.code,
+        meta: error.meta,
+        stack: error.stack,
+      });
+      throw error;
+    }
   }
 
   async findAll(pagination: PaginationDto, filters?: any) {
