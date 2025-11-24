@@ -8,6 +8,7 @@ import { useCartStore } from '@/lib/store/cart-store';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { ShoppingCart } from 'lucide-react';
+import { isCatalogMode } from '@/lib/catalog-mode';
 
 interface AddToCartButtonProps {
   productId: string;
@@ -66,6 +67,11 @@ export function AddToCartButton({
       setLoading(false);
     }
   };
+
+  // En modo catálogo, no mostrar el botón
+  if (isCatalogMode()) {
+    return null;
+  }
 
   return (
     <Button onClick={handleAddToCart} disabled={loading} size="lg" className="w-full">

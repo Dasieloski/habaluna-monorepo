@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPrice } from '@/lib/utils';
 import { SupernovaWidget } from '@/components/payment/supernova-widget';
+import { isCatalogMode } from '@/lib/catalog-mode';
 
 const checkoutSchema = z.object({
   firstName: z.string().min(1, 'Nombre requerido'),
@@ -50,6 +51,12 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
+    // En modo catálogo, redirigir a productos
+    if (isCatalogMode()) {
+      router.push('/products');
+      return;
+    }
+
     if (!isAuthenticated()) {
       router.push('/auth/login');
       return;

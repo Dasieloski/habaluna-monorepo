@@ -3,38 +3,42 @@
 import { formatPrice } from '@/lib/utils';
 import { isCatalogMode } from '@/lib/catalog-mode';
 
-interface PriceDisplayProps {
+interface ProductPriceProps {
   priceUSD?: number | string | null;
   priceMNs?: number | string | null;
   comparePriceUSD?: number | string | null;
   comparePriceMNs?: number | string | null;
+  variant?: 'default' | 'large';
   className?: string;
-  compareClassName?: string;
 }
 
-export function PriceDisplay({ 
-  priceUSD, 
+export function ProductPrice({
+  priceUSD,
   priceMNs,
   comparePriceUSD,
   comparePriceMNs,
+  variant = 'default',
   className = '',
-  compareClassName = '',
-}: PriceDisplayProps) {
+}: ProductPriceProps) {
   // En modo catálogo, no mostrar precios
   if (isCatalogMode()) {
     return null;
   }
 
+  const priceClass = variant === 'large' ? 'text-2xl' : 'text-xl';
+  const compareClass = variant === 'large' ? 'text-sm' : 'text-sm';
+
   return (
-    <div>
-      <span className={className}>
+    <div className={className}>
+      <p className={`${priceClass} font-bold text-primary`}>
         {formatPrice(priceUSD, priceMNs)}
-      </span>
-      {comparePriceUSD || comparePriceMNs ? (
-        <span className={compareClassName}>
+      </p>
+      {(comparePriceUSD || comparePriceMNs) && (
+        <p className={`${compareClass} text-gray-400 line-through`}>
           {formatPrice(comparePriceUSD, comparePriceMNs)}
-        </span>
-      ) : null}
+        </p>
+      )}
     </div>
   );
 }
+

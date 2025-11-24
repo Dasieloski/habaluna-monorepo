@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { api } from '@/lib/api';
-import { formatPrice } from '@/lib/utils';
 import { getFirstImage, getImageUrl } from '@/lib/image-utils';
 import { ArrowRight, Star, Truck, Shield, Award, Heart } from 'lucide-react';
+import { ProductPrice } from '@/components/product/product-price';
 
 async function getBanners() {
   try {
@@ -196,21 +196,13 @@ export default async function Home() {
                       {product.shortDescription || product.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-2xl font-bold text-primary">
-                          {product.variants && product.variants.length > 0
-                            ? formatPrice(product.variants[0].priceUSD, product.variants[0].priceMNs)
-                            : formatPrice(product.priceUSD, product.priceMNs)}
-                        </p>
-                        {(product.variants && product.variants.length > 0 && (product.variants[0].comparePriceUSD || product.variants[0].comparePriceMNs)) ||
-                        (product.comparePriceUSD || product.comparePriceMNs) ? (
-                          <p className="text-sm text-gray-400 line-through">
-                            {product.variants && product.variants.length > 0
-                              ? formatPrice(product.variants[0].comparePriceUSD, product.variants[0].comparePriceMNs)
-                              : formatPrice(product.comparePriceUSD, product.comparePriceMNs)}
-                          </p>
-                        ) : null}
-                      </div>
+                      <ProductPrice
+                        priceUSD={product.variants && product.variants.length > 0 ? product.variants[0].priceUSD : product.priceUSD}
+                        priceMNs={product.variants && product.variants.length > 0 ? product.variants[0].priceMNs : product.priceMNs}
+                        comparePriceUSD={product.variants && product.variants.length > 0 ? product.variants[0].comparePriceUSD : product.comparePriceUSD}
+                        comparePriceMNs={product.variants && product.variants.length > 0 ? product.variants[0].comparePriceMNs : product.comparePriceMNs}
+                        variant="large"
+                      />
                       <div className="text-primary group-hover:underline transition-colors flex items-center gap-1 text-sm font-medium">
                         Ver más
                         <ArrowRight className="h-4 w-4" />

@@ -24,9 +24,9 @@ COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 4000
 
-# Copiar script de inicio
-COPY start.sh ./
-RUN chmod +x start.sh
+# Copiar scripts de inicio
+COPY start.sh start-dev.sh ./
+RUN chmod +x start.sh start-dev.sh
 
 CMD ["./start.sh"]
 

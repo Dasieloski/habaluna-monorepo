@@ -1,29 +1,51 @@
+'use client';
+
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import { formatPrice } from '@/lib/utils';
 import { getFirstImage } from '@/lib/image-utils';
+import { ProductPrice } from '@/components/product/product-price';
+import { isCatalogMode } from '@/lib/catalog-mode';
+import { useEffect, useState } from 'react';
 
-async function getProducts(searchParams: { [key: string]: string | string[] | undefined }) {
-  try {
-    const params = new URLSearchParams();
-    if (searchParams.categoryId) params.append('categoryId', searchParams.categoryId as string);
-    if (searchParams.search) params.append('search', searchParams.search as string);
-    if (searchParams.page) params.append('page', searchParams.page as string);
-    params.append('limit', '12');
-
-    const response = await api.get(`/products?${params.toString()}`);
-    return response.data;
-  } catch (error) {
-    return { data: [], meta: { total: 0, page: 1, limit: 12, totalPages: 0 } };
-  }
-}
-
-export default async function ProductsPage({
+export default function ProductsPage({
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const { data: products, meta } = await getProducts(searchParams);
+  const [products, setProducts] = useState<any[]>([]);
+  const [meta, setMeta] = useState({ total: 0, page: 1, limit: 12, totalPages: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function getProducts() {
+      try {
+        const params = new URLSearchParams();
+        if (searchParams.categoryId) params.append('categoryId', searchParams.categoryId as string);
+        if (searchParams.search) params.append('search', searchParams.search as string);
+        if (searchParams.page) params.append('page', searchParams.page as string);
+        params.append('limit', '12');
+
+        const response = await api.get(`/products?${params.toString()}`);
+        setProducts(response.data.data || []);
+        setMeta(response.data.meta || { total: 0, page: 1, limit: 12, totalPages: 0 });
+      } catch (error) {
+        setProducts([]);
+        setMeta({ total: 0, page: 1, limit: 12, totalPages: 0 });
+      } finally {
+        setLoading(false);
+      }
+    }
+    getProducts();
+  }, [searchParams]);
+
+  if (loading) {
+    return (
+      <div className="container py-12">
+        <h1 className="text-4xl font-bold mb-8">Productos</h1>
+        <p>Cargando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-12">
@@ -52,21 +74,13 @@ export default async function ProductsPage({
                   {product.shortDescription || product.description}
                 </p>
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xl font-bold text-primary">
-                      {product.variants && product.variants.length > 0
-                        ? formatPrice(product.variants[0].priceUSD, product.variants[0].priceMNs)
-                        : formatPrice(product.priceUSD, product.priceMNs)}
-                    </p>
-                    {(product.variants && product.variants.length > 0 && (product.variants[0].comparePriceUSD || product.variants[0].comparePriceMNs)) ||
-                    (product.comparePriceUSD || product.comparePriceMNs) ? (
-                      <p className="text-sm text-gray-400 line-through">
-                        {product.variants && product.variants.length > 0
-                          ? formatPrice(product.variants[0].comparePriceUSD, product.variants[0].comparePriceMNs)
-                          : formatPrice(product.comparePriceUSD, product.comparePriceMNs)}
-                      </p>
-                    ) : null}
-                  </div>
+                  <ProductPrice
+                    priceUSD={product.variants && product.variants.length > 0 ? product.variants[0].priceUSD : product.priceUSD}
+                    priceMNs={product.variants && product.variants.length > 0 ? product.variants[0].priceMNs : product.priceMNs}
+                    comparePriceUSD={product.variants && product.variants.length > 0 ? product.variants[0].comparePriceUSD : product.comparePriceUSD}
+                    comparePriceMNs={product.variants && product.variants.length > 0 ? product.variants[0].comparePriceMNs : product.comparePriceMNs}
+                    variant="default"
+                  />
                   {product.variants && product.variants.length > 0 && (
                     <span className="text-xs text-gray-500">
                       {product.variants.length} opciones

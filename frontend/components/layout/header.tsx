@@ -6,6 +6,7 @@ import { useCartStore } from '@/lib/store/cart-store';
 import { Button } from '@/components/ui/button';
 import { LogoWithText } from '@/components/logo';
 import { ShoppingCart, User, LogOut } from 'lucide-react';
+import { isCatalogMode } from '@/lib/catalog-mode';
 
 export function Header() {
   const { user, logout, isAuthenticated } = useAuthStore();
@@ -28,14 +29,16 @@ export function Header() {
           </Link>
 
           <div className="flex items-center gap-4">
-            <Link href="/cart" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              {itemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
+            {!isCatalogMode() && (
+              <Link href="/cart" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {isAuthenticated() ? (
               <>

@@ -11,6 +11,7 @@ import { formatPrice } from '@/lib/utils';
 import { getFirstImage } from '@/lib/image-utils';
 import { Trash2, ShoppingBag } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { isCatalogMode } from '@/lib/catalog-mode';
 
 export default function CartPage() {
   const [loading, setLoading] = useState(true);
@@ -19,6 +20,12 @@ export default function CartPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // En modo catálogo, redirigir a productos
+    if (isCatalogMode()) {
+      router.push('/products');
+      return;
+    }
+
     if (!isAuthenticated()) {
       router.push('/auth/login');
       return;
