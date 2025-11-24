@@ -244,21 +244,36 @@ async function createProduct(
   },
   token: string
 ) {
+  let productPayload: any;
   try {
     const category = await getCategoryBySlug(productData.categorySlug);
     const slug = generateSlug(productData.name);
 
-    // Verificar si el producto ya existe
-    const existing = await prisma.product.findUnique({
+    // Verificar si el producto ya existe por slug
+    const existingBySlug = await prisma.product.findUnique({
       where: { slug },
     });
 
-    if (existing) {
-      console.log(`⚠️  Producto ya existe: ${productData.name}`);
-      return existing;
+    if (existingBySlug) {
+      console.log(`⚠️  Producto ya existe (slug): ${productData.name}`);
+      return existingBySlug;
     }
 
-    const productPayload: any = {
+    // Verificar si el SKU ya existe
+    if (productData.sku) {
+      const existingBySku = await prisma.product.findUnique({
+        where: { sku: productData.sku },
+      });
+
+      if (existingBySku) {
+        console.log(`⚠️  Producto ya existe (SKU): ${productData.name} (SKU: ${productData.sku})`);
+        // Generar un nuevo SKU único
+        productData.sku = `${productData.sku}-${Date.now()}`;
+        console.log(`   🔄 Nuevo SKU generado: ${productData.sku}`);
+      }
+    }
+
+    productPayload = {
       name: productData.name,
       slug,
       description: productData.description,
@@ -292,7 +307,11 @@ async function createProduct(
     console.log(`✅ Producto creado: ${productData.name}`);
     return response.data;
   } catch (error: any) {
-    console.error(`Error al crear producto ${productData.name}:`, error.response?.data || error.message);
+    const errorDetails = error.response?.data || error.message;
+    console.error(`Error al crear producto ${productData.name}:`, JSON.stringify(errorDetails, null, 2));
+    if (error.response?.status === 500 && productPayload) {
+      console.error(`   Payload enviado:`, JSON.stringify(productPayload, null, 2));
+    }
     throw error;
   }
 }
