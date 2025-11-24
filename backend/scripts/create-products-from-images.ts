@@ -1,9 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
 import axios from 'axios';
-
-const prisma = new PrismaClient();
 
 // Configuración
 const API_URL = process.env.API_URL || 'http://localhost:4000/api';
@@ -200,36 +197,80 @@ async function uploadImage(filePath: string, token: string): Promise<string> {
   }
 }
 
-// Función para obtener categoría por slug
-async function getCategoryBySlug(slug: string) {
-  const category = await prisma.category.findUnique({
-    where: { slug },
-  });
-  if (!category) {
-    // Intentar crear la categoría si no existe
-    console.log(`   ⚠️  Categoría ${slug} no encontrada, creándola...`);
-    const categoryNames: Record<string, string> = {
-      'aceites-vinagres': 'Aceites y Vinagres',
-      'conservas': 'Conservas',
-      'especias-condimentos': 'Especias y Condimentos',
-      'miel-mermeladas': 'Miel y Mermeladas',
-      'pastas-arroces': 'Pastas y Arroces',
-      'dulces-postres': 'Dulces y Postres',
-    };
+// Función para obtener categoría por slug usando la API
+async function getCategoryBySlug(slug: string, token: string) {
+  try {
+    // Primero intentar obtener de la API
+    const response = await axios.get(`${API_URL}/categories`);
+    const categories = response.data;
+    const category = categories.find((cat: any) => cat.slug === slug);
     
-    const category = await prisma.category.create({
-      data: {
-        name: categoryNames[slug] || slug,
-        slug: slug,
-        description: `Categoría ${categoryNames[slug] || slug}`,
-        isActive: true,
+    if (category) {
+      return category;
+    }
+    
+    // Si no existe, crear usando la API
+    console.log(`   ⚠️  Categoría ${slug} no encontrada, creándola...`);
+    const categoryNames: Record<string, { name: string; description: string; order: number }> = {
+      'aceites-vinagres': {
+        name: 'Aceites y Vinagres',
+        description: 'Aceites de oliva premium y vinagres artesanales',
         order: 1,
       },
-    });
-    console.log(`   ✅ Categoría creada: ${category.name}`);
-    return category;
+      'conservas': {
+        name: 'Conservas',
+        description: 'Conservas gourmet de la más alta calidad',
+        order: 2,
+      },
+      'especias-condimentos': {
+        name: 'Especias y Condimentos',
+        description: 'Especias exóticas y condimentos únicos',
+        order: 3,
+      },
+      'miel-mermeladas': {
+        name: 'Miel y Mermeladas',
+        description: 'Miel artesanal y mermeladas premium',
+        order: 4,
+      },
+      'pastas-arroces': {
+        name: 'Pastas y Arroces',
+        description: 'Pastas artesanales y arroces selectos',
+        order: 5,
+      },
+      'dulces-postres': {
+        name: 'Dulces y Postres',
+        description: 'Dulces artesanales y postres gourmet',
+        order: 6,
+      },
+    };
+    
+    const catData = categoryNames[slug];
+    if (!catData) {
+      throw new Error(`Categoría desconocida: ${slug}`);
+    }
+    
+    const createResponse = await axios.post(
+      `${API_URL}/categories`,
+      {
+        name: catData.name,
+        slug: slug,
+        description: catData.description,
+        isActive: true,
+        order: catData.order,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    
+    console.log(`   ✅ Categoría creada: ${catData.name}`);
+    return createResponse.data;
+  } catch (error: any) {
+    console.error(`   ❌ Error al obtener/crear categoría ${slug}:`, error.response?.data || error.message);
+    throw error;
   }
-  return category;
 }
 
 // Función para crear producto
@@ -249,15 +290,25 @@ async function createProduct(
     const category = await getCategoryBySlug(productData.categorySlug, token);
     const slug = generateSlug(productData.name);
 
-    // Verificar si el producto ya existe usando la API
+    // Verificar si el producto ya existe y eliminarlo para recrearlo
     try {
       const existingResponse = await axios.get(`${API_URL}/products/slug/${slug}`);
       if (existingResponse.data) {
-        console.log(`⚠️  Producto ya existe (slug): ${productData.name}`);
-        return existingResponse.data;
+        console.log(`   ⚠️  Producto ya existe, eliminando para recrear...`);
+        try {
+          await axios.delete(`${API_URL}/products/${existingResponse.data.id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          console.log(`   ✅ Producto eliminado, creando nuevo...`);
+        } catch (deleteError: any) {
+          console.error(`   ❌ Error al eliminar:`, deleteError.response?.data?.message || deleteError.message);
+          // Continuar de todas formas
+        }
       }
     } catch (error: any) {
-      // Si no existe, continuar
+      // Si no existe (404), continuar
       if (error.response?.status !== 404) {
         throw error;
       }
@@ -367,8 +418,6 @@ async function main() {
   } catch (error: any) {
     console.error('\n❌ Error general:', error.message);
     process.exit(1);
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

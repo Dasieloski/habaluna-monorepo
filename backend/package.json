@@ -25,7 +25,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
-    "create:products": "ts-node scripts/create-products-from-images.ts"
+    "create:products": "ts-node scripts/create-products-from-images.ts",
+    "clean:products": "ts-node scripts/clean-and-create-products.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.0",
