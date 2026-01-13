@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { BannersService } from './banners.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
@@ -25,6 +16,15 @@ export class BannersController {
   @ApiOperation({ summary: 'Get active banners' })
   async findAll() {
     return this.bannersService.findAll();
+  }
+
+  @Get('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all banners (Admin only)' })
+  async adminFindAll() {
+    return this.bannersService.adminFindAll();
   }
 
   @Get(':id')
@@ -60,4 +60,3 @@ export class BannersController {
     return this.bannersService.remove(id);
   }
 }
-

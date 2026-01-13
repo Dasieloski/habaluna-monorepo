@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
@@ -9,15 +9,93 @@ export class CartService {
   constructor(private prisma: PrismaService) {}
 
   async getCart(userId: string) {
-    const cartItems = await this.prisma.cartItem.findMany({
-      where: { userId },
-      include: {
-        product: {
-          include: { category: true },
+    const cartItems = await this.prisma.cartItem
+      .findMany({
+        where: { userId },
+        include: {
+          product: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              description: true,
+              shortDescription: true,
+              priceUSD: true,
+              priceMNs: true,
+              comparePriceUSD: true,
+              comparePriceMNs: true,
+              sku: true,
+              stock: true,
+              isActive: true,
+              isFeatured: true,
+              isCombo: true,
+              images: true,
+              allergens: true,
+              nutritionalInfo: true,
+              weight: true,
+              categoryId: true,
+              createdAt: true,
+              updatedAt: true,
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
+            },
+          },
+          productVariant: true,
         },
-        productVariant: true,
-      },
-    });
+      })
+      .catch(async (error) => {
+        // Si falla por campos que no existen, intentar sin ellos
+        if (
+          error.message?.includes('does not exist') ||
+          error.message?.includes('no existe') ||
+          error.message?.includes('column')
+        ) {
+          return this.prisma.cartItem.findMany({
+            where: { userId },
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  description: true,
+                  shortDescription: true,
+                  priceUSD: true,
+                  priceMNs: true,
+                  comparePriceUSD: true,
+                  comparePriceMNs: true,
+                  sku: true,
+                  stock: true,
+                  isActive: true,
+                  isFeatured: true,
+                  isCombo: true,
+                  images: true,
+                  allergens: true,
+                  nutritionalInfo: true,
+                  weight: true,
+                  categoryId: true,
+                  createdAt: true,
+                  updatedAt: true,
+                  category: {
+                    select: {
+                      id: true,
+                      name: true,
+                      slug: true,
+                    },
+                  },
+                },
+              },
+              productVariant: true,
+            },
+          });
+        }
+        throw error;
+      });
 
     const subtotal = cartItems.reduce((sum, item) => {
       // Usar precio de la variante si existe, sino el precio del producto
@@ -48,13 +126,84 @@ export class CartService {
   }
 
   async addToCart(userId: string, addToCartDto: AddToCartDto) {
-    const product = await this.prisma.product.findUnique({
-      where: { id: addToCartDto.productId },
-      include: { variants: true },
-    });
+    const product = await this.prisma.product
+      .findUnique({
+        where: { id: addToCartDto.productId },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          shortDescription: true,
+          priceUSD: true,
+          priceMNs: true,
+          comparePriceUSD: true,
+          comparePriceMNs: true,
+          sku: true,
+          stock: true,
+          isActive: true,
+          isFeatured: true,
+          isCombo: true,
+          images: true,
+          allergens: true,
+          nutritionalInfo: true,
+          weight: true,
+          categoryId: true,
+          createdAt: true,
+          updatedAt: true,
+          variants: {
+            where: { isActive: true },
+            orderBy: { order: 'asc' },
+          },
+        },
+      })
+      .catch(async (error) => {
+        // Si falla por campos que no existen, intentar sin ellos
+        if (
+          error.message?.includes('does not exist') ||
+          error.message?.includes('no existe') ||
+          error.message?.includes('column')
+        ) {
+          return this.prisma.product.findUnique({
+            where: { id: addToCartDto.productId },
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              description: true,
+              shortDescription: true,
+              priceUSD: true,
+              priceMNs: true,
+              comparePriceUSD: true,
+              comparePriceMNs: true,
+              sku: true,
+              stock: true,
+              isActive: true,
+              isFeatured: true,
+              isCombo: true,
+              images: true,
+              allergens: true,
+              nutritionalInfo: true,
+              weight: true,
+              categoryId: true,
+              createdAt: true,
+              updatedAt: true,
+              variants: {
+                where: { isActive: true },
+                orderBy: { order: 'asc' },
+              },
+            },
+          });
+        }
+        throw error;
+      });
 
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Producto no encontrado');
+    }
+
+    if (!product.isActive) {
+      throw new BadRequestException('El producto no está disponible');
     }
 
     // Si hay variante, verificar que existe y tiene stock
@@ -65,20 +214,11 @@ export class CartService {
       });
 
       if (!variant || variant.productId !== product.id) {
-        throw new NotFoundException('Product variant not found');
+        throw new NotFoundException('Variante del producto no encontrada');
       }
 
       if (!variant.isActive) {
-        throw new Error('Product variant is not available');
-      }
-
-      if (variant.stock < addToCartDto.quantity) {
-        throw new Error('Insufficient stock for this variant');
-      }
-    } else {
-      // Si no hay variante, verificar stock del producto
-      if (product.stock < addToCartDto.quantity) {
-        throw new Error('Insufficient stock');
+        throw new BadRequestException('La variante del producto no está disponible');
       }
     }
 
@@ -91,35 +231,133 @@ export class CartService {
       },
     });
 
+    // Calcular cantidad total que se intentará agregar
+    const totalQuantity = existingItem
+      ? existingItem.quantity + addToCartDto.quantity
+      : addToCartDto.quantity;
+
+    // Verificar stock disponible
+    const availableStock = variant ? variant.stock : product.stock;
+
+    if (availableStock < totalQuantity) {
+      const productName = product.name;
+      const variantName = variant ? ` (${variant.name})` : '';
+      const availableText =
+        availableStock === 0
+          ? 'no disponible'
+          : `solo ${availableStock} disponible${availableStock > 1 ? 's' : ''}`;
+
+      throw new BadRequestException(
+        `Stock insuficiente para "${productName}${variantName}". ${availableText}.`,
+      );
+    }
+
+    const productSelect = {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      shortDescription: true,
+      priceUSD: true,
+      priceMNs: true,
+      comparePriceUSD: true,
+      comparePriceMNs: true,
+      sku: true,
+      stock: true,
+      isActive: true,
+      isFeatured: true,
+      isCombo: true,
+      images: true,
+      allergens: true,
+      nutritionalInfo: true,
+      weight: true,
+      categoryId: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    };
+
     if (existingItem) {
-      return this.prisma.cartItem.update({
-        where: { id: existingItem.id },
+      return this.prisma.cartItem
+        .update({
+          where: { id: existingItem.id },
+          data: {
+            quantity: totalQuantity,
+          },
+          include: {
+            product: {
+              select: productSelect,
+            },
+            productVariant: true,
+          },
+        })
+        .catch(async (error) => {
+          if (
+            error.message?.includes('does not exist') ||
+            error.message?.includes('no existe') ||
+            error.message?.includes('column')
+          ) {
+            return this.prisma.cartItem.update({
+              where: { id: existingItem.id },
+              data: {
+                quantity: totalQuantity,
+              },
+              include: {
+                product: {
+                  select: productSelect,
+                },
+                productVariant: true,
+              },
+            });
+          }
+          throw error;
+        });
+    }
+
+    return this.prisma.cartItem
+      .create({
         data: {
-          quantity: existingItem.quantity + addToCartDto.quantity,
+          userId,
+          productId: addToCartDto.productId,
+          productVariantId: addToCartDto.productVariantId || null,
+          quantity: addToCartDto.quantity,
         },
         include: {
           product: {
-            include: { category: true },
+            select: productSelect,
           },
           productVariant: true,
         },
+      })
+      .catch(async (error) => {
+        if (
+          error.message?.includes('does not exist') ||
+          error.message?.includes('no existe') ||
+          error.message?.includes('column')
+        ) {
+          return this.prisma.cartItem.create({
+            data: {
+              userId,
+              productId: addToCartDto.productId,
+              productVariantId: addToCartDto.productVariantId || null,
+              quantity: addToCartDto.quantity,
+            },
+            include: {
+              product: {
+                select: productSelect,
+              },
+              productVariant: true,
+            },
+          });
+        }
+        throw error;
       });
-    }
-
-    return this.prisma.cartItem.create({
-      data: {
-        userId,
-        productId: addToCartDto.productId,
-        productVariantId: addToCartDto.productVariantId || null,
-        quantity: addToCartDto.quantity,
-      },
-      include: {
-        product: {
-          include: { category: true },
-        },
-        productVariant: true,
-      },
-    });
   }
 
   async updateCartItem(userId: string, itemId: string, updateDto: UpdateCartItemDto) {
@@ -129,28 +367,112 @@ export class CartService {
     });
 
     if (!item) {
-      throw new NotFoundException('Cart item not found');
+      throw new NotFoundException('Item del carrito no encontrado');
     }
 
-    // Verificar stock según si tiene variante o no
-    const stock = item.productVariant 
-      ? item.productVariant.stock 
-      : item.product.stock;
+    // Obtener stock actualizado de la base de datos
+    let availableStock: number;
+    let productName: string;
+    let variantName: string | null = null;
 
-    if (stock < updateDto.quantity) {
-      throw new Error('Insufficient stock');
+    if (item.productVariant) {
+      const variant = await this.prisma.productVariant.findUnique({
+        where: { id: item.productVariant.id },
+      });
+
+      if (!variant || !variant.isActive) {
+        throw new BadRequestException('La variante del producto ya no está disponible');
+      }
+
+      availableStock = variant.stock;
+      productName = item.product.name;
+      variantName = variant.name;
+    } else {
+      const product = await this.prisma.product.findUnique({
+        where: { id: item.product.id },
+      });
+
+      if (!product || !product.isActive) {
+        throw new BadRequestException('El producto ya no está disponible');
+      }
+
+      availableStock = product.stock;
+      productName = product.name;
     }
 
-    return this.prisma.cartItem.update({
-      where: { id: itemId },
-      data: { quantity: updateDto.quantity },
-      include: {
-        product: {
-          include: { category: true },
+    if (availableStock < updateDto.quantity) {
+      const availableText =
+        availableStock === 0
+          ? 'no disponible'
+          : `solo ${availableStock} disponible${availableStock > 1 ? 's' : ''}`;
+      const variantText = variantName ? ` (${variantName})` : '';
+
+      throw new BadRequestException(
+        `Stock insuficiente para "${productName}${variantText}". ${availableText}.`,
+      );
+    }
+
+    const productSelect = {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      shortDescription: true,
+      priceUSD: true,
+      priceMNs: true,
+      comparePriceUSD: true,
+      comparePriceMNs: true,
+      sku: true,
+      stock: true,
+      isActive: true,
+      isFeatured: true,
+      isCombo: true,
+      images: true,
+      allergens: true,
+      nutritionalInfo: true,
+      weight: true,
+      categoryId: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
         },
-        productVariant: true,
       },
-    });
+    };
+
+    return this.prisma.cartItem
+      .update({
+        where: { id: itemId },
+        data: { quantity: updateDto.quantity },
+        include: {
+          product: {
+            select: productSelect,
+          },
+          productVariant: true,
+        },
+      })
+      .catch(async (error) => {
+        if (
+          error.message?.includes('does not exist') ||
+          error.message?.includes('no existe') ||
+          error.message?.includes('column')
+        ) {
+          return this.prisma.cartItem.update({
+            where: { id: itemId },
+            data: { quantity: updateDto.quantity },
+            include: {
+              product: {
+                select: productSelect,
+              },
+              productVariant: true,
+            },
+          });
+        }
+        throw error;
+      });
   }
 
   async removeFromCart(userId: string, itemId: string) {
@@ -172,5 +494,164 @@ export class CartService {
       where: { userId },
     });
   }
-}
 
+  /**
+   * Valida el stock de todos los items del carrito
+   * Retorna información sobre items con problemas de stock
+   */
+  async validateCart(userId: string) {
+    const productSelect = {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      shortDescription: true,
+      priceUSD: true,
+      priceMNs: true,
+      comparePriceUSD: true,
+      comparePriceMNs: true,
+      sku: true,
+      stock: true,
+      isActive: true,
+      isFeatured: true,
+      isCombo: true,
+      images: true,
+      allergens: true,
+      nutritionalInfo: true,
+      weight: true,
+      categoryId: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    };
+
+    const cartItems = await this.prisma.cartItem
+      .findMany({
+        where: { userId },
+        include: {
+          product: {
+            select: productSelect,
+          },
+          productVariant: true,
+        },
+      })
+      .catch(async (error) => {
+        if (
+          error.message?.includes('does not exist') ||
+          error.message?.includes('no existe') ||
+          error.message?.includes('column')
+        ) {
+          return this.prisma.cartItem.findMany({
+            where: { userId },
+            include: {
+              product: {
+                select: productSelect,
+              },
+              productVariant: true,
+            },
+          });
+        }
+        throw error;
+      });
+
+    const validationResults: Array<{
+      itemId: string;
+      productId: string;
+      productName: string;
+      variantId?: string;
+      variantName?: string;
+      requestedQuantity: number;
+      availableStock: number;
+      isAvailable: boolean;
+      isActive: boolean;
+      issue: 'out_of_stock' | 'insufficient_stock' | 'unavailable' | null;
+    }> = [];
+
+    for (const item of cartItems) {
+      let availableStock: number;
+      let isActive: boolean;
+      let issue: 'out_of_stock' | 'insufficient_stock' | 'unavailable' | null = null;
+
+      if (item.productVariant) {
+        // Obtener datos actualizados de la variante
+        const variant = await this.prisma.productVariant.findUnique({
+          where: { id: item.productVariant.id },
+        });
+
+        if (!variant) {
+          issue = 'unavailable';
+          isActive = false;
+          availableStock = 0;
+        } else {
+          isActive = variant.isActive && item.product.isActive;
+          availableStock = variant.stock;
+
+          if (!isActive) {
+            issue = 'unavailable';
+          } else if (availableStock === 0) {
+            issue = 'out_of_stock';
+          } else if (availableStock < item.quantity) {
+            issue = 'insufficient_stock';
+          }
+        }
+      } else {
+        // Obtener datos actualizados del producto
+        const product = await this.prisma.product.findUnique({
+          where: { id: item.product.id },
+        });
+
+        if (!product) {
+          issue = 'unavailable';
+          isActive = false;
+          availableStock = 0;
+        } else {
+          isActive = product.isActive;
+          availableStock = product.stock;
+
+          if (!isActive) {
+            issue = 'unavailable';
+          } else if (availableStock === 0) {
+            issue = 'out_of_stock';
+          } else if (availableStock < item.quantity) {
+            issue = 'insufficient_stock';
+          }
+        }
+      }
+
+      validationResults.push({
+        itemId: item.id,
+        productId: item.product.id,
+        productName: item.product.name,
+        variantId: item.productVariant?.id,
+        variantName: item.productVariant?.name,
+        requestedQuantity: item.quantity,
+        availableStock,
+        isAvailable: issue === null,
+        isActive,
+        issue,
+      });
+    }
+
+    const hasIssues = validationResults.some((result) => result.issue !== null);
+    const isValid = !hasIssues;
+
+    return {
+      isValid,
+      hasIssues,
+      items: validationResults,
+      summary: {
+        total: validationResults.length,
+        valid: validationResults.filter((r) => r.isAvailable).length,
+        outOfStock: validationResults.filter((r) => r.issue === 'out_of_stock').length,
+        insufficientStock: validationResults.filter((r) => r.issue === 'insufficient_stock').length,
+        unavailable: validationResults.filter((r) => r.issue === 'unavailable').length,
+      },
+    };
+  }
+}
