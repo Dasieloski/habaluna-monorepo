@@ -24,6 +24,7 @@ import { HealthModule } from './health/health.module';
 import { SearchModule } from './search/search.module';
 import { ReportsModule } from './reports/reports.module';
 import { CacheModule } from './common/cache/cache.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { CacheModule } from './common/cache/cache.module';
     SearchModule,
     ReportsModule,
     CacheModule,
+    MediaModule,
   ],
   providers: [
     HttpExceptionFilter,

@@ -401,3 +401,16 @@ model UiSettings {
 
   @@map("ui_settings")
 }
+
+/// Media binario almacenado en BD (Postgres bytea) para servir imágenes sin Cloudinary.
+model Media {
+  id        String   @id @default(uuid())
+  filename  String?
+  mimeType  String
+  sizeBytes Int
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("media")
+}

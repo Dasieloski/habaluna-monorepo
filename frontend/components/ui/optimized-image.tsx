@@ -52,8 +52,17 @@ export function OptimizedImage({
 
     let normalizedSrc = src.trim()
     
-    // Si es una URL relativa que empieza con /, mantenerla
+    // Si es una URL relativa que empieza con /:
+    // - /api/* y /uploads/* viven en el backend (prefijar con NEXT_PUBLIC_API_URL)
+    // - lo demás se asume que es asset local del frontend (public/)
     if (normalizedSrc.startsWith('/')) {
+      const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000')
+        .replace(/\/api\/?$/, '')
+        .replace(/^http:/, 'https:')
+      if (normalizedSrc.startsWith('/api/') || normalizedSrc.startsWith('/uploads/')) {
+        setImgSrc(`${apiBase}${normalizedSrc}`)
+        return
+      }
       setImgSrc(normalizedSrc)
       return
     }
@@ -65,7 +74,12 @@ export function OptimizedImage({
         .replace(/\/api\/?$/, '')
         .replace(/^http:/, 'https:') // Forzar HTTPS
       
-      if (normalizedSrc.startsWith('/uploads/') || normalizedSrc.startsWith('uploads/')) {
+      if (
+        normalizedSrc.startsWith('/api/') ||
+        normalizedSrc.startsWith('api/') ||
+        normalizedSrc.startsWith('/uploads/') ||
+        normalizedSrc.startsWith('uploads/')
+      ) {
         normalizedSrc = `${apiBase}${normalizedSrc.startsWith('/') ? '' : '/'}${normalizedSrc}`
       } else {
         normalizedSrc = `${apiBase}/uploads/${normalizedSrc}`
@@ -166,8 +180,15 @@ export function OptimizedImg({
 
     let normalizedSrc = src.trim()
     
-    // Si es relativa, mantenerla
+    // Si es relativa, ver si pertenece al backend (/api o /uploads)
     if (normalizedSrc.startsWith('/')) {
+      const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000')
+        .replace(/\/api\/?$/, '')
+        .replace(/^http:/, 'https:')
+      if (normalizedSrc.startsWith('/api/') || normalizedSrc.startsWith('/uploads/')) {
+        setImgSrc(`${apiBase}${normalizedSrc}`)
+        return
+      }
       setImgSrc(normalizedSrc)
       return
     }
@@ -178,7 +199,12 @@ export function OptimizedImg({
         .replace(/\/api\/?$/, '')
         .replace(/^http:/, 'https:')
       
-      if (normalizedSrc.startsWith('/uploads/') || normalizedSrc.startsWith('uploads/')) {
+      if (
+        normalizedSrc.startsWith('/api/') ||
+        normalizedSrc.startsWith('api/') ||
+        normalizedSrc.startsWith('/uploads/') ||
+        normalizedSrc.startsWith('uploads/')
+      ) {
         normalizedSrc = `${apiBase}${normalizedSrc.startsWith('/') ? '' : '/'}${normalizedSrc}`
       } else {
         normalizedSrc = `${apiBase}/uploads/${normalizedSrc}`
