@@ -101,6 +101,17 @@ async function bootstrap() {
         }
       }
 
+      // Permitir dominios custom del proyecto (si el frontend está en habaluna.com / habanaluna.com)
+      // Esto evita que el deploy quede bloqueado por CORS si FRONTEND_URL no está seteado correctamente.
+      if (originDomain === 'habaluna.com' || originDomain.endsWith('.habaluna.com')) {
+        logger.log(`CORS: Origen permitido (dominio habaluna): ${origin}`, 'CORS');
+        return callback(null, true);
+      }
+      if (originDomain === 'habanaluna.com' || originDomain.endsWith('.habanaluna.com')) {
+        logger.log(`CORS: Origen permitido (dominio habanaluna): ${origin}`, 'CORS');
+        return callback(null, true);
+      }
+
       // Permitir dominios de Railway (para desarrollo/testing)
       if (normalizedOrigin.includes('.railway.app')) {
         logger.log(`CORS: Origen Railway permitido: ${origin}`, 'CORS');
@@ -165,11 +176,16 @@ async function bootstrap() {
       const origin = req.headers.origin;
       if (origin) {
         const normalizedOrigin = origin.replace(/\/$/, '').toLowerCase();
+        const originDomain = getBaseDomain(normalizedOrigin);
         // Permitir cualquier origen de Vercel o Railway en producción
         if (
           normalizedOrigin.includes('.vercel.app') ||
           normalizedOrigin.includes('vercel.app') ||
-          normalizedOrigin.includes('.railway.app')
+          normalizedOrigin.includes('.railway.app') ||
+          originDomain === 'habaluna.com' ||
+          originDomain.endsWith('.habaluna.com') ||
+          originDomain === 'habanaluna.com' ||
+          originDomain.endsWith('.habanaluna.com')
         ) {
           res.header('Access-Control-Allow-Origin', origin);
           res.header('Access-Control-Allow-Credentials', 'true');
