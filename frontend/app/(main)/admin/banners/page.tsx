@@ -75,6 +75,7 @@ export default function AdminBannersPage() {
 
   const [uiLoading, setUiLoading] = useState(true)
   const [uiSaving, setUiSaving] = useState(false)
+  const [siteModeSaving, setSiteModeSaving] = useState(false)
   const [categoryOptions, setCategoryOptions] = useState<Array<{ id: string; name: string }>>([])
   const [uiForm, setUiForm] = useState({
     headerAnnouncement: "Envíos a toda la Habana - Entrega rápida",
@@ -89,6 +90,7 @@ export default function AdminBannersPage() {
     b2Desc: "Tienes 30 días para devolver tu producto sin costo adicional.",
     b3Title: "ENTREGA RÁPIDA",
     b3Desc: "Tu pedido sale en menos de 24h y llega en tiempo récord.",
+    siteMode: "LIVE" as "LIVE" | "MAINTENANCE" | "COMING_SOON",
   })
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -180,6 +182,7 @@ export default function AdminBannersPage() {
           b2Desc: String(benefits[1]?.description || prev.b2Desc),
           b3Title: String(benefits[2]?.title || prev.b3Title),
           b3Desc: String(benefits[2]?.description || prev.b3Desc),
+          siteMode: ((s as any)?.siteMode as any) || prev.siteMode,
         }))
       } catch (e: any) {
         if (!cancelled) {
@@ -195,6 +198,20 @@ export default function AdminBannersPage() {
       cancelled = true
     }
   }, [])
+
+  const saveSiteMode = async () => {
+    setError("")
+    setSiteModeSaving(true)
+    try {
+      await api.updateAdminUiSettings({
+        siteMode: uiForm.siteMode,
+      } as any)
+    } catch (e: any) {
+      setError(e?.response?.data?.message || e?.message || "No se pudo guardar el modo del sitio.")
+    } finally {
+      setSiteModeSaving(false)
+    }
+  }
 
   const saveUiTexts = async () => {
     setError("")
@@ -581,6 +598,65 @@ export default function AdminBannersPage() {
             <Button onClick={saveUiTexts} disabled={uiLoading || uiSaving} className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg">
               {uiSaving ? "Guardando..." : "Guardar textos"}
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Modo del sitio (Bloqueo público) */}
+      <Card className="border-0 shadow-md">
+        <CardContent className="p-5 space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Modo del sitio</h2>
+            <p className="text-sm text-muted-foreground">
+              Cuando no está en <strong>Normal</strong>, se bloquean todas las rutas públicas y solo se permite <code>/admin</code>.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+            <div className="space-y-2">
+              <Label>Estado</Label>
+              <Select
+                value={uiForm.siteMode}
+                onValueChange={(v: any) => setUiForm((p) => ({ ...p, siteMode: v }))}
+                disabled={uiLoading || siteModeSaving}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona modo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="LIVE">Normal</SelectItem>
+                  <SelectItem value="MAINTENANCE">Página en mantenimiento</SelectItem>
+                  <SelectItem value="COMING_SOON">Página próxima a lanzamiento</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2 justify-end">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => window.open("/maintenance", "_blank")}
+                disabled={uiLoading}
+              >
+                Vista previa mantenimiento
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => window.open("/coming-soon", "_blank")}
+                disabled={uiLoading}
+              >
+                Vista previa lanzamiento
+              </Button>
+              <Button
+                type="button"
+                onClick={saveSiteMode}
+                disabled={uiLoading || siteModeSaving}
+                className="bg-gradient-to-r from-primary to-habaluna-blue-dark text-primary-foreground"
+              >
+                {siteModeSaving ? "Guardando..." : "Aplicar modo"}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -31,6 +31,7 @@ export class UiSettingsService {
           description: 'Tu pedido sale en menos de 24h y llega en tiempo récord.',
         },
       ],
+      siteMode: 'LIVE' as const,
     };
   }
 
@@ -44,6 +45,7 @@ export class UiSettingsService {
         headerHighlights: d.headerHighlights as any,
         headerNavCategories: d.headerNavCategories as any,
         benefits: d.benefits as any,
+        siteMode: d.siteMode as any,
       },
     });
   }
@@ -71,6 +73,7 @@ export class UiSettingsService {
           ? { headerNavCategories: dto.headerNavCategories as any }
           : {}),
         ...(dto.benefits !== undefined ? { benefits: dto.benefits as any } : {}),
+        ...(dto.siteMode !== undefined ? { siteMode: dto.siteMode as any } : {}),
       },
     });
   }

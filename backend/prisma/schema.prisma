@@ -41,6 +41,12 @@ enum OfferType {
   FIXED
 }
 
+enum SiteMode {
+  LIVE
+  MAINTENANCE
+  COMING_SOON
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -396,6 +402,7 @@ model UiSettings {
   // IDs de categorías a mostrar en el menú principal (ordenadas, idealmente 6)
   headerNavCategories Json?
   benefits           Json?
+  siteMode           SiteMode @default(LIVE)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

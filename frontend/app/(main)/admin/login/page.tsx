@@ -86,7 +86,7 @@ export default function AdminLoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@habanaluna.com"
+                  placeholder="correo@dominio.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-12 bg-secondary/50 border-border focus:border-primary transition-colors"
@@ -135,12 +135,6 @@ export default function AdminLoginPage() {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 p-4 bg-secondary/50 rounded-lg">
-            <p className="text-xs text-muted-foreground text-center">
-              <strong>Demo:</strong> admin@habanaluna.com / admin123
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

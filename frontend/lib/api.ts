@@ -179,6 +179,7 @@ export interface BackendUiSettings {
   headerHighlights?: any
   headerNavCategories?: any
   benefits?: any
+  siteMode?: "LIVE" | "MAINTENANCE" | "COMING_SOON"
   createdAt: string
   updatedAt: string
 }

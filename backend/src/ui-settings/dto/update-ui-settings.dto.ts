@@ -1,6 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
+
+export enum SiteModeDto {
+  LIVE = 'LIVE',
+  MAINTENANCE = 'MAINTENANCE',
+  COMING_SOON = 'COMING_SOON',
+}
 
 export class BenefitItemDto {
   @ApiPropertyOptional()
@@ -41,4 +47,12 @@ export class UpdateUiSettingsDto {
   @IsArray()
   @IsString({ each: true })
   headerNavCategories?: string[];
+
+  @ApiPropertyOptional({
+    enum: SiteModeDto,
+    description: 'Modo del sitio: LIVE | MAINTENANCE | COMING_SOON',
+  })
+  @IsOptional()
+  @IsEnum(SiteModeDto)
+  siteMode?: SiteModeDto;
 }
