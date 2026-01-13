@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
+// Import side-effect: registra el transport DailyRotateFile en winston.transports (compatibilidad CJS/ESM)
+import 'winston-daily-rotate-file';
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 
@@ -43,8 +44,19 @@ const productionFormat = winston.format.combine(
 );
 
 // Configuración de rotación de archivos
-const createDailyRotateFileTransport = (level: string, filename: string): DailyRotateFile => {
-  return new DailyRotateFile({
+const getDailyRotateFileCtor = (): any => {
+  const t = (winston.transports as any)?.DailyRotateFile;
+  if (t) return t;
+
+  // Fallback: algunas resoluciones de módulos no “parchean” winston.transports
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const mod = require('winston-daily-rotate-file');
+  return mod?.default ?? mod;
+};
+
+const createDailyRotateFileTransport = (level: string, filename: string): winston.transport => {
+  const DailyRotateFileCtor = getDailyRotateFileCtor();
+  return new DailyRotateFileCtor({
     level,
     filename: join(process.cwd(), 'logs', `${filename}-%DATE%.log`),
     datePattern: 'YYYY-MM-DD',
