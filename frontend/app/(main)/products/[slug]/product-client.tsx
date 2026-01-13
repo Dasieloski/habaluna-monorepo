@@ -1,94 +1,582 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { formatPrice } from '@/lib/utils';
-import { AddToCartButton } from '@/components/product/add-to-cart-button';
-import { ProductVariants } from '@/components/product/product-variants';
-import { ProductImageGallery } from '@/components/product/product-image-gallery';
-import { isCatalogMode } from '@/lib/catalog-mode';
+import { useEffect, useMemo, useRef, useState } from "react"
+import Link from "next/link"
+import { ProductCard } from "@/components/product/product-card"
+import { ProductPrice } from "@/components/product/product-price"
+import { toNumber } from "@/lib/money"
+import { useToast } from "@/hooks/use-toast"
+import { showSuccess, showError } from "@/components/ui/use-toast"
+import { api } from "@/lib/api"
+import { useCartStore } from "@/lib/store/cart-store"
+import {
+  HeartIcon,
+  ShareIcon,
+  TruckIcon,
+  ReturnIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@/components/icons/streamline-icons"
+import { OptimizedImage } from "@/components/ui/optimized-image"
+
+import { ProductReviews } from "@/components/reviews/product-reviews"
 
 interface ProductClientProps {
-  product: any;
+  product: any
+  relatedProducts?: any[]
+  initialReviews?: any[]
+  initialReviewsMeta?: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
 }
 
-export function ProductClient({ product }: ProductClientProps) {
-  const [selectedVariantId, setSelectedVariantId] = useState<string | undefined>(
-    product.variants && product.variants.length > 0 ? product.variants[0].id : undefined
-  );
+function normalizeImageUrl(imagePath: string): string {
+  if (!imagePath) return "/placeholder.svg"
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) return imagePath
+  const base = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(/\/api\/?$/, "")
+  if (imagePath.startsWith("/")) return `${base}${imagePath}`
+  return `${base}/uploads/${imagePath}`
+}
 
-  const selectedVariant = product.variants?.find((v: any) => v.id === selectedVariantId);
+export function ProductClient({
+  product,
+  relatedProducts = [],
+  initialReviews = [],
+  initialReviewsMeta,
+}: ProductClientProps) {
+  const { toast } = useToast()
+  const addToCart = useCartStore((s) => s.addToCart)
+  const [selectedImage, setSelectedImage] = useState(0)
+  const [quantity, setQuantity] = useState(1)
+  const [isFavorite, setIsFavorite] = useState(false)
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null)
+  const [selectedVariantId, setSelectedVariantId] = useState<string>(() => product?.variants?.[0]?.id || "")
+  const relatedScrollRef = useRef<HTMLDivElement>(null)
+  const isCombo = Boolean(product?.isCombo)
+
+
+  const images = useMemo(() => {
+    const raw: string[] = Array.isArray(product?.images) ? product.images : []
+    const combined: string[] = raw.map(normalizeImageUrl).filter(Boolean)
+
+    // Si es combo, meter también imágenes de los productos incluidos para verlas en el carrusel
+    if (isCombo) {
+      const items = Array.isArray(product?.comboItems) ? product.comboItems : []
+      for (const ci of items) {
+        const p = ci?.product || ci?.item || ci?.includedProduct || null
+        const imgs: string[] = Array.isArray(p?.images) ? p.images : []
+        for (const img of imgs) {
+          const u = normalizeImageUrl(img || "")
+          if (u) combined.push(u)
+        }
+      }
+    }
+
+    const deduped = Array.from(new Set(combined))
+    return deduped.length > 0 ? deduped : ["/placeholder.svg"]
+  }, [isCombo, product?.comboItems, product?.images])
+
+  useEffect(() => {
+    if (selectedImage >= images.length) setSelectedImage(0)
+  }, [images.length, selectedImage])
+
+  const comboItems = useMemo(() => {
+    const raw = Array.isArray(product?.comboItems) ? product.comboItems : []
+    return raw
+      .map((ci: any) => {
+        const p = ci?.product || ci?.item || ci?.includedProduct || null
+        const rawImages: string[] = Array.isArray(p?.images) ? p.images : []
+        const image = normalizeImageUrl(rawImages[0] || "")
+        const name = p?.name || "Producto"
+        const slug = p?.slug || ""
+        const id = ci?.id || `${ci?.comboId || product?.id || "combo"}-${p?.id || slug || name}`
+        const quantity = Math.max(1, Number(ci?.quantity ?? 1) || 1)
+
+        return { id, name, slug, image, quantity }
+      })
+      .filter((x: any) => Boolean(x?.name))
+  }, [product?.comboItems, product?.id])
+
+  const variants = Array.isArray(product?.variants) ? product.variants : []
+  const selectedVariant = variants.find((v: any) => v.id === selectedVariantId) || null
+
+  const priceUSD = toNumber(selectedVariant?.priceUSD ?? product?.priceUSD) ?? 0
+  const comparePriceUSD = toNumber(selectedVariant?.comparePriceUSD ?? product?.comparePriceUSD)
+  const hasDiscount = comparePriceUSD !== null && comparePriceUSD > priceUSD
+  const salePercentage =
+    hasDiscount && comparePriceUSD
+      ? Math.round(((comparePriceUSD - priceUSD) / comparePriceUSD) * 100)
+      : null
+
+  const stock = selectedVariant ? Number(selectedVariant.stock ?? 0) : Number(product?.stock ?? 0)
+
+  const shareProduct = async () => {
+    try {
+      const url = typeof window !== "undefined" ? window.location.href : ""
+      const title = product?.name || "Producto"
+      const text = product?.shortDescription || ""
+
+      if (navigator.share) {
+        await navigator.share({ title, text, url })
+        return
+      }
+
+      if (navigator.clipboard && url) {
+        await navigator.clipboard.writeText(url)
+        toast({
+          title: "Enlace copiado",
+          description: "Copiamos el enlace del producto al portapapeles.",
+        })
+        return
+      }
+
+      toast({
+        title: "No se pudo compartir",
+        description: "Tu navegador no soporta compartir o copiar el enlace.",
+        variant: "destructive",
+      })
+    } catch (e: any) {
+      // Si el usuario cancela el share, no es error real
+      if (e?.name === "AbortError") return
+      toast({
+        title: "No se pudo compartir",
+        description: "Ocurrió un error al intentar compartir este producto.",
+        variant: "destructive",
+      })
+    }
+  }
+
+
+  const scrollRelated = (direction: "left" | "right") => {
+    if (!relatedScrollRef.current) return
+    const scrollAmount = 280
+    relatedScrollRef.current.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    })
+  }
 
   return (
-    <div className="container py-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div>
-          <ProductImageGallery images={product.images || []} productName={product.name} />
+    <>
+      {/* Breadcrumb */}
+      <div className="container mx-auto px-4 py-3 md:py-4">
+        <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
+          <Link href="/" className="hover:text-sky-600 transition-colors">
+            Inicio
+          </Link>
+          <span>/</span>
+          <Link href="/products" className="hover:text-sky-600 transition-colors">
+            Productos
+          </Link>
+          {product?.categoryId && (
+            <>
+              <span>/</span>
+              <Link
+                href={`/products?categoryId=${encodeURIComponent(product.categoryId)}`}
+                className="hover:text-sky-600 transition-colors"
+              >
+                {product?.category?.name || "Categoría"}
+              </Link>
+            </>
+          )}
+          <span>/</span>
+          <span className="text-foreground">{product?.name}</span>
         </div>
+      </div>
 
-        <div>
-          <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
-          {!isCatalogMode() && (
-            <div className="flex items-center gap-4 mb-6">
-              <div>
-                <p className="text-3xl font-bold text-primary">
-                  {formatPrice(
-                    selectedVariant?.priceUSD || product.priceUSD,
-                    selectedVariant?.priceMNs || product.priceMNs
-                  )}
-                </p>
-                {(selectedVariant?.comparePriceUSD || selectedVariant?.comparePriceMNs || product.comparePriceUSD || product.comparePriceMNs) && (
-                  <p className="text-xl text-gray-400 line-through">
-                    {formatPrice(
-                      selectedVariant?.comparePriceUSD || product.comparePriceUSD,
-                      selectedVariant?.comparePriceMNs || product.comparePriceMNs
-                    )}
-                  </p>
+      {/* Product Section */}
+      <section className="container mx-auto px-4 pb-8 md:pb-16 max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-start">
+          {/* Left - Gallery */}
+          <div className="w-full overflow-hidden" style={{ maxWidth: '100%' }}>
+            <div className="flex flex-col-reverse md:flex-row gap-3 md:gap-4">
+              {/* Thumbnails */}
+              <div className="flex md:flex-col gap-2 md:gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 shrink-0">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(idx)}
+                    className={`shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all relative ${
+                      selectedImage === idx
+                        ? "border-sky-500 ring-2 ring-sky-200"
+                        : "border-transparent hover:border-gray-200"
+                    }`}
+                  >
+                    <OptimizedImage
+                      src={img || "/placeholder.svg"}
+                      alt={`Vista ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                      objectFit="cover"
+                      loading="lazy"
+                    />
+                  </button>
+                ))}
+              </div>
+
+              {/* Main Image */}
+              <div className="relative w-full aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl md:rounded-2xl overflow-hidden">
+                <OptimizedImage
+                  src={images[selectedImage] || "/placeholder.svg"}
+                  alt={product?.name || "Producto"}
+                  fill
+                  className="p-4 md:p-8"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  objectFit="contain"
+                  loading="eager"
+                  priority
+                />
+                {/* Navigation arrows */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setSelectedImage((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
+                      className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all z-10"
+                    >
+                      <ChevronLeftIcon className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => setSelectedImage((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
+                      className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all z-10"
+                    >
+                      <ChevronRightIcon className="w-5 h-5" />
+                    </button>
+                  </>
                 )}
               </div>
             </div>
-          )}
+          </div>
 
-          <p className="text-lg mb-6">{product.description}</p>
+          {/* Right - Product Info */}
+          <div className="w-full flex flex-col bg-white relative z-10" style={{ minWidth: 0 }}>
+            {/* Category */}
+            {product?.category?.name && (
+              <span className="text-xs md:text-sm text-sky-600 font-medium mb-1 md:mb-2">{product.category.name}</span>
+            )}
 
-          {product.allergens && product.allergens.length > 0 && (
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Alérgenos:</h3>
-              <p className="text-sm text-gray-600">{product.allergens.join(', ')}</p>
+            {/* Title */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-1 md:mb-2">{product?.name}</h1>
+                {isCombo && (
+                  <div className="mb-2 md:mb-3">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="text-xs font-bold tracking-wide uppercase bg-sky-600 text-white px-3 py-1 rounded-full">
+                        Combo
+                      </span>
+                      <span className="text-xs md:text-sm text-muted-foreground">
+                        Incluye varios productos seleccionados
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+            {product?.shortDescription && (
+              <p className="text-sm md:text-base text-muted-foreground mb-2 md:mb-3">{product.shortDescription}</p>
+            )}
 
-          {/* Variantes del producto */}
-          {product.variants && product.variants.length > 0 && (
-            <div className="mb-6">
-              <ProductVariants
-                variants={product.variants}
-                selectedVariantId={selectedVariantId}
-                onSelectVariant={setSelectedVariantId}
-                basePrice={product.price}
-                baseComparePrice={product.comparePrice}
-              />
+            {/* Price */}
+            <div className="flex items-center gap-3 mb-4 md:mb-6">
+              <ProductPrice priceUSD={priceUSD} comparePriceUSD={comparePriceUSD ?? undefined} variant="large" />
+              {salePercentage !== null && (
+                <span className="text-xs md:text-sm font-semibold text-white bg-linear-to-r from-orange-400 to-red-500 px-3 py-1 rounded-full">
+                  -{salePercentage}%
+                </span>
+              )}
             </div>
-          )}
 
-          {!isCatalogMode() && (
-            <div className="mb-6">
-              <p className="text-sm text-gray-600 mb-2">
-                Stock disponible: {selectedVariant 
-                  ? selectedVariant.stock 
-                  : product.stock} unidades
-              </p>
+            {/* Combo contents */}
+            {isCombo && comboItems.length > 0 && (
+              <div className="mb-4 md:mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm md:text-base font-semibold text-foreground">Este combo incluye</h3>
+                  <span className="text-xs text-muted-foreground">{comboItems.length} productos</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {comboItems.map((item: any) => {
+                    const card = (
+                      <>
+                        <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted shrink-0 relative">
+                          <OptimizedImage
+                            src={item.image || "/placeholder.svg"}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            sizes="56px"
+                            objectFit="cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">Cantidad: {item.quantity}</p>
+                        </div>
+                      </>
+                    )
+
+                    if (item.slug) {
+                      return (
+                        <Link
+                          key={item.id}
+                          href={`/products/${encodeURIComponent(item.slug)}`}
+                          className="flex items-center gap-3 rounded-xl border border-border bg-background p-3 hover:bg-muted/40 transition-colors"
+                        >
+                          {card}
+                        </Link>
+                      )
+                    }
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 rounded-xl border border-border bg-background p-3 opacity-80"
+                      >
+                        {card}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Variants */}
+            {variants.length > 0 && (
+              <div className="mb-4 md:mb-6">
+                <label className="block text-sm font-medium text-foreground mb-2">Elige una opción</label>
+                <select
+                  value={selectedVariantId}
+                  onChange={(e) => setSelectedVariantId(e.target.value)}
+                  className="w-full md:w-auto px-4 py-3 border border-border rounded-xl text-sm focus:ring-2 focus:ring-sky-300 bg-background"
+                >
+                  {variants.map((v: any) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Quantity */}
+            <div className="flex items-center gap-3 mb-4 md:mb-6">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+              >
+                -
+              </button>
+              <span className="w-8 text-center font-medium">{quantity}</span>
+              <button
+                onClick={() => setQuantity(quantity + 1)}
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+              >
+                +
+              </button>
             </div>
-          )}
 
-          <AddToCartButton 
-            productId={product.id} 
-            productName={product.name}
-            productVariantId={selectedVariantId}
-            variantName={selectedVariant?.name}
-          />
+            {/* Add to cart (UI) */}
+            <div className="flex items-center gap-3 mb-4 md:mb-6">
+              <button
+                disabled={stock <= 0}
+                onClick={async () => {
+                  try {
+                    await addToCart({
+                      product: {
+                        id: product.id,
+                        name: product.name,
+                        slug: product.slug,
+                        priceUSD: product.priceUSD ?? null,
+                        priceMNs: product.priceMNs ?? null,
+                        images: Array.isArray(product.images) ? product.images : [],
+                      },
+                      productVariant: selectedVariant
+                        ? {
+                            id: selectedVariant.id,
+                            name: selectedVariant.name,
+                            priceUSD: selectedVariant.priceUSD ?? null,
+                            priceMNs: selectedVariant.priceMNs ?? null,
+                          }
+                        : null,
+                      quantity,
+                    })
+                    showSuccess(
+                      "Producto agregado",
+                      `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} se agregó al carrito`
+                    )
+                  } catch (err: any) {
+                    const errorMessage = err.response?.data?.message || err.message || "No se pudo añadir al carrito"
+                    showError(
+                      "Error al agregar",
+                      errorMessage
+                    )
+                  }
+                }}
+                className="flex-1 flex items-center justify-center gap-2 bg-foreground text-background py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-foreground/90 transition-all text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  />
+                </svg>
+                Añadir al carrito
+              </button>
+              <button
+                onClick={() => setIsFavorite(!isFavorite)}
+                className={`p-3.5 md:p-4 rounded-xl border transition-all ${
+                  isFavorite ? "bg-red-50 border-red-200 text-red-500" : "border-border hover:bg-muted"
+                }`}
+              >
+                <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={isFavorite} />
+              </button>
+              <button
+                onClick={shareProduct}
+                className="p-3.5 md:p-4 rounded-xl border border-border hover:bg-muted transition-all"
+                aria-label="Compartir"
+                type="button"
+              >
+                <ShareIcon className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+            </div>
+
+            {/* Benefits */}
+            <div className="flex flex-wrap items-center gap-4 md:gap-6 text-xs md:text-sm text-muted-foreground mb-4 md:mb-6">
+              <span className="flex items-center gap-1.5">
+                <ReturnIcon className="w-4 h-4 md:w-5 md:h-5" />
+                Devoluciones gratuitas
+              </span>
+              <span className="flex items-center gap-1.5">
+                <TruckIcon className="w-4 h-4 md:w-5 md:h-5" />
+                Entrega rápida
+              </span>
+            </div>
+
+            {/* Delivery info */}
+            <div className="bg-sky-50 rounded-xl p-4 mb-4 md:mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
+                  <TruckIcon className="w-5 h-5 text-sky-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Entrega prevista:</p>
+                  <p className="text-sm font-medium text-foreground">24–72h (estimado)</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-sky-600 font-medium">Envío gratis desde $100</p>
+                <Link href="/shipping" className="text-xs text-sky-500 hover:underline">
+                  Saber más
+                </Link>
+              </div>
+            </div>
+
+            {/* Accordions */}
+            <div className="border-t border-border">
+              {[
+                { id: "brief", title: "Breve descripción", content: product?.shortDescription || "" },
+                { id: "desc", title: "Descripción", content: product?.description || "" },
+                {
+                  id: "details",
+                  title: "Detalles",
+                  content: [
+                    product?.sku ? `SKU: ${product.sku}` : null,
+                    product?.weight ? `Peso: ${product.weight}` : null,
+                    Array.isArray(product?.allergens) && product.allergens.length > 0
+                      ? `Alérgenos: ${product.allergens.join(", ")}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join("\n"),
+                },
+              ].filter((x) => x.id !== "brief" || x.content).map((item) => (
+                <div key={item.id} className="border-b border-border">
+                  <button
+                    onClick={() => setOpenAccordion(openAccordion === item.id ? null : item.id)}
+                    className="w-full py-4 flex items-center justify-between text-sm md:text-base font-medium text-foreground hover:text-sky-600 transition-colors"
+                  >
+                    {item.title}
+                    <ChevronRightIcon
+                      className={`w-5 h-5 transition-transform ${openAccordion === item.id ? "rotate-90" : ""}`}
+                    />
+                  </button>
+                  {openAccordion === item.id && (
+                    <div className="pb-4 text-sm text-muted-foreground whitespace-pre-wrap">{item.content}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  );
+      </section>
+
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <section className="py-10 md:py-16 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-6 md:mb-8">
+              <div>
+                <h2 className="text-xl md:text-3xl font-bold text-foreground">También te puede interesar</h2>
+                <p className="text-sm text-muted-foreground mt-1">Más productos de la misma categoría</p>
+              </div>
+              <div className="hidden md:flex items-center gap-2">
+                <button
+                  onClick={() => scrollRelated("left")}
+                  className="p-3 bg-muted rounded-full hover:bg-muted/80 transition-colors"
+                >
+                  <ChevronLeftIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => scrollRelated("right")}
+                  className="p-3 bg-sky-500 text-white rounded-full hover:bg-sky-600 transition-colors"
+                >
+                  <ChevronRightIcon className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div ref={relatedScrollRef} className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-2 px-2">
+              {relatedProducts.map((p: any) => (
+                <div key={p.id} className="shrink-0 w-[160px] md:w-[240px]">
+                  <ProductCard
+                    product={{
+                      id: p.id,
+                      slug: p.slug,
+                      name: p.name,
+                      images: p.images?.map(normalizeImageUrl),
+                      priceUSD: toNumber(p.priceUSD) ?? undefined,
+                      comparePriceUSD: toNumber(p.comparePriceUSD) ?? undefined,
+                      variants: p.variants,
+                    }}
+                    badge={undefined}
+              />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Reviews Section */}
+      <section className="py-10 md:py-16 bg-sky-50/50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <ProductReviews
+              productId={product?.id}
+              productName={product?.name || "Producto"}
+              initialReviews={initialReviews}
+              initialReviewsMeta={initialReviewsMeta}
+            />
+          </div>
+        </div>
+      </section>
+    </>
+  )
 }
 

@@ -1,51 +1,23 @@
-/**
- * Normaliza una URL de imagen para mostrarla correctamente
- * - Si es una URL absoluta (http/https), la devuelve tal cual
- * - Si es una ruta relativa que empieza con /uploads, la convierte a URL del backend
- * - Si es una ruta relativa del seed (como /products/...), devuelve un placeholder
- * - Si está vacía o es null/undefined, devuelve null
- */
-export function getImageUrl(imagePath: string | null | undefined): string | null {
-  if (!imagePath) return null;
-
-  // Si ya es una URL absoluta, devolverla tal cual
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    return imagePath;
+export function getFirstImage(images?: string | string[]): string | null {
+  if (!images) return null
+  if (typeof images === "string") {
+    try {
+      const parsed = JSON.parse(images)
+      return Array.isArray(parsed) ? parsed[0] : images
+    } catch {
+      return images
+    }
   }
-
-  // Si es una ruta de uploads, construir la URL del backend
-  if (imagePath.startsWith('/uploads/')) {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
-    // Remover /api del final para obtener la URL base del backend
-    const backendUrl = apiUrl.replace(/\/api\/?$/, '');
-    return `${backendUrl}${imagePath}`;
-  }
-
-  // Si es una ruta relativa que empieza con /, puede ser:
-  // - Un archivo estático del frontend (como /logo.png) - devolver tal cual
-  // - Una ruta del seed que no existe (como /products/...) - devolver null
-  // Por ahora, solo devolvemos null para rutas conocidas del seed
-  if (imagePath.startsWith('/products/') || imagePath.startsWith('/banners/')) {
-    return null;
-  }
-  
-  // Para otras rutas que empiezan con /, asumimos que son archivos estáticos del frontend
-  if (imagePath.startsWith('/')) {
-    return imagePath;
-  }
-
-  // Si no tiene prefijo, asumimos que es una ruta de uploads
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
-  // Remover /api del final para obtener la URL base del backend
-  const backendUrl = apiUrl.replace(/\/api\/?$/, '');
-  return `${backendUrl}/uploads/${imagePath}`;
+  return images[0] || null
 }
 
-/**
- * Obtiene la primera imagen de un array de imágenes
- */
-export function getFirstImage(images: string[] | null | undefined): string | null {
-  if (!images || images.length === 0) return null;
-  return getImageUrl(images[0]);
+export function getImageUrl(image?: string): string | null {
+  if (!image) return null
+  if (image.startsWith("http")) return image
+  // Si la ruta empieza con /, es una ruta local de public (Next.js sirve public/ desde la raíz)
+  if (image.startsWith("/")) return image
+  // Si no, usa el API URL del backend
+  const raw = (process.env.NEXT_PUBLIC_API_URL || "").trim()
+  const base = raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw
+  return `${base}${image}`
 }
-

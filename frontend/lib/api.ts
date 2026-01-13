@@ -1,74 +1,1262 @@
-import axios from 'axios';
+import { useAuthStore } from "@/lib/store/auth-store"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+function normalizeApiBaseUrl(raw: string): string {
+  let url = (raw || "").trim()
+  if (!url) return "http://localhost:4000"
+  // Si el usuario pegó solo el dominio (sin http/https), asumir https en producción.
+  if (!/^https?:\/\//i.test(url)) {
+    url = `https://${url}`
+  }
+  // Remover /api del final si existe (normalizar)
+  url = url.replace(/\/api\/?$/, "")
+  return url
+}
 
-export const api = axios.create({
-  baseURL: API_URL,
-});
+// Asegurar que API_BASE_URL no termine con /api y que sea URL válida (con protocolo)
+let API_BASE_URL = normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000")
 
-// Request interceptor to add auth token and handle Content-Type
-api.interceptors.request.use(
-  (config) => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+// Token en memoria (Zustand). El refresh token vive en cookie HttpOnly (backend).
+const getAuthToken = (): string | null => {
+  try {
+    const t = useAuthStore.getState().accessToken
+    return t && t.trim() ? t.trim() : null
+  } catch {
+    return null
+  }
+}
+
+type ApiError = Error & {
+  status?: number
+  response?: { data?: { message?: string } }
+  url?: string
+}
+
+function clearAuthStorage() {
+  try {
+    useAuthStore.getState().logout()
+  } catch {
+    // ignore
+  }
+}
+
+function redirectToAdminLoginIfOnAdmin() {
+  if (typeof window === "undefined") return
+  const path = window.location.pathname || ""
+  if (path.startsWith("/admin") && !path.startsWith("/admin/login")) {
+    window.location.href = "/admin/login"
+  }
+}
+
+function handleUnauthorized() {
+  clearAuthStorage()
+  redirectToAdminLoginIfOnAdmin()
+}
+
+async function buildApiError(response: Response, finalUrl: string): Promise<ApiError> {
+  let errorMessage = `API Error: ${response.status} ${response.statusText}`
+  try {
+    const errorData = await response.json()
+    errorMessage = errorData?.message || errorData?.error || errorMessage
+  } catch {
+    // ignore
+  }
+  const err: ApiError = new Error(errorMessage)
+  err.status = response.status
+  err.url = finalUrl
+  err.response = { data: { message: errorMessage } }
+  return err
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  try {
+    const url = `${API_BASE_URL}/api/auth/refresh`
+    const res = await fetch(url, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    })
+    if (!res.ok) return null
+    const data = await res.json().catch(() => null)
+    const token = data?.accessToken
+    if (typeof token === "string" && token.trim()) {
+      useAuthStore.getState().setAccessToken(token.trim())
+      return token.trim()
     }
-    
-    // Si el data es FormData, NO establecer Content-Type (axios lo hará automáticamente)
-    // Si no es FormData, establecer Content-Type como application/json
-    if (!(config.data instanceof FormData)) {
-      if (!config.headers['Content-Type']) {
-        config.headers['Content-Type'] = 'application/json';
-      }
-    } else {
-      // Para FormData, eliminar cualquier Content-Type para que axios lo establezca con el boundary correcto
-      delete config.headers['Content-Type'];
-      delete config.headers['content-type'];
+    return null
+  } catch {
+    return null
+  }
+}
+
+async function fetchJsonWithAuth(
+  finalUrl: string,
+  init: RequestInit & { retryOn401?: boolean } = {},
+) {
+  const token = getAuthToken()
+  // Normalizar a objeto plano para poder setear Authorization sin problemas de tipos
+  const headers: Record<string, string> = {
+    ...(init.headers as any),
+  }
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  const response = await fetch(finalUrl, {
+    ...init,
+    headers,
+    credentials: "include", // enviar cookie HttpOnly de refresh token
+  })
+
+  // 401 -> intentar refresh una vez y reintentar
+  if (response.status === 401 && init.retryOn401 !== false) {
+    const newToken = await refreshAccessToken()
+    if (newToken) {
+      const retryHeaders: Record<string, string> = { ...(headers || {}) }
+      retryHeaders.Authorization = `Bearer ${newToken}`
+      return fetch(finalUrl, {
+        ...init,
+        headers: retryHeaders,
+        credentials: "include",
+      })
     }
-    
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
+    handleUnauthorized()
+  }
 
-// Response interceptor to handle token refresh
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  return response
+}
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+// Tipos para la respuesta de la API del backend
+export interface BackendProduct {
+  id: string
+  name: string
+  slug: string
+  description: string
+  shortDescription?: string | null
+  priceUSD?: string | number | null
+  priceMNs?: string | number | null
+  comparePriceUSD?: string | number | null
+  comparePriceMNs?: string | number | null
+  stock: number
+  isActive: boolean
+  isFeatured: boolean
+  isCombo?: boolean
+  images: string[]
+  allergens: string[]
+  categoryId: string
+  category: {
+    id: string
+    name: string
+    slug: string
+  }
+  comboItems?: Array<{
+    id: string
+    productId: string
+    quantity: number
+    product?: BackendProduct
+  }>
+  createdAt: string
+  updatedAt: string
+}
 
-      try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
-          const response = await axios.post(`${API_URL}/auth/refresh`, {
-            refreshToken,
-          });
+export interface BackendBanner {
+  id: string
+  title: string
+  description?: string | null
+  image: string
+  link?: string | null
+  isActive: boolean
+  order: number
+  startDate?: string | null
+  endDate?: string | null
+  createdAt: string
+  updatedAt: string
+}
 
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
-          localStorage.setItem('accessToken', accessToken);
-          if (newRefreshToken) {
-            localStorage.setItem('refreshToken', newRefreshToken);
-          }
+export interface BackendUiSettings {
+  id: string
+  headerAnnouncement: string
+  headerHighlights?: any
+  headerNavCategories?: any
+  benefits?: any
+  createdAt: string
+  updatedAt: string
+}
 
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          return api(originalRequest);
+export interface BackendReview {
+  id: string
+  productId: string
+  userId?: string | null
+  authorName: string
+  authorEmail?: string | null
+  rating: number
+  title?: string | null
+  content: string
+  isApproved: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface BackendAdminReview extends BackendReview {
+  product?: {
+    id: string
+    name: string
+    slug: string
+  }
+}
+
+export interface AdminReviewsResponse {
+  data: BackendAdminReview[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
+}
+
+export interface BackendReviewSettings {
+  id: string
+  autoApproveReviews: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface BackendWishlistItem {
+  id: string
+  productId: string
+  createdAt: string
+  product: BackendProduct
+}
+
+export interface WishlistResponse {
+  items: BackendWishlistItem[]
+}
+
+export interface ProductsResponse {
+  data: BackendProduct[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
+}
+
+export interface BackendCategory {
+  id: string
+  name: string
+  slug: string
+  description?: string | null
+  image?: string | null
+  isActive?: boolean
+  order?: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface BackendAdminCategory extends BackendCategory {
+  _count?: {
+    products?: number
+  }
+}
+
+export interface BackendAdminCustomer {
+  id: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  phone?: string | null
+  createdAt: string
+  isActive: boolean
+  totalOrders: number
+  totalSpent: number
+  lastOrderAt?: string | null
+}
+
+export interface AdminCustomersResponse {
+  data: BackendAdminCustomer[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
+}
+
+export type BackendOfferType = "PERCENTAGE" | "FIXED"
+
+export interface BackendAdminOffer {
+  id: string
+  name: string
+  code: string
+  type: BackendOfferType
+  value: string | number
+  minPurchase?: string | number | null
+  usageLimit?: number | null
+  usageCount: number
+  startDate: string
+  endDate: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface OffersResponse {
+  data: BackendAdminOffer[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
+}
+
+export interface CreateCategoryData {
+  name: string
+  slug: string
+  description?: string
+  image?: string
+  isActive?: boolean
+  order?: number
+}
+
+export interface CreateProductData {
+  name: string
+  slug: string
+  description: string
+  shortDescription?: string
+  priceUSD?: number
+  priceMNs?: number
+  comparePriceUSD?: number | null
+  comparePriceMNs?: number | null
+  stock: number
+  isActive?: boolean
+  isFeatured?: boolean
+  images?: string[]
+  allergens?: string[]
+  categoryId: string
+  sku?: string
+  weight?: number
+  nutritionalInfo?: any
+}
+
+export const api = {
+  get: async (endpoint: string) => {
+    try {
+      // Separar path y query string
+      const [pathPart, queryPart] = endpoint.includes('?') ? endpoint.split('?', 2) : [endpoint, '']
+      
+      // Limpiar el path: remover cualquier /api al inicio
+      let cleanPath = pathPart.trim()
+      while (cleanPath.startsWith('/api')) {
+        cleanPath = cleanPath.substring(4)
+      }
+      
+      // Asegurar que empiece con /
+      if (!cleanPath.startsWith('/')) {
+        cleanPath = '/' + cleanPath
+      }
+      
+      // Reconstruir endpoint limpio
+      const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
+      
+      // Construir URL final - API_BASE_URL no incluye /api, lo agregamos aquí
+      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+      
+      // Retry logic para requests fallidos (solo en cliente)
+      const fetchWithRetry = async (): Promise<Response> => {
+        if (typeof window !== 'undefined') {
+          // Solo usar retry en el cliente
+          const { retryFetch } = await import('./api-retry');
+          return retryFetch(
+            () => fetchJsonWithAuth(finalUrl, {
+              headers: { 'Content-Type': 'application/json' },
+              cache: "no-store",
+            }),
+            {
+              maxRetries: 2, // Máximo 2 reintentos (3 intentos totales)
+              initialDelay: 500,
+              retryableStatuses: [408, 429, 500, 502, 503, 504],
+            }
+          );
         }
-      } catch (refreshError) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/auth/login';
-        return Promise.reject(refreshError);
+        // En servidor, fetch normal
+        return fetchJsonWithAuth(finalUrl, {
+          headers: { 'Content-Type': 'application/json' },
+          cache: "no-store",
+        });
+      };
+
+      const response = await fetchWithRetry();
+      
+      if (!response.ok) {
+        // Si es 401, limpiar tokens (sesión expirada) para evitar spam de requests con token inválido
+        if (response.status === 401) {
+          handleUnauthorized()
+        }
+        throw await buildApiError(response, finalUrl)
+      }
+      const data = await response.json()
+      return { data }
+    } catch (error) {
+      // No spamear consola: 401/404 pueden ser casos normales (sesión expirada / producto no existe)
+      throw error
+    }
+  },
+
+  // Función específica para obtener productos
+  getProducts: async (params?: {
+    page?: number
+    limit?: number
+    categoryId?: string
+    search?: string
+    isFeatured?: boolean
+    isCombo?: boolean
+    minPrice?: number
+    maxPrice?: number
+    inStock?: boolean
+    sortBy?: 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc' | 'created-desc'
+  }): Promise<ProductsResponse> => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.limit) {
+      // Asegurar que el límite no exceda 100 (máximo permitido por el backend)
+      const limit = Math.min(params.limit, 100)
+      queryParams.append('limit', limit.toString())
+    }
+    if (params?.categoryId) queryParams.append('categoryId', params.categoryId)
+    if (params?.search) queryParams.append('search', params.search)
+    if (params?.isFeatured !== undefined) queryParams.append('isFeatured', params.isFeatured.toString())
+    if (params?.isCombo !== undefined) queryParams.append('isCombo', params.isCombo.toString())
+    if (params?.minPrice !== undefined) queryParams.append('minPrice', params.minPrice.toString())
+    if (params?.maxPrice !== undefined) queryParams.append('maxPrice', params.maxPrice.toString())
+    if (params?.inStock !== undefined) queryParams.append('inStock', params.inStock.toString())
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy)
+
+    const queryString = queryParams.toString()
+    const endpoint = `/products${queryString ? `?${queryString}` : ''}`
+    
+    const response = await api.get(endpoint)
+    return response.data as ProductsResponse
+  },
+
+  // Productos (Admin) - incluye inactivos/borradores
+  getAdminProducts: async (params?: {
+    page?: number
+    limit?: number
+    categoryId?: string
+    search?: string
+    isFeatured?: boolean
+    isCombo?: boolean
+    isActive?: boolean
+  }): Promise<ProductsResponse> => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+    if (params?.categoryId) queryParams.append('categoryId', params.categoryId)
+    if (params?.search) queryParams.append('search', params.search)
+    if (params?.isFeatured !== undefined) queryParams.append('isFeatured', params.isFeatured.toString())
+    if (params?.isCombo !== undefined) queryParams.append('isCombo', params.isCombo.toString())
+    if (params?.isActive !== undefined) queryParams.append('isActive', params.isActive.toString())
+
+    const queryString = queryParams.toString()
+    const endpoint = `/products/admin${queryString ? `?${queryString}` : ''}`
+
+    const response = await api.get(endpoint)
+    return response.data as ProductsResponse
+  },
+
+  // Productos más vendidos
+  getBestSellers: async (limit: number = 8): Promise<BackendProduct[]> => {
+    const response = await api.get(`/products/best-sellers?limit=${encodeURIComponent(String(limit))}`)
+    return (response.data || []) as BackendProduct[]
+  },
+
+  // Función para crear un producto
+  createProduct: async (productData: CreateProductData) => {
+    const response = await api.post('/products', productData)
+    return response.data as BackendProduct
+  },
+
+  // Función para actualizar un producto
+  updateProduct: async (id: string, productData: Partial<CreateProductData>) => {
+    const response = await api.patch(`/products/${id}`, productData)
+    return response.data as BackendProduct
+  },
+
+  // Función para eliminar un producto
+  deleteProduct: async (id: string) => {
+    const response = await api.delete(`/products/${id}`)
+    return response.data
+  },
+
+  // Función para obtener un producto por ID
+  getProduct: async (id: string) => {
+    const response = await api.get(`/products/${id}`)
+    return response.data as BackendProduct
+  },
+
+  // Productos relacionados
+  getRelatedProducts: async (productId: string, limit?: number): Promise<BackendProduct[]> => {
+    const queryParams = limit ? `?limit=${limit}` : ''
+    const response = await api.get(`/products/${productId}/related${queryParams}`)
+    return response.data as BackendProduct[]
+  },
+
+  // Historial de búsquedas
+  getSearchHistory: async (limit?: number): Promise<Array<{ id: string; searchTerm: string; resultsCount: number; createdAt: string }>> => {
+    const queryParams = limit ? `?limit=${limit}` : ''
+    const response = await api.get(`/search/history${queryParams}`)
+    return response.data
+  },
+
+  getPopularSearches: async (limit?: number): Promise<Array<{ term: string; count: number }>> => {
+    const queryParams = limit ? `?limit=${limit}` : ''
+    const response = await api.get(`/search/popular${queryParams}`)
+    return response.data
+  },
+
+  getSearchSuggestions: async (term: string, limit?: number): Promise<string[]> => {
+    const queryParams = new URLSearchParams({ term })
+    if (limit) queryParams.append('limit', limit.toString())
+    const response = await api.get(`/search/suggestions?${queryParams.toString()}`)
+    return response.data
+  },
+
+  // Función para obtener categorías
+  getCategories: async (): Promise<BackendCategory[]> => {
+    const response = await api.get('/categories')
+    return (response.data?.data || response.data || []) as BackendCategory[]
+  },
+
+  // Función para obtener categorías (Admin)
+  getAdminCategories: async (): Promise<BackendAdminCategory[]> => {
+    const response = await api.get('/categories/admin')
+    return (response.data?.data || response.data || []) as BackendAdminCategory[]
+  },
+
+  // Banners (público)
+  getBanners: async (): Promise<BackendBanner[]> => {
+    const response = await api.get("/banners")
+    return (response.data || []) as BackendBanner[]
+  },
+
+  // Banners (Admin)
+  getAdminBanners: async (): Promise<BackendBanner[]> => {
+    const response = await api.get("/banners/admin")
+    return (response.data || []) as BackendBanner[]
+  },
+
+  createBanner: async (data: {
+    title: string
+    description?: string
+    image: string
+    link?: string
+    isActive?: boolean
+    order?: number
+    startDate?: string
+    endDate?: string
+  }): Promise<BackendBanner> => {
+    const response = await api.post("/banners", data)
+    return response.data as BackendBanner
+  },
+
+  updateBanner: async (
+    id: string,
+    data: Partial<{
+      title: string
+      description: string | null
+      image: string
+      link: string | null
+      isActive: boolean
+      order: number
+      startDate: string | null
+      endDate: string | null
+    }>,
+  ): Promise<BackendBanner> => {
+    const response = await api.patch(`/banners/${id}`, data)
+    return response.data as BackendBanner
+  },
+
+  deleteBanner: async (id: string) => {
+    const response = await api.delete(`/banners/${id}`)
+    return response.data
+  },
+
+  // UI Settings (público/admin)
+  getUiSettings: async (): Promise<BackendUiSettings> => {
+    const response = await api.get("/ui-settings/public")
+    return response.data as BackendUiSettings
+  },
+
+  getAdminUiSettings: async (): Promise<BackendUiSettings> => {
+    const response = await api.get("/ui-settings/admin")
+    return response.data as BackendUiSettings
+  },
+
+  updateAdminUiSettings: async (
+    data: Partial<{
+      headerAnnouncement: string
+      headerHighlights: string[]
+      headerNavCategories: string[]
+      benefits: Array<{ title: string; description: string }>
+    }>,
+  ) => {
+    const response = await api.patch("/ui-settings/admin", data)
+    return response.data as BackendUiSettings
+  },
+
+  // Clientes (Admin)
+  getAdminCustomers: async (params?: {
+    page?: number
+    limit?: number
+    search?: string
+  }): Promise<AdminCustomersResponse> => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+    if (params?.search) queryParams.append('search', params.search)
+
+    const queryString = queryParams.toString()
+    const endpoint = `/users/admin/customers${queryString ? `?${queryString}` : ''}`
+    const response = await api.get(endpoint)
+    return response.data as AdminCustomersResponse
+  },
+
+  // Usuario (Admin)
+  getAdminUser: async (id: string) => {
+    const response = await api.get(`/users/${id}`)
+    return response.data as any
+  },
+
+  // Activar/Desactivar usuario (Admin)
+  setUserActive: async (id: string, isActive: boolean) => {
+    const response = await api.patch(`/users/${id}`, { isActive })
+    return response.data as any
+  },
+
+  // Ofertas (Admin)
+  getAdminOffers: async (params?: { page?: number; limit?: number; search?: string }): Promise<OffersResponse> => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append("page", params.page.toString())
+    if (params?.limit) queryParams.append("limit", params.limit.toString())
+    if (params?.search) queryParams.append("search", params.search)
+    const queryString = queryParams.toString()
+    const endpoint = `/offers/admin${queryString ? `?${queryString}` : ""}`
+    const response = await api.get(endpoint)
+    return response.data as OffersResponse
+  },
+
+  getAdminOffer: async (id: string): Promise<BackendAdminOffer> => {
+    const response = await api.get(`/offers/admin/${id}`)
+    return response.data as BackendAdminOffer
+  },
+
+  createOffer: async (data: {
+    name: string
+    code: string
+    type: BackendOfferType
+    value: number
+    minPurchase?: number
+    usageLimit?: number
+    startDate: string
+    endDate: string
+    isActive?: boolean
+  }): Promise<BackendAdminOffer> => {
+    const response = await api.post(`/offers/admin`, data)
+    return response.data as BackendAdminOffer
+  },
+
+  updateOffer: async (
+    id: string,
+    data: Partial<{
+      name: string
+      code: string
+      type: BackendOfferType
+      value: number
+      minPurchase: number | null
+      usageLimit: number | null
+      startDate: string
+      endDate: string
+      isActive: boolean
+    }>,
+  ): Promise<BackendAdminOffer> => {
+    const response = await api.patch(`/offers/admin/${id}`, data)
+    return response.data as BackendAdminOffer
+  },
+
+  deleteOffer: async (id: string) => {
+    const response = await api.delete(`/offers/admin/${id}`)
+    return response.data
+  },
+
+  // Validar cupón/offer
+  validateOffer: async (code: string, subtotal: number) => {
+    const response = await api.post('/offers/validate', { code, subtotal })
+    return response.data as {
+      valid: boolean
+      discount: number
+      offer?: {
+        id: string
+        name: string
+        code: string
+        type: BackendOfferType
+        value: string | number
+      }
+      message?: string
+    }
+  },
+
+  // Reseñas (público)
+  getProductReviews: async (productId: string, page?: number, limit?: number): Promise<{
+    data: BackendReview[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+    }
+  }> => {
+    const params = new URLSearchParams()
+    if (page) params.append('page', page.toString())
+    if (limit) params.append('limit', limit.toString())
+    const queryString = params.toString()
+    const response = await api.get(`/products/${productId}/reviews${queryString ? `?${queryString}` : ''}`)
+    return response.data as {
+      data: BackendReview[]
+      meta: {
+        total: number
+        page: number
+        limit: number
+        totalPages: number
       }
     }
-
-    return Promise.reject(error);
   },
-);
 
+  createProductReview: async (
+    productId: string,
+    data: {
+      rating: number
+      title?: string
+      comment: string
+    },
+  ) => {
+    const response = await api.post(`/products/${productId}/reviews`, data)
+    return response.data as BackendReview
+  },
+
+  updateProductReview: async (
+    reviewId: string,
+    data: {
+      rating?: number
+      title?: string
+      comment?: string
+    },
+  ): Promise<BackendReview> => {
+    const response = await api.put(`/reviews/${reviewId}`, data)
+    return response.data as BackendReview
+  },
+
+  deleteProductReview: async (reviewId: string): Promise<{ message: string }> => {
+    const response = await api.delete(`/reviews/${reviewId}`)
+    return response.data as { message: string }
+  },
+
+  // Reseñas (Admin)
+  getAdminReviewSettings: async (): Promise<BackendReviewSettings> => {
+    const response = await api.get(`/reviews/admin/settings`)
+    return response.data as BackendReviewSettings
+  },
+
+  updateAdminReviewSettings: async (data: { autoApproveReviews: boolean }): Promise<BackendReviewSettings> => {
+    const response = await api.patch(`/reviews/admin/settings`, data)
+    return response.data as BackendReviewSettings
+  },
+
+  // Wishlist (usuario)
+  getWishlist: async (): Promise<WishlistResponse> => {
+    const response = await api.get("/wishlist")
+    return response.data as WishlistResponse
+  },
+
+  addToWishlist: async (productId: string) => {
+    const response = await api.post("/wishlist", { productId })
+    return response.data as BackendWishlistItem
+  },
+
+  removeFromWishlist: async (productId: string) => {
+    const response = await api.delete(`/wishlist/${productId}`)
+    return response.data
+  },
+
+  getAdminReviews: async (params?: {
+    page?: number
+    limit?: number
+    search?: string
+    productId?: string
+    isApproved?: boolean
+  }): Promise<AdminReviewsResponse> => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append("page", params.page.toString())
+    if (params?.limit) queryParams.append("limit", params.limit.toString())
+    if (params?.search) queryParams.append("search", params.search)
+    if (params?.productId) queryParams.append("productId", params.productId)
+    if (params?.isApproved !== undefined) queryParams.append("isApproved", params.isApproved.toString())
+    const queryString = queryParams.toString()
+    const endpoint = `/reviews/admin${queryString ? `?${queryString}` : ""}`
+    const response = await api.get(endpoint)
+    return response.data as AdminReviewsResponse
+  },
+
+  createAdminReview: async (data: {
+    productId: string
+    authorName: string
+    authorEmail?: string
+    rating: number
+    title?: string
+    content: string
+    isApproved?: boolean
+  }): Promise<BackendAdminReview> => {
+    const response = await api.post(`/reviews/admin`, data)
+    return response.data as BackendAdminReview
+  },
+
+  updateAdminReview: async (
+    id: string,
+    data: Partial<{
+      productId: string
+      authorName: string
+      authorEmail: string | null
+      rating: number
+      title: string | null
+      content: string
+      isApproved: boolean
+    }>,
+  ): Promise<BackendAdminReview> => {
+    const response = await api.patch(`/reviews/admin/${id}`, data)
+    return response.data as BackendAdminReview
+  },
+
+  deleteAdminReview: async (id: string) => {
+    const response = await api.delete(`/reviews/admin/${id}`)
+    return response.data
+  },
+
+  // Obtener/crear categoría especial "Sin categoría" (Admin)
+  getUncategorizedCategory: async (): Promise<BackendAdminCategory> => {
+    const response = await api.get('/categories/uncategorized')
+    return response.data as BackendAdminCategory
+  },
+
+  // Crear categoría (Admin)
+  createCategory: async (categoryData: CreateCategoryData) => {
+    const response = await api.post('/categories', categoryData)
+    return response.data as BackendAdminCategory
+  },
+
+  // Actualizar categoría (Admin)
+  updateCategory: async (id: string, categoryData: Partial<CreateCategoryData>) => {
+    const response = await api.patch(`/categories/${id}`, categoryData)
+    return response.data as BackendAdminCategory
+  },
+
+  // Eliminar categoría (Admin)
+  deleteCategory: async (
+    id: string,
+    mode: 'delete_with_products' | 'move_products_to_uncategorized',
+  ) => {
+    const response = await api.delete(`/categories/${id}?mode=${encodeURIComponent(mode)}`)
+    return response.data
+  },
+
+  // Asociar productos a una categoría (Admin) - mueve productos seteando categoryId
+  assignProductsToCategory: async (categoryId: string, productIds: string[]) => {
+    const response = await api.patch(`/categories/${categoryId}/products`, { productIds })
+    return response.data as BackendAdminCategory
+  },
+
+  // Función para subir una imagen
+  uploadImage: async (file: File): Promise<string> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    const url = `${API_BASE_URL}/api/upload/single`
+    const response = await fetchJsonWithAuth(url, {
+      method: 'POST',
+      body: formData,
+      // No incluir Content-Type header, el navegador lo hace automáticamente con FormData
+    })
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        handleUnauthorized()
+      }
+      throw new Error(`Upload failed: ${response.status} ${response.statusText}`)
+    }
+    
+    const data = await response.json()
+    return data.url // Retorna la URL de la imagen subida
+  },
+
+  // Función genérica PATCH
+  patch: async (endpoint: string, data: any) => {
+    try {
+      // Normalizar endpoint igual que en get
+      const [pathPart, queryPart] = endpoint.includes('?') ? endpoint.split('?', 2) : [endpoint, '']
+      
+      let cleanPath = pathPart.trim()
+      while (cleanPath.startsWith('/api')) {
+        cleanPath = cleanPath.substring(4)
+      }
+      
+      if (!cleanPath.startsWith('/')) {
+        cleanPath = '/' + cleanPath
+      }
+      
+      const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
+      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+      
+      const token = getAuthToken()
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+      
+      if (!token) {
+        const errorMessage = "No estás autenticado. Por favor, inicia sesión nuevamente."
+        // En admin, redirigir directamente al login; fuera del admin, solo lanzar 401.
+        redirectToAdminLoginIfOnAdmin()
+        const err: any = new Error(errorMessage)
+        err.status = 401
+        err.response = { data: { message: errorMessage } }
+        throw err
+      }
+      
+      headers['Authorization'] = `Bearer ${token}`
+
+      const response = await fetchJsonWithAuth(finalUrl, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(data),
+      })
+      
+      if (!response.ok) {
+        // Si es 401, el token puede haber expirado o no ser válido
+        if (response.status === 401) {
+          handleUnauthorized()
+          throw new Error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
+        }
+        
+        let errorMessage = `API Error: ${response.status} ${response.statusText}`
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorData.error || errorMessage
+        } catch {
+          // Si no se puede parsear el error, usar el mensaje por defecto
+        }
+        const error: any = new Error(errorMessage)
+        error.status = response.status
+        error.response = { data: { message: errorMessage } }
+        throw error
+      }
+      
+      const responseData = await response.json()
+      return { data: responseData }
+    } catch (error: any) {
+      if (error.response || error.status) {
+        throw error
+      }
+      const formattedError: any = new Error(error.message || "Error de conexión")
+      formattedError.status = error.status || 500
+      formattedError.response = { data: { message: error.message || "Error de conexión" } }
+      throw formattedError
+    }
+  },
+
+  // Función genérica PUT
+  put: async (endpoint: string, data: any) => {
+    try {
+      const [pathPart, queryPart] = endpoint.includes('?') ? endpoint.split('?', 2) : [endpoint, '']
+
+      let cleanPath = pathPart.trim()
+      while (cleanPath.startsWith('/api')) {
+        cleanPath = cleanPath.substring(4)
+      }
+
+      if (!cleanPath.startsWith('/')) {
+        cleanPath = '/' + cleanPath
+      }
+
+      const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
+      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+
+      const token = getAuthToken()
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+
+      if (!token) {
+        const errorMessage = "No estás autenticado. Por favor, inicia sesión nuevamente."
+        redirectToAdminLoginIfOnAdmin()
+        const err: any = new Error(errorMessage)
+        err.status = 401
+        err.response = { data: { message: errorMessage } }
+        throw err
+      }
+
+      ;(headers as any)['Authorization'] = `Bearer ${token}`
+
+      const response = await fetchJsonWithAuth(finalUrl, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          handleUnauthorized()
+          throw new Error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
+        }
+
+        let errorMessage = `API Error: ${response.status} ${response.statusText}`
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorData.error || errorMessage
+        } catch {
+          // ignore
+        }
+        const error: any = new Error(errorMessage)
+        error.status = response.status
+        error.response = { data: { message: errorMessage } }
+        throw error
+      }
+
+      const responseData = await response.json()
+      return { data: responseData }
+    } catch (error: any) {
+      if (error.response || error.status) {
+        throw error
+      }
+      const formattedError: any = new Error(error.message || "Error de conexión")
+      formattedError.status = error.status || 500
+      formattedError.response = { data: { message: error.message || "Error de conexión" } }
+      throw formattedError
+    }
+  },
+
+  // Función genérica DELETE
+  delete: async (endpoint: string) => {
+    try {
+      // Normalizar endpoint igual que en get
+      const [pathPart, queryPart] = endpoint.includes('?') ? endpoint.split('?', 2) : [endpoint, '']
+      
+      let cleanPath = pathPart.trim()
+      while (cleanPath.startsWith('/api')) {
+        cleanPath = cleanPath.substring(4)
+      }
+      
+      if (!cleanPath.startsWith('/')) {
+        cleanPath = '/' + cleanPath
+      }
+      
+      const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
+      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+      
+      const token = getAuthToken()
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const response = await fetchJsonWithAuth(finalUrl, {
+        method: 'DELETE',
+        headers,
+      })
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          handleUnauthorized()
+        }
+        let errorMessage = `API Error: ${response.status} ${response.statusText}`
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorData.error || errorMessage
+        } catch {
+          // Si no se puede parsear el error, usar el mensaje por defecto
+        }
+        const error: any = new Error(errorMessage)
+        error.status = response.status
+        error.response = { data: { message: errorMessage } }
+        throw error
+      }
+      
+      // DELETE puede no retornar contenido
+      const contentType = response.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        const responseData = await response.json()
+        return { data: responseData }
+      }
+      return { data: { success: true } }
+    } catch (error: any) {
+      if (error.response || error.status) {
+        throw error
+      }
+      const formattedError: any = new Error(error.message || "Error de conexión")
+      formattedError.status = error.status || 500
+      formattedError.response = { data: { message: error.message || "Error de conexión" } }
+      throw formattedError
+    }
+  },
+
+  // Función genérica POST
+  post: async (endpoint: string, data: any) => {
+    try {
+      // Normalizar endpoint igual que en get
+      const [pathPart, queryPart] = endpoint.includes('?') ? endpoint.split('?', 2) : [endpoint, '']
+      
+      let cleanPath = pathPart.trim()
+      while (cleanPath.startsWith('/api')) {
+        cleanPath = cleanPath.substring(4)
+      }
+      
+      if (!cleanPath.startsWith('/')) {
+        cleanPath = '/' + cleanPath
+      }
+      
+      const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
+      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+      
+      const token = getAuthToken()
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const response = await fetchJsonWithAuth(finalUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(data),
+      })
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          handleUnauthorized()
+        }
+        // Intentar obtener el mensaje de error del backend
+        let errorMessage = `API Error: ${response.status} ${response.statusText}`
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorData.error || errorMessage
+        } catch {
+          // Si no se puede parsear el error, usar el mensaje por defecto
+        }
+        const error: any = new Error(errorMessage)
+        error.status = response.status
+        error.response = { data: { message: errorMessage } }
+        throw error
+      }
+      
+      const responseData = await response.json()
+      return { data: responseData }
+    } catch (error: any) {
+      // Si el error ya tiene formato correcto, re-lanzarlo
+      if (error.response || error.status) {
+        throw error
+      }
+      // Si no, crear un error con formato estándar
+      const formattedError: any = new Error(error.message || "Error de conexión")
+      formattedError.status = error.status || 500
+      formattedError.response = { data: { message: error.message || "Error de conexión" } }
+      throw formattedError
+    }
+  },
+
+  // Auth: recuperación de contraseña
+  forgotPassword: async (email: string) => {
+    const response = await api.post("/auth/forgot-password", { email })
+    return response.data as { message: string }
+  },
+
+  resetPassword: async (token: string, newPassword: string) => {
+    const response = await api.post("/auth/reset-password", { token, newPassword })
+    return response.data as { message: string }
+  },
+}
+
+// Función para normalizar URLs de imágenes
+function normalizeImageUrl(imagePath: string): string {
+  // Si ya es una URL completa, retornarla tal cual
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath
+  }
+  
+  // Si empieza con /uploads, construir la URL completa del backend
+  if (imagePath.startsWith('/uploads/')) {
+    return `${API_BASE_URL}${imagePath}`
+  }
+  
+  // Si empieza con /, asumir que es una ruta relativa del backend
+  if (imagePath.startsWith('/')) {
+    return `${API_BASE_URL}${imagePath}`
+  }
+  
+  // Si no tiene prefijo, asumir que es relativa a uploads
+  return `${API_BASE_URL}/uploads/${imagePath}`
+}
+
+// Función para mapear productos del backend al formato del frontend
+export function mapBackendProductToFrontend(backendProduct: BackendProduct): import('./mock-data').Product {
+  const priceUSD = backendProduct.priceUSD 
+    ? (typeof backendProduct.priceUSD === 'string' ? parseFloat(backendProduct.priceUSD) : backendProduct.priceUSD)
+    : 0
+  
+  const comparePriceUSD = backendProduct.comparePriceUSD
+    ? (typeof backendProduct.comparePriceUSD === 'string' ? parseFloat(backendProduct.comparePriceUSD) : backendProduct.comparePriceUSD)
+    : undefined
+
+  // Determinar si está en oferta (tiene precio comparación)
+  const isOnSale = !!comparePriceUSD && comparePriceUSD > priceUSD
+  const salePercentage = isOnSale && comparePriceUSD
+    ? Math.round(((comparePriceUSD - priceUSD) / comparePriceUSD) * 100)
+    : undefined
+
+  // Convertir isActive a status
+  let status: "active" | "draft" | "archived" = "active"
+  if (!backendProduct.isActive) {
+    status = "archived"
+  }
+
+  // Normalizar URLs de imágenes
+  const images = backendProduct.images.length > 0 
+    ? backendProduct.images.map(normalizeImageUrl)
+    : ['/placeholder.svg']
+
+  return {
+    id: backendProduct.id,
+    name: backendProduct.name,
+    slug: backendProduct.slug,
+    shortDescription: backendProduct.shortDescription || '',
+    description: backendProduct.description,
+    details: '', // El backend no tiene este campo específico, dejar vacío o usar description
+    category: backendProduct.category.name,
+    categoryId: backendProduct.categoryId,
+    priceUSD: priceUSD,
+    comparePriceUSD: comparePriceUSD,
+    stock: backendProduct.stock,
+    images: images,
+    status: status,
+    isOnSale: isOnSale,
+    salePercentage: salePercentage,
+    createdAt: backendProduct.createdAt,
+    // Incluir isFeatured como propiedad adicional (no está en el tipo Product pero lo necesitamos)
+    isFeatured: backendProduct.isFeatured ?? false,
+    // Incluir isCombo como propiedad adicional (no está en el tipo Product pero lo necesitamos)
+    isCombo: backendProduct.isCombo ?? false,
+  } as import('./mock-data').Product & { isFeatured: boolean }
+}

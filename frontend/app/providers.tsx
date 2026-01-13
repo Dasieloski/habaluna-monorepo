@@ -1,14 +1,13 @@
-'use client';
+"use client"
 
-import { ThemeProvider } from 'next-themes';
-import { Toaster } from '@/components/ui/toaster';
+import type { ReactNode } from "react"
+import { SessionBootstrap } from "@/components/auth/session-bootstrap"
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <>
+      <SessionBootstrap />
       {children}
-      <Toaster />
-    </ThemeProvider>
-  );
+    </>
+  )
 }
-

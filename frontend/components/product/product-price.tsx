@@ -1,44 +1,35 @@
-'use client';
-
-import { formatPrice } from '@/lib/utils';
-import { isCatalogMode } from '@/lib/catalog-mode';
+import { toNumber } from "@/lib/money"
 
 interface ProductPriceProps {
-  priceUSD?: number | string | null;
-  priceMNs?: number | string | null;
-  comparePriceUSD?: number | string | null;
-  comparePriceMNs?: number | string | null;
-  variant?: 'default' | 'large';
-  className?: string;
+  priceUSD?: number
+  priceMNs?: number
+  comparePriceUSD?: number
+  comparePriceMNs?: number
+  variant?: "default" | "large"
 }
 
-export function ProductPrice({
-  priceUSD,
-  priceMNs,
-  comparePriceUSD,
-  comparePriceMNs,
-  variant = 'default',
-  className = '',
-}: ProductPriceProps) {
-  // En modo catálogo, no mostrar precios
-  if (isCatalogMode()) {
-    return null;
+export function ProductPrice({ priceUSD, comparePriceUSD, variant = "default" }: ProductPriceProps) {
+  const price = toNumber(priceUSD) ?? 0
+  const compare = toNumber(comparePriceUSD)
+  const hasDiscount = compare !== null && compare > price
+
+  if (variant === "large") {
+    return (
+      <div className="flex items-baseline gap-3">
+        <span className="text-2xl font-bold text-foreground">${price.toFixed(2)}</span>
+        {hasDiscount && (
+          <span className="text-lg text-muted-foreground line-through">${compare!.toFixed(2)}</span>
+        )}
+      </div>
+    )
   }
 
-  const priceClass = variant === 'large' ? 'text-2xl' : 'text-xl';
-  const compareClass = variant === 'large' ? 'text-sm' : 'text-sm';
-
   return (
-    <div className={className}>
-      <p className={`${priceClass} font-bold text-primary`}>
-        {formatPrice(priceUSD, priceMNs)}
-      </p>
-      {(comparePriceUSD || comparePriceMNs) && (
-        <p className={`${compareClass} text-gray-400 line-through`}>
-          {formatPrice(comparePriceUSD, comparePriceMNs)}
-        </p>
+    <div className="flex items-center gap-2">
+      <span className="text-base font-bold text-foreground">${price.toFixed(2)}</span>
+      {hasDiscount && (
+        <span className="text-sm text-muted-foreground line-through">${compare!.toFixed(2)}</span>
       )}
     </div>
-  );
+  )
 }
-
