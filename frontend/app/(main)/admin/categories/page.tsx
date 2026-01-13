@@ -459,7 +459,15 @@ function CategoriesContent() {
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => onPickImage(e.target.files?.[0] ?? null)}
+                    onClick={(e) => {
+                      // Permitir re-seleccionar el mismo archivo (si el valor no cambia, algunos browsers no disparan onChange)
+                      ;(e.currentTarget as HTMLInputElement).value = ""
+                    }}
+                    onChange={(e) => {
+                      const file = e.currentTarget.files?.[0] ?? null
+                      e.currentTarget.value = ""
+                      onPickImage(file)
+                    }}
                     className="bg-secondary/50 border-transparent focus:border-primary"
                   />
                 </div>

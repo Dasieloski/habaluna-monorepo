@@ -53,10 +53,13 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
   const statusRef = useRef<"active" | "draft" | "archived">("active")
   const [isFeatured, setIsFeatured] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  // Evita que la carga async del producto (loadFullProduct) sobreescriba previews recién seleccionados.
+  const hasUserTouchedImagesRef = useRef(false)
 
   // Cargar categorías y datos del producto cuando se abre el dialog
   useEffect(() => {
     if (open && product) {
+      hasUserTouchedImagesRef.current = false
       loadCategories()
       loadFullProduct()
     } else if (!open) {
@@ -140,8 +143,11 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
       // Si no tiene /, agregarlo
       return `http://localhost:4000/${img}`
     }).filter(img => img !== '')
-    setImages(normalizedImages)
-    setImageFiles([])
+    // Solo setear imágenes iniciales si el usuario aún no ha seleccionado nuevas (para no “pisar” previews)
+    if (!hasUserTouchedImagesRef.current) {
+      setImages(normalizedImages)
+      setImageFiles([])
+    }
 
     // Configurar estado
     statusRef.current = productToLoad.status || "draft"
@@ -246,7 +252,8 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
     if (!files) return
 
     const newFiles = Array.from(files)
-    setImageFiles([...imageFiles, ...newFiles])
+    hasUserTouchedImagesRef.current = true
+    setImageFiles((prev) => [...prev, ...newFiles])
 
     // Crear URLs temporales para previsualización
     newFiles.forEach((file) => {
@@ -258,12 +265,12 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
     })
 
     // Limpiar el input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
+    e.target.value = ""
+    if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
   const removeImage = (index: number) => {
+    hasUserTouchedImagesRef.current = true
     const productToUse = fullProduct || product
     const totalExistingImages = productToUse?.images?.length || 0
     const currentExistingImages = images.length - imageFiles.length
@@ -272,10 +279,10 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
     if (index >= currentExistingImages) {
       // Es una imagen nueva, removerla de imageFiles
       const newImageIndex = index - currentExistingImages
-      setImageFiles(imageFiles.filter((_, i) => i !== newImageIndex))
+      setImageFiles((prev) => prev.filter((_, i) => i !== newImageIndex))
     }
     // Remover de la lista visual
-    setImages(images.filter((_, i) => i !== index))
+    setImages((prev) => prev.filter((_, i) => i !== index))
   }
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

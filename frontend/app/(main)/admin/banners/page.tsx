@@ -727,12 +727,20 @@ export default function AdminBannersPage() {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => pickImage(e.target.files?.[0] || null)}
+                  onChange={(e) => {
+                    const f = e.currentTarget.files?.[0] || null
+                    // permitir re-seleccionar el mismo archivo (si el usuario elige el mismo, el browser no dispara change)
+                    e.currentTarget.value = ""
+                    pickImage(f)
+                  }}
                 />
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => {
+                    if (fileInputRef.current) fileInputRef.current.value = ""
+                    fileInputRef.current?.click()
+                  }}
                 >
                   <ImageIcon className="w-4 h-4 mr-2" />
                   Subir

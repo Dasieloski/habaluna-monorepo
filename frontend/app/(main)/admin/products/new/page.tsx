@@ -146,7 +146,7 @@ export default function NewProductPage() {
     if (!files) return
 
     const newFiles = Array.from(files)
-    setImageFiles([...imageFiles, ...newFiles])
+    setImageFiles((prev) => [...prev, ...newFiles])
 
     // Crear URLs temporales para previsualización
     newFiles.forEach((file) => {
@@ -158,14 +158,13 @@ export default function NewProductPage() {
     })
 
     // Limpiar el input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
+    e.target.value = ""
+    if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
   const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index))
-    setImageFiles(imageFiles.filter((_, i) => i !== index))
+    setImages((prev) => prev.filter((_, i) => i !== index))
+    setImageFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
   // Generar slug automáticamente desde el nombre
