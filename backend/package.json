@@ -8,8 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
-    "prestart": "prisma generate && (npx prisma migrate deploy || npx prisma db push || true) && (npx prisma db seed || true)",
-    "start": "nest start",
+    "prestart": "node -e \"console.log('Skipping prestart (migrations/seed should run in a release phase, not on boot)')\"",
+    "start": "node dist/src/main.js",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "seed:if": "node -e \"process.exit(['true','1','yes'].includes(String(process.env.RUN_SEED||'').toLowerCase())?0:1)\" && npx prisma db seed || echo \"Skipping seed (set RUN_SEED=true to run)\"",

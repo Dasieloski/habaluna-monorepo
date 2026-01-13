@@ -62,6 +62,50 @@ async function bootstrap() {
   );
   logger.log(`CORS - NODE_ENV: ${process.env.NODE_ENV}, FRONTEND_URL: ${frontendUrl}`, 'Bootstrap');
 
+  // IMPORTANTE: Responder preflight (OPTIONS) ANTES del middleware cors().
+  // Si cors() rechaza un origin, Express salta a error-handlers y los middlewares normales no se ejecutan.
+  // Poniéndolo primero garantizamos headers CORS en preflight para orígenes esperados.
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      const origin = req.headers.origin as string | undefined;
+      if (origin) {
+        const normalizedOrigin = origin.replace(/\/$/, '').toLowerCase();
+        const originDomain = getBaseDomain(normalizedOrigin);
+        const normalizedAllowed = allowedOriginsList.map((o) => o.replace(/\/$/, '').toLowerCase());
+
+        const isAllowed =
+          normalizedAllowed.includes(normalizedOrigin) ||
+          // mismo dominio base (con/sin www)
+          normalizedAllowed.some((o) => getBaseDomain(o) === originDomain) ||
+          // dominios del proyecto
+          originDomain === 'habaluna.com' ||
+          originDomain.endsWith('.habaluna.com') ||
+          originDomain === 'habanaluna.com' ||
+          originDomain.endsWith('.habanaluna.com') ||
+          // hosts de plataformas
+          normalizedOrigin.includes('.vercel.app') ||
+          normalizedOrigin.includes('.railway.app') ||
+          // desarrollo
+          (process.env.NODE_ENV !== 'production' &&
+            (normalizedOrigin.includes('localhost') || normalizedOrigin.includes('127.0.0.1')));
+
+        if (isAllowed) {
+          res.header('Vary', 'Origin');
+          res.header('Access-Control-Allow-Origin', origin);
+          res.header('Access-Control-Allow-Credentials', 'true');
+          res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
+          res.header(
+            'Access-Control-Allow-Headers',
+            'Content-Type, Authorization, X-Requested-With, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers, X-CSRF-Token',
+          );
+          res.header('Access-Control-Max-Age', '86400');
+          return res.status(204).end();
+        }
+      }
+    }
+    next();
+  });
+
   app.enableCors({
     origin: (origin, callback) => {
       // Log para debugging (usar log en lugar de debug para que se vea en producción)
@@ -282,9 +326,9 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const port = process.env.PORT || 4000;
-  await app.listen(port);
-  logger.log(`🚀 Server running on http://localhost:${port}`, 'Bootstrap');
-  logger.log(`📚 Swagger docs available at http://localhost:${port}/api/docs`, 'Bootstrap');
+  await app.listen(port, '0.0.0.0');
+  logger.log(`🚀 Server running on 0.0.0.0:${port}`, 'Bootstrap');
+  logger.log(`📚 Swagger docs available at /api/docs`, 'Bootstrap');
 }
 
 bootstrap();
