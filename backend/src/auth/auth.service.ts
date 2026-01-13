@@ -41,11 +41,22 @@ export class AuthService {
   }
 
   /**
+   * Determinar si debemos comportarnos "production-like" para cookies.
+   * En Railway es común que NODE_ENV no esté seteado, pero el frontend es HTTPS y necesita SameSite=None+Secure.
+   */
+  private isProdLike(): boolean {
+    const nodeEnv = String(this.config.get<string>('NODE_ENV') || '').toLowerCase();
+    const frontendUrl = String(this.config.get<string>('FRONTEND_URL') || '').toLowerCase();
+    const railwayEnv = String(this.config.get<string>('RAILWAY_ENVIRONMENT') || '').toLowerCase();
+    return nodeEnv === 'production' || railwayEnv === 'production' || frontendUrl.startsWith('https://');
+  }
+
+  /**
    * Cookie HttpOnly para refresh token (rotación server-side).
    */
   setRefreshCookie(res: Response, refreshToken: string) {
     const name = this.getRefreshCookieName();
-    const isProd = this.config.get<string>('NODE_ENV') === 'production';
+    const isProd = this.isProdLike();
     const cookieDomain = (this.config.get<string>('COOKIE_DOMAIN') || '').trim();
 
     res.cookie(name, refreshToken, {
@@ -62,7 +73,7 @@ export class AuthService {
 
   clearRefreshCookie(res: Response) {
     const name = this.getRefreshCookieName();
-    const isProd = this.config.get<string>('NODE_ENV') === 'production';
+    const isProd = this.isProdLike();
     const cookieDomain = (this.config.get<string>('COOKIE_DOMAIN') || '').trim();
     res.clearCookie(name, {
       httpOnly: true,
