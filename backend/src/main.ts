@@ -221,6 +221,10 @@ async function bootstrap() {
     prefix: '/uploads',
   });
 
+  // Compatibilidad: servir también directamente desde la raíz para rutas antiguas
+  // Ej: /banners/banner-1.jpg, /products/xxx.jpg -> uploads/banners/banner-1.jpg, uploads/products/xxx.jpg
+  app.useStaticAssets(uploadsPath);
+
   // Con proxies (Railway / reverse proxy), Express debe confiar en X-Forwarded-For
   if (process.env.TRUST_PROXY === 'true' || process.env.NODE_ENV === 'production') {
     app.set('trust proxy', 1);
