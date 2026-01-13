@@ -33,6 +33,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingProduct, setIsLoadingProduct] = useState(false)
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null)
   const [categories, setCategories] = useState<BackendCategory[]>([])
   const [fullProduct, setFullProduct] = useState<Product | null>(null)
   const [images, setImages] = useState<string[]>([])
@@ -191,14 +192,21 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
 
       // Subir nuevas imágenes primero
       const uploadedImageUrls: string[] = []
+      if (imageFiles.length > 0) {
+        setUploadProgress({ current: 0, total: imageFiles.length })
+      }
+      let idx = 0
       for (const file of imageFiles) {
         try {
+          idx++
+          setUploadProgress({ current: idx, total: imageFiles.length })
           const imageUrl = await api.uploadImage(file)
           uploadedImageUrls.push(imageUrl)
         } catch (err) {
           console.error("Error al subir imagen:", err)
         }
       }
+      setUploadProgress(null)
 
       // Combinar imágenes existentes (que no fueron removidas) con las nuevas
       // Las imágenes que están en imageFiles son nuevas, las demás son existentes
@@ -243,6 +251,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
         variant: "destructive",
       })
     } finally {
+      setUploadProgress(null)
       setIsLoading(false)
     }
   }
@@ -390,6 +399,12 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
           {/* Imágenes */}
           <div className="space-y-2">
             <Label>Imágenes</Label>
+            {uploadProgress ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Subiendo imágenes {uploadProgress.current}/{uploadProgress.total}...
+              </div>
+            ) : null}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {images.map((image, index) => (
                 <div key={index} className="relative aspect-square rounded-lg bg-secondary overflow-hidden group">
@@ -401,6 +416,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
+                    disabled={isLoading}
                     className="absolute top-2 right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X className="w-4 h-4" />
@@ -417,6 +433,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
                   multiple
                   onChange={handleImageUpload}
                   className="hidden"
+                  disabled={isLoading}
                 />
               </label>
             </div>

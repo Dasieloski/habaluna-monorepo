@@ -21,6 +21,7 @@ export default function NewProductPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null)
   const [categories, setCategories] = useState<BackendCategory[]>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
   const [images, setImages] = useState<string[]>([]) // URLs de imágenes subidas
@@ -90,8 +91,14 @@ export default function NewProductPage() {
 
       // Subir imágenes primero
       const uploadedImageUrls: string[] = []
+      if (imageFiles.length > 0) {
+        setUploadProgress({ current: 0, total: imageFiles.length })
+      }
+      let idx = 0
       for (const file of imageFiles) {
         try {
+          idx++
+          setUploadProgress({ current: idx, total: imageFiles.length })
           const imageUrl = await api.uploadImage(file)
           uploadedImageUrls.push(imageUrl)
         } catch (err) {
@@ -99,6 +106,7 @@ export default function NewProductPage() {
           // Continuar aunque falle una imagen
         }
       }
+      setUploadProgress(null)
 
       // Crear el objeto del producto
       const productData = {
@@ -137,6 +145,7 @@ export default function NewProductPage() {
         variant: "destructive",
       })
     } finally {
+      setUploadProgress(null)
       setIsLoading(false)
     }
   }
@@ -285,6 +294,12 @@ export default function NewProductPage() {
                 <CardDescription>Añade fotos del producto</CardDescription>
               </CardHeader>
               <CardContent>
+                {uploadProgress ? (
+                  <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Subiendo imágenes {uploadProgress.current}/{uploadProgress.total}...
+                  </div>
+                ) : null}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {images.map((image, index) => (
                     <div key={index} className="relative aspect-square rounded-xl bg-secondary overflow-hidden group">
@@ -296,6 +311,7 @@ export default function NewProductPage() {
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
+                        disabled={isLoading}
                         className="absolute top-2 right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X className="w-4 h-4" />
@@ -312,6 +328,7 @@ export default function NewProductPage() {
                       multiple
                       onChange={handleImageUpload}
                       className="hidden"
+                      disabled={isLoading}
                     />
                   </label>
                 </div>

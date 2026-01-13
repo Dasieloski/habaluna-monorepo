@@ -36,7 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Plus, Search, Pencil, Trash2, Image as ImageIcon, ArrowUp, ArrowDown, Link as LinkIcon } from "lucide-react"
+import { Plus, Search, Pencil, Trash2, Image as ImageIcon, ArrowUp, ArrowDown, Link as LinkIcon, Loader2 } from "lucide-react"
 
 const getApiBaseUrl = () => {
   const raw = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
@@ -111,6 +111,7 @@ export default function AdminBannersPage() {
   })
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
 
   const [linkMode, setLinkMode] = useState<"none" | "combos" | "combo" | "product" | "custom">("none")
   const [comboOptions, setComboOptions] = useState<Array<{ id: string; name: string; slug: string }>>([])
@@ -320,11 +321,14 @@ export default function AdminBannersPage() {
   const pickImage = async (file: File | null) => {
     if (!file) return
     setError("")
+    setIsUploadingImage(true)
     try {
       const url = await api.uploadImage(file)
       setForm((p) => ({ ...p, image: url }))
     } catch (e: any) {
       setError(e?.message || "No se pudo subir la imagen.")
+    } finally {
+      setIsUploadingImage(false)
     }
   }
 
@@ -727,6 +731,7 @@ export default function AdminBannersPage() {
                   type="file"
                   accept="image/*"
                   className="hidden"
+                  disabled={isUploadingImage || isSaving}
                   onChange={(e) => {
                     const f = e.currentTarget.files?.[0] || null
                     // permitir re-seleccionar el mismo archivo (si el usuario elige el mismo, el browser no dispara change)
@@ -741,9 +746,19 @@ export default function AdminBannersPage() {
                     if (fileInputRef.current) fileInputRef.current.value = ""
                     fileInputRef.current?.click()
                   }}
+                  disabled={isUploadingImage || isSaving}
                 >
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Subir
+                  {isUploadingImage ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Subiendo...
+                    </>
+                  ) : (
+                    <>
+                      <ImageIcon className="w-4 h-4 mr-2" />
+                      Subir
+                    </>
+                  )}
                 </Button>
               </div>
               {form.image ? (

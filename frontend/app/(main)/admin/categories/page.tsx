@@ -27,7 +27,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Plus, Search, Pencil, Trash2, FolderTree, Package, Image as ImageIcon } from "lucide-react"
+import { Plus, Search, Pencil, Trash2, FolderTree, Package, Image as ImageIcon, Loader2 } from "lucide-react"
 import { slugify } from "@/lib/slug"
 
 type CategoryRow = BackendAdminCategory & { productCount: number }
@@ -52,6 +52,7 @@ function CategoriesContent() {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<CategoryRow | null>(null)
@@ -183,11 +184,14 @@ function CategoriesContent() {
   const onPickImage = async (file: File | null) => {
     if (!file) return
     setError("")
+    setIsUploadingImage(true)
     try {
       const url = await api.uploadImage(file)
       setNewCategory((prev) => ({ ...prev, image: url }))
     } catch (e: any) {
       setError(e?.message || "No se pudo subir la imagen.")
+    } finally {
+      setIsUploadingImage(false)
     }
   }
 
@@ -469,8 +473,15 @@ function CategoriesContent() {
                       onPickImage(file)
                     }}
                     className="bg-secondary/50 border-transparent focus:border-primary"
+                    disabled={isUploadingImage || isSaving}
                   />
                 </div>
+                {isUploadingImage ? (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Subiendo imagen...
+                  </div>
+                ) : null}
                 <p className="text-xs text-muted-foreground">La imagen se sube al backend y se guarda en uploads.</p>
               </div>
 

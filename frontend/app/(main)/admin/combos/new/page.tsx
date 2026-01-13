@@ -23,6 +23,7 @@ export default function NewComboPage() {
   const { toast } = useToast()
 
   const [isLoading, setIsLoading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null)
 
   const [images, setImages] = useState<string[]>([]) // previews
   const [imageFiles, setImageFiles] = useState<File[]>([])
@@ -212,14 +213,21 @@ export default function NewComboPage() {
       }
 
       const uploadedImageUrls: string[] = []
+      if (imageFiles.length > 0) {
+        setUploadProgress({ current: 0, total: imageFiles.length })
+      }
+      let idx = 0
       for (const file of imageFiles) {
         try {
+          idx++
+          setUploadProgress({ current: idx, total: imageFiles.length })
           const imageUrl = await api.uploadImage(file)
           uploadedImageUrls.push(imageUrl)
         } catch {
           // ignore individual image
         }
       }
+      setUploadProgress(null)
 
       await api.createProduct({
         name: nameRef.current.value,
@@ -244,6 +252,7 @@ export default function NewComboPage() {
       setError(msg)
       toast({ title: "Error", description: msg, variant: "destructive" })
     } finally {
+      setUploadProgress(null)
       setIsLoading(false)
     }
   }
@@ -405,9 +414,28 @@ export default function NewComboPage() {
                 <CardDescription>Sube imágenes del combo</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {uploadProgress ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Subiendo imágenes {uploadProgress.current}/{uploadProgress.total}...
+                  </div>
+                ) : null}
                 <div className="flex items-center gap-3">
-                  <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
-                  <Button type="button" variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleImageUpload}
+                    disabled={isLoading}
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isLoading}
+                  >
                     <ImagePlus className="w-4 h-4 mr-2" />
                     Subir imágenes
                   </Button>
@@ -418,7 +446,12 @@ export default function NewComboPage() {
                       <div key={i} className="relative rounded-lg overflow-hidden border">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={src} alt="preview" className="w-full h-28 object-cover" />
-                        <button type="button" onClick={() => removeImage(i)} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1">
+                        <button
+                          type="button"
+                          onClick={() => removeImage(i)}
+                          disabled={isLoading}
+                          className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1"
+                        >
                           <X className="w-4 h-4" />
                         </button>
                       </div>
