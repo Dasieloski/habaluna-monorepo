@@ -66,8 +66,16 @@ export class EmailService {
       <p>Si no lo solicitaste, ignora este correo.</p>
     `;
 
-    // Usar sendEmail para tener manejo de errores consistente
-    return this.sendEmail({ from, to: params.to, subject, text, html });
+    this.logger.log(`Intentando enviar email de recuperación a ${params.to}`);
+    const result = await this.sendEmail({ from, to: params.to, subject, text, html });
+    
+    if (result.sent) {
+      this.logger.log(`Email de recuperación enviado exitosamente a ${params.to}`);
+    } else {
+      this.logger.warn(`No se pudo enviar email de recuperación a ${params.to}. Error: ${result.error || 'desconocido'}`);
+    }
+    
+    return result;
   }
 
   async sendWelcomeEmail(params: { to: string; firstName?: string }) {
