@@ -2,6 +2,11 @@
 const nextConfig = {
   // Comentar standalone temporalmente para verificar si funciona sin él
   // output: 'standalone',
+  // Asegurar que las rutas dinámicas se generen correctamente
+  experimental: {
+    // Habilitar generación dinámica de rutas
+    dynamicIO: true,
+  },
   typescript: {
     // Permite que `next build` (y por ende Vercel) no falle por errores de TypeScript.
     // Úsalo solo si lo necesitas temporalmente; puede ocultar bugs reales.

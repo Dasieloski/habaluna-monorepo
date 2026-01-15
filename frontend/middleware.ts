@@ -69,16 +69,15 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Excluir completamente las rutas de auth del middleware
-  // Esto asegura que Next.js procese las rutas dinámicas sin interferencia
+  // CRÍTICO: El matcher debe excluir completamente /auth para que Next.js procese las rutas dinámicas
+  // Si el matcher incluye /auth, el middleware se ejecuta y puede interferir
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
+     * - _next (Next.js internals - static files, image optimization, etc)
      * - favicon.ico (favicon file)
-     * - auth (auth routes including reset-password with dynamic segments) - COMPLETAMENTE EXCLUIDO
+     * - auth (auth routes - DEBE estar excluido completamente del matcher)
      * - admin (admin routes)
      * - maintenance and coming-soon pages
      */
