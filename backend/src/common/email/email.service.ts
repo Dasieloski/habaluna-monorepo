@@ -1,13 +1,26 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { createHmac } from 'crypto';
 
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
+  private resendClient: Resend | null = null;
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService) {
+    // Inicializar Resend si está configurado
+    const resendApiKey = this.config.get<string>('RESEND_API_KEY');
+    if (resendApiKey) {
+      try {
+        this.resendClient = new Resend(resendApiKey);
+        this.logger.log('Resend inicializado correctamente');
+      } catch (error) {
+        this.logger.error(`Error inicializando Resend: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+  }
 
   getFromAddress(): string {
     return this.config.get<string>('EMAIL_FROM') ?? 'no-reply@habanaluna.local';
@@ -47,7 +60,7 @@ export class EmailService {
       transport.verify((error) => {
         if (error) {
           this.logger.error(`Error verificando conexión SMTP a ${host}:${port}: ${error.message}`);
-          if (error.code === 'ENOTFOUND') {
+          if ((error as any).code === 'ENOTFOUND') {
             this.logger.error(`El hostname SMTP "${host}" no se puede resolver. Verifica que el hostname sea correcto.`);
           }
         } else {
@@ -216,10 +229,41 @@ export class EmailService {
     text: string;
     html: string;
   }) {
+    // Intentar usar Resend primero si está configurado
+    if (this.resendClient) {
+      try {
+        const fromAddress = this.config.get<string>('RESEND_FROM') || params.from;
+        this.logger.log(`Enviando email vía Resend a ${params.to}`);
+        
+        const result = await this.resendClient.emails.send({
+          from: fromAddress,
+          to: params.to,
+          subject: params.subject,
+          html: params.html,
+          text: params.text,
+        });
+
+        if (result.error) {
+          this.logger.error(`Error enviando email vía Resend: ${result.error.message}`);
+          return { sent: false, error: result.error.message };
+        }
+
+        this.logger.log(`Email enviado exitosamente vía Resend. ID: ${result.data?.id}`);
+        return { sent: true };
+      } catch (error) {
+        this.logger.error(
+          `Error enviando email vía Resend a ${params.to}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        // Fallback a SMTP si Resend falla
+        this.logger.log('Intentando fallback a SMTP...');
+      }
+    }
+
+    // Fallback a SMTP si Resend no está configurado o falló
     const transport = this.createTransport();
     if (!transport) {
-      this.logger.warn(`SMTP no configurado. No se envió email a ${params.to}`);
-      return { sent: false };
+      this.logger.warn(`Ni Resend ni SMTP están configurados. No se envió email a ${params.to}`);
+      return { sent: false, error: 'No hay proveedor de email configurado' };
     }
 
     try {
