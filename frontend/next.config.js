@@ -2,6 +2,8 @@
 const nextConfig = {
   // CRÍTICO: Railway necesita output: 'standalone' para servir rutas dinámicas correctamente
   output: 'standalone',
+  // Asegurar que todas las rutas se sirvan correctamente
+  trailingSlash: false,
   typescript: {
     // Permite que `next build` (y por ende Vercel) no falle por errores de TypeScript.
     // Úsalo solo si lo necesitas temporalmente; puede ocultar bugs reales.

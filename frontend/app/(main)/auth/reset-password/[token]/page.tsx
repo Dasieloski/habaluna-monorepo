@@ -9,6 +9,7 @@ import type { Metadata } from "next"
 import { ResetPasswordClient } from "./reset-password-client"
 
 // CRÍTICO: Forzar modo dinámico para Next.js 16 en producción
+// Similar a /products/[slug] pero con revalidate = 0 para no cachear
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 export const revalidate = 0
@@ -75,19 +76,44 @@ export default async function ResetPasswordPage({ params }: PageProps) {
     
     const { token } = resolvedParams
 
-    // Paso 2: Validar token
+    // Paso 2: Validar token (validación exhaustiva)
     console.log('[ResetPassword] [PAGE] Paso 2: Validando token...')
-    if (!token || typeof token !== "string" || token.trim() === "") {
-      console.error('[ResetPassword] [PAGE] Paso 2 ERROR - Token inválido:', {
-        token: token,
-        type: typeof token,
-        isEmpty: !token,
-        isString: typeof token === "string",
-        isTrimmedEmpty: typeof token === "string" && token.trim() === ""
-      })
+    console.log('[ResetPassword] [PAGE] Token recibido:', {
+      value: token,
+      type: typeof token,
+      length: token?.length,
+      isEmpty: !token,
+      isString: typeof token === "string",
+      isTrimmedEmpty: typeof token === "string" && token.trim() === "",
+      preview: typeof token === "string" ? token.substring(0, 20) + '...' : 'N/A'
+    })
+    
+    // Validación exhaustiva del token
+    if (!token) {
+      console.error('[ResetPassword] [PAGE] Paso 2 ERROR - Token es null/undefined')
       notFound()
     }
-    console.log('[ResetPassword] [PAGE] Paso 2 COMPLETADO - Token válido')
+    
+    if (typeof token !== "string") {
+      console.error('[ResetPassword] [PAGE] Paso 2 ERROR - Token no es string:', typeof token)
+      notFound()
+    }
+    
+    if (token.trim() === "") {
+      console.error('[ResetPassword] [PAGE] Paso 2 ERROR - Token está vacío después de trim')
+      notFound()
+    }
+    
+    // Validar formato básico del token (debe ser hexadecimal, mínimo 32 caracteres)
+    const tokenPattern = /^[a-f0-9]{32,}$/i
+    if (!tokenPattern.test(token.trim())) {
+      console.warn('[ResetPassword] [PAGE] Paso 2 WARNING - Token no coincide con patrón esperado, pero continuando')
+    }
+    
+    console.log('[ResetPassword] [PAGE] Paso 2 COMPLETADO - Token válido:', {
+      length: token.length,
+      preview: token.substring(0, 20) + '...'
+    })
 
     // Paso 3: Decodificar token
     console.log('[ResetPassword] [PAGE] Paso 3: Decodificando token...')
