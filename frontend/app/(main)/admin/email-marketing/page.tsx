@@ -369,7 +369,7 @@ export default function AdminEmailMarketingPage() {
                     <Input value={campPreheader} onChange={(e) => setCampPreheader(e.target.value)} placeholder="Texto corto que aparece en la bandeja..." />
                   </div>
                   <div className="md:col-span-2">
-                    <Label>HTML (soporta variables: {{firstName}}, {{email}})</Label>
+                    <Label>HTML (soporta variables: {"{{firstName}}"}, {"{{email}}"})</Label>
                     <Textarea value={campHtml} onChange={(e) => setCampHtml(e.target.value)} className="min-h-48 font-mono text-xs" />
                   </div>
                   <div className="md:col-span-2">

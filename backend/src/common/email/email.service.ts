@@ -25,6 +25,8 @@ export class EmailService {
       return null;
     }
 
+    this.logger.log(`Configurando SMTP: host=${host}, port=${port}, secure=${secure}, user=${user}`);
+
     try {
       const transport = nodemailer.createTransport({
         host,
@@ -35,14 +37,21 @@ export class EmailService {
         tls: {
           rejectUnauthorized: false, // Permitir certificados autofirmados (útil para algunos servidores SMTP)
         },
+        // Timeout más largo para conexiones lentas
+        connectionTimeout: 10000, // 10 segundos
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
       });
 
-      // Verificar la conexión
+      // Verificar la conexión de forma asíncrona (no bloquea)
       transport.verify((error) => {
         if (error) {
-          this.logger.error(`Error verificando conexión SMTP: ${error.message}`);
+          this.logger.error(`Error verificando conexión SMTP a ${host}:${port}: ${error.message}`);
+          if (error.code === 'ENOTFOUND') {
+            this.logger.error(`El hostname SMTP "${host}" no se puede resolver. Verifica que el hostname sea correcto.`);
+          }
         } else {
-          this.logger.log('Conexión SMTP verificada correctamente');
+          this.logger.log(`Conexión SMTP verificada correctamente a ${host}:${port}`);
         }
       });
 
@@ -51,6 +60,9 @@ export class EmailService {
       this.logger.error(
         `Error creando transporte SMTP: ${error instanceof Error ? error.message : String(error)}`,
       );
+      if (error instanceof Error && error.message.includes('ENOTFOUND')) {
+        this.logger.error(`No se puede resolver el hostname "${host}". Verifica que sea correcto.`);
+      }
       return null;
     }
   }
