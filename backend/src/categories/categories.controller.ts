@@ -6,12 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { AssignProductsToCategoryDto } from './dto/assign-products.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -22,9 +26,29 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(1800) // Cache por 30 minutos (categorías cambian raramente)
   @ApiOperation({ summary: 'Get all categories' })
   async findAll() {
     return this.categoriesService.findAll();
+  }
+
+  @Get('admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all categories (Admin only)' })
+  async findAllAdmin() {
+    return this.categoriesService.findAllAdmin();
+  }
+
+  @Get('uncategorized')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get or create uncategorized category (Admin only)' })
+  async getUncategorized() {
+    return this.categoriesService.ensureUncategorizedCategory();
   }
 
   @Get('slug/:slug')
@@ -57,13 +81,31 @@ export class CategoriesController {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 
+  @Patch(':id/products')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Assign products to category (Admin only)' })
+  async assignProducts(@Param('id') id: string, @Body() dto: AssignProductsToCategoryDto) {
+    return this.categoriesService.assignProducts(id, dto.productIds);
+  }
+
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete category (Admin only)' })
-  async remove(@Param('id') id: string) {
-    return this.categoriesService.remove(id);
+  @ApiQuery({
+    name: 'mode',
+    required: true,
+    enum: ['delete_with_products', 'move_products_to_uncategorized'],
+    description:
+      'delete_with_products: elimina la categoría y sus productos; move_products_to_uncategorized: mueve productos a "Sin categoría" (inactivos) y elimina la categoría',
+  })
+  async remove(
+    @Param('id') id: string,
+    @Query('mode') mode: 'delete_with_products' | 'move_products_to_uncategorized',
+  ) {
+    return this.categoriesService.remove(id, mode);
   }
 }
-

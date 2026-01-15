@@ -1,10 +1,14 @@
 'use client';
 
+// Configuración para rutas dinámicas Client Components
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
-import { getFirstImage } from '@/lib/image-utils';
+import { getFirstImage, getImageUrl } from '@/lib/image-utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -106,7 +110,7 @@ export default function OrderDetailPage() {
               </p>
               <p>{order.shippingAddress.address}</p>
               <p>
-                {order.shippingAddress.zipCode} {order.shippingAddress.city}
+                {(order.shippingAddress.municipality ? `${order.shippingAddress.municipality}, ` : '') + (order.shippingAddress.city || '')}
               </p>
               <p>{order.shippingAddress.country}</p>
               {order.shippingAddress.phone && <p>{order.shippingAddress.phone}</p>}
@@ -126,10 +130,6 @@ export default function OrderDetailPage() {
               <div className="flex justify-between">
                 <span>Subtotal</span>
                 <span>{formatPrice(order.subtotal)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>IVA (21%)</span>
-                <span>{formatPrice(order.tax)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Envío</span>
@@ -157,7 +157,7 @@ export default function OrderDetailPage() {
                 <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center">
                   {getFirstImage(item.product.images) ? (
                     <img
-                      src={getFirstImage(item.product.images)!}
+                      src={getImageUrl(getFirstImage(item.product.images))!}
                       alt={item.product.name}
                       className="w-full h-full object-contain rounded-lg"
                     />

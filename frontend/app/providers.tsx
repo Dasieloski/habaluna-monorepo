@@ -1,14 +1,15 @@
-'use client';
+"use client"
 
-import { ThemeProvider } from 'next-themes';
-import { Toaster } from '@/components/ui/toaster';
+import type { ReactNode } from "react"
+import { SessionBootstrap } from "@/components/auth/session-bootstrap"
+import { RadixSafetyReset } from "@/components/layout/radix-safety-reset"
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <>
+      <RadixSafetyReset />
+      <SessionBootstrap />
       {children}
-      <Toaster />
-    </ThemeProvider>
-  );
+    </>
+  )
 }
-

@@ -18,20 +18,21 @@ export class BannersService {
     return this.prisma.banner.findMany({
       where: {
         isActive: true,
-        OR: [
-          { startDate: null },
-          { startDate: { lte: now } },
-        ],
+        OR: [{ startDate: null }, { startDate: { lte: now } }],
         AND: [
           {
-            OR: [
-              { endDate: null },
-              { endDate: { gte: now } },
-            ],
+            OR: [{ endDate: null }, { endDate: { gte: now } }],
           },
         ],
       },
       orderBy: { order: 'asc' },
+    });
+  }
+
+  // Admin: listar todos (incluye inactivos y sin filtrar por fechas)
+  async adminFindAll() {
+    return this.prisma.banner.findMany({
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
     });
   }
 
@@ -62,4 +63,3 @@ export class BannersService {
     });
   }
 }
-

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -44,6 +45,22 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('admin/customers')
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  @ApiOperation({ summary: 'Get customers with stats (Admin only)' })
+  async findCustomers(
+    @Query('search') search?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.usersService.findCustomers({
+      search,
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+    });
+  }
+
   @Get(':id')
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
@@ -68,4 +85,3 @@ export class UsersController {
     return this.usersService.remove(id);
   }
 }
-

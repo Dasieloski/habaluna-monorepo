@@ -32,7 +32,8 @@ out/
 Thumbs.db
 
 # Prisma
-backend/prisma/migrations/
+# NOTA: las migraciones deben versionarse para despliegue (Railway) y consistencia del esquema.
+# backend/prisma/migrations/
 
 # Docker
 docker-compose.override.yml

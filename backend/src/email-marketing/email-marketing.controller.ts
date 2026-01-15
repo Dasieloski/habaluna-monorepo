@@ -1,0 +1,176 @@
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { EmailMarketingService } from './email-marketing.service';
+import { CreateSubscriberDto } from './dto/create-subscriber.dto';
+import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
+import { CreateCampaignDto } from './dto/create-campaign.dto';
+import { UpdateCampaignDto } from './dto/update-campaign.dto';
+import { SendTestDto } from './dto/send-test.dto';
+import { UnsubscribeDto } from './dto/unsubscribe.dto';
+
+@ApiTags('email-marketing')
+@Controller('email-marketing')
+export class EmailMarketingController {
+  constructor(private readonly svc: EmailMarketingService) {}
+
+  // --- Public: unsubscribe ---
+  @Get('unsubscribe')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests por minuto
+  @ApiOperation({ summary: 'Unsubscribe (public)' })
+  async unsubscribe(@Query() dto: UnsubscribeDto) {
+    return this.svc.unsubscribe(dto.e, dto.t);
+  }
+
+  // --- Admin: subscribers ---
+  @Get('admin/subscribers')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List newsletter subscribers (Admin)' })
+  async listSubscribers(
+    @Query('search') search?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.svc.listSubscribers({
+      search,
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+    });
+  }
+
+  @Post('admin/subscribers')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Add/subscribe an email (Admin)' })
+  async upsertSubscriber(@Body() dto: CreateSubscriberDto) {
+    return this.svc.upsertSubscriber(dto, 'ADMIN');
+  }
+
+  @Patch('admin/subscribers/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update subscriber (Admin)' })
+  async updateSubscriber(@Param('id') id: string, @Body() dto: UpdateSubscriberDto) {
+    return this.svc.updateSubscriber(id, dto);
+  }
+
+  // --- Admin: campaigns ---
+  @Get('admin/campaigns')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List campaigns (Admin)' })
+  async listCampaigns(@Query('page') page?: string, @Query('limit') limit?: string) {
+    return this.svc.listCampaigns({
+      page: page ? Number(page) : undefined,
+      limit: limit ? Number(limit) : undefined,
+    });
+  }
+
+  @Post('admin/campaigns')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create campaign (Admin)' })
+  async createCampaign(@Body() dto: CreateCampaignDto) {
+    return this.svc.createCampaign(dto);
+  }
+
+  @Get('admin/campaigns/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get campaign (Admin)' })
+  async getCampaign(@Param('id') id: string) {
+    return this.svc.getCampaign(id);
+  }
+
+  @Patch('admin/campaigns/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update campaign (Admin)' })
+  async updateCampaign(@Param('id') id: string, @Body() dto: UpdateCampaignDto) {
+    return this.svc.updateCampaign(id, dto);
+  }
+
+  @Post('admin/campaigns/:id/send-test')
+  @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
+  @Roles('ADMIN')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 test emails por minuto
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Send test email (Admin)' })
+  async sendTest(@Param('id') id: string, @Body() dto: SendTestDto) {
+    return this.svc.sendTest(id, dto.to);
+  }
+
+  @Post('admin/campaigns/:id/send')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ summary: 'Start sending campaign to subscribers (Admin)' })
+  async sendCampaign(@Param('id') id: string) {
+    return this.svc.startSendCampaign(id);
+  }
+
+  // --- Admin: templates ---
+  @Get('admin/templates')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get email templates (Admin)' })
+  async getTemplates(@Query('category') category?: string) {
+    return this.svc.getTemplates(category);
+  }
+
+  @Get('admin/templates/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get template by ID (Admin)' })
+  async getTemplate(@Param('id') id: string) {
+    return this.svc.getTemplate(id);
+  }
+
+  @Post('admin/templates/:id/render')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Render template with variables (Admin)' })
+  async renderTemplate(
+    @Param('id') id: string,
+    @Body() variables: Record<string, string>,
+  ) {
+    return { html: this.svc.renderTemplate(id, variables) };
+  }
+
+  @Post('admin/campaigns/preview')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Render full email preview with Habaluna template (Admin)' })
+  async previewCampaign(@Body() dto: { subject: string; preheader?: string; html: string }) {
+    return { html: this.svc.renderFullPreview(dto) };
+  }
+}
+

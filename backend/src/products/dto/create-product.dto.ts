@@ -1,6 +1,16 @@
-import { IsString, IsNumber, IsBoolean, IsOptional, IsArray, IsUUID, Min, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+  IsArray,
+  IsUUID,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { ComboItemDto } from './combo-item.dto';
 
 export class CreateProductDto {
   @ApiProperty()
@@ -68,6 +78,18 @@ export class CreateProductDto {
   @IsBoolean()
   isFeatured?: boolean;
 
+  @ApiProperty({ default: false, required: false })
+  @IsOptional()
+  @IsBoolean()
+  isCombo?: boolean;
+
+  @ApiProperty({ type: [ComboItemDto], required: false })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ComboItemDto)
+  comboItems?: ComboItemDto[];
+
   @ApiProperty({ type: [String], default: [] })
   @IsOptional()
   @IsArray()
@@ -94,4 +116,3 @@ export class CreateProductDto {
   @IsUUID()
   categoryId: string;
 }
-

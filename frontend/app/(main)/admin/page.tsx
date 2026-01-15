@@ -1,126 +1,122 @@
-'use client';
+"use client"
 
-import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatPrice } from '@/lib/utils';
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DashboardStats } from "@/components/admin/dashboard-stats"
+import { SalesChart } from "@/components/admin/sales-chart"
+import { RecentOrders } from "@/components/admin/recent-orders"
+import { TopProducts } from "@/components/admin/top-products"
+import { QuickActions } from "@/components/admin/quick-actions"
+import { CategoryChart } from "@/components/admin/category-chart"
+import { ComparisonChart } from "@/components/admin/comparison-chart"
+import { TrafficChart } from "@/components/admin/traffic-chart"
+import { PerformanceMetrics } from "@/components/admin/performance-metrics"
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await api.get('/stats/dashboard');
-        setStats(response.data);
-      } catch (error) {
-        console.error('Error fetching stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, []);
-
-  if (loading) {
-    return <div className="p-8">Cargando...</div>;
-  }
+    setIsLoaded(true)
+  }, [])
 
   return (
-    <div>
-      <h1 className="text-4xl font-bold mb-8">Dashboard</h1>
+    <div className="space-y-6">
+      {/* Page header */}
+      <div
+        className={`transition-all duration-500 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+      >
+        <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Bienvenido de vuelta. Aquí tienes un resumen de tu tienda.</p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
+      {/* Stats cards */}
+      <DashboardStats isLoaded={isLoaded} />
+
+      <PerformanceMetrics isLoaded={isLoaded} />
+
+      {/* Main charts section with tabs */}
+      <Card
+        className={`border-0 shadow-md transition-all duration-500 delay-300 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+      >
+        <CardHeader>
+          <CardTitle className="text-foreground">Análisis de Ventas</CardTitle>
+          <CardDescription>Visualiza el rendimiento de tu tienda</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="daily" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="daily">Diario</TabsTrigger>
+              <TabsTrigger value="comparison">Comparativa Anual</TabsTrigger>
+              <TabsTrigger value="categories">Por Categoría</TabsTrigger>
+            </TabsList>
+            <TabsContent value="daily">
+              <SalesChart />
+            </TabsContent>
+            <TabsContent value="comparison">
+              <ComparisonChart />
+            </TabsContent>
+            <TabsContent value="categories">
+              <CategoryChart />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Charts and tables - 3 column layout */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Traffic sources */}
+        <Card
+          className={`border-0 shadow-md transition-all duration-500 delay-400 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+        >
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-600">Total Usuarios</CardTitle>
+            <CardTitle className="text-foreground">Fuentes de Tráfico</CardTitle>
+            <CardDescription>De dónde vienen tus visitantes</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{stats?.overview?.totalUsers || 0}</p>
+            <TrafficChart />
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Top products */}
+        <Card
+          className={`border-0 shadow-md transition-all duration-500 delay-500 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+        >
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-600">Total Productos</CardTitle>
+            <CardTitle className="text-foreground">Productos más vendidos</CardTitle>
+            <CardDescription>Top 5 este mes</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{stats?.overview?.totalProducts || 0}</p>
+            <TopProducts />
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Quick actions */}
+        <Card
+          className={`border-0 shadow-md transition-all duration-500 delay-600 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+        >
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-600">Total Pedidos</CardTitle>
+            <CardTitle className="text-foreground">Acciones rápidas</CardTitle>
+            <CardDescription>Tareas frecuentes del panel</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{stats?.overview?.totalOrders || 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-600">Ingresos Totales</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">
-              {formatPrice(stats?.overview?.totalRevenue || 0)}
-            </p>
+            <QuickActions />
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Pedidos Recientes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {stats?.recentOrders?.length > 0 ? (
-              <div className="space-y-4">
-                {stats.recentOrders.map((order: any) => (
-                  <div key={order.id} className="border-b pb-4">
-                    <div className="flex justify-between">
-                      <span className="font-semibold">{order.orderNumber}</span>
-                      <span>{formatPrice(order.total)}</span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      {order.user?.email} - {order.status}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-600">No hay pedidos recientes</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Productos con Bajo Stock</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {stats?.lowStockProducts?.length > 0 ? (
-              <div className="space-y-4">
-                {stats.lowStockProducts.map((product: any) => (
-                  <div key={product.id} className="border-b pb-4">
-                    <div className="flex justify-between">
-                      <span className="font-semibold">{product.name}</span>
-                      <span className="text-destructive">Stock: {product.stock}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-600">Todos los productos tienen stock suficiente</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      {/* Recent orders - full width */}
+      <Card
+        className={`border-0 shadow-md transition-all duration-500 delay-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+      >
+        <CardHeader>
+          <CardTitle className="text-foreground">Pedidos recientes</CardTitle>
+          <CardDescription>Últimas transacciones de tu tienda</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RecentOrders />
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }
-

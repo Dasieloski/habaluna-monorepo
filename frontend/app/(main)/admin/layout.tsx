@@ -1,90 +1,85 @@
-'use client';
+"use client"
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAuthStore } from '@/lib/store/auth-store';
-import { Button } from '@/components/ui/button';
-import { LogoWithText } from '@/components/logo';
-import { LayoutDashboard, Package, ShoppingCart, Users, BarChart3, LogOut } from 'lucide-react';
+import type React from "react"
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const router = useRouter();
-  const { isAuthenticated, isAdmin, logout } = useAuthStore();
+import { useEffect, useState } from "react"
+import { useRouter, usePathname } from "next/navigation"
+import { useAuthStore } from "@/lib/store/auth-store"
+import { AdminSidebar } from "@/components/admin/admin-sidebar"
+import { AdminHeader } from "@/components/admin/admin-header"
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { user, isAuthenticated, isAdmin } = useAuthStore()
+  const isBootstrapped = useAuthStore((s) => s.isBootstrapped)
+  const router = useRouter()
+  const pathname = usePathname()
+  const [isLoading, setIsLoading] = useState(true)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+
+  const isLoginPage = pathname === "/admin/login"
 
   useEffect(() => {
-    if (!isAuthenticated() || !isAdmin()) {
-      router.push('/');
+    // Dar tiempo para que el store se inicialice
+    setIsLoading(false)
+    
+    // Si no es la página de login y no está autenticado o no es admin, redirigir
+    if (!isLoginPage && !isLoading) {
+      if (!isBootstrapped) return
+      if (!isAuthenticated() || !isAdmin()) {
+        router.push("/admin/login")
+      }
     }
-  }, [isAuthenticated, isAdmin, router]);
+    
+    // Si está en login pero ya está autenticado como admin, redirigir al admin
+    if (isLoginPage && isAuthenticated() && isAdmin()) {
+      router.push("/admin")
+    }
+  }, [user, isAuthenticated, isAdmin, isLoginPage, router, isLoading, isBootstrapped])
 
-  if (!isAuthenticated() || !isAdmin()) {
-    return null;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+          <p className="text-muted-foreground">Cargando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isLoginPage) {
+    return <>{children}</>
+  }
+
+  // Si no está autenticado o no es admin, no mostrar nada (ya se redirigió)
+  if (!isBootstrapped || !isAuthenticated() || !isAdmin()) {
+    return null
+  }
+
+  const handleMenuToggle = () => {
+    setIsMobileMenuOpen((prev) => !prev)
+  }
+
+  const handleMenuClose = () => {
+    setIsMobileMenuOpen(false)
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        <aside className="w-64 bg-white border-r min-h-screen p-6">
-          <Link href="/" className="block mb-8">
-            <LogoWithText />
-          </Link>
-          <h2 className="text-lg font-semibold text-gray-600 mb-6">Panel de Administración</h2>
-          <nav className="space-y-2">
-            <Link href="/admin">
-              <Button variant="ghost" className="w-full justify-start">
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                Dashboard
-              </Button>
-            </Link>
-            <Link href="/admin/products">
-              <Button variant="ghost" className="w-full justify-start">
-                <Package className="mr-2 h-4 w-4" />
-                Productos
-              </Button>
-            </Link>
-            <Link href="/admin/categories">
-              <Button variant="ghost" className="w-full justify-start">
-                <Package className="mr-2 h-4 w-4" />
-                Categorías
-              </Button>
-            </Link>
-            <Link href="/admin/orders">
-              <Button variant="ghost" className="w-full justify-start">
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                Pedidos
-              </Button>
-            </Link>
-            <Link href="/admin/users">
-              <Button variant="ghost" className="w-full justify-start">
-                <Users className="mr-2 h-4 w-4" />
-                Usuarios
-              </Button>
-            </Link>
-            <Link href="/admin/stats">
-              <Button variant="ghost" className="w-full justify-start">
-                <BarChart3 className="mr-2 h-4 w-4" />
-                Estadísticas
-              </Button>
-            </Link>
-            <Button
-              variant="ghost"
-              className="w-full justify-start mt-8"
-              onClick={logout}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Cerrar Sesión
-            </Button>
-          </nav>
-        </aside>
-
-        <main className="flex-1 p-8">{children}</main>
+    <div className="min-h-screen bg-secondary/30">
+      <AdminSidebar 
+        isMobileOpen={isMobileMenuOpen} 
+        onMobileClose={handleMenuClose} 
+        isCollapsed={isSidebarCollapsed}
+        onCollapsedChange={setIsSidebarCollapsed}
+      />
+      <div className={isSidebarCollapsed ? "lg:pl-20" : "lg:pl-72"}>
+        <AdminHeader 
+          onMenuToggle={handleMenuToggle}
+          isMenuOpen={isMobileMenuOpen}
+        />
+        <main className="p-4 lg:p-8">{children}</main>
       </div>
     </div>
-  );
+  )
 }
-

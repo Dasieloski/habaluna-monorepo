@@ -1,23 +1,73 @@
-import { notFound } from 'next/navigation';
-import { api } from '@/lib/api';
-import { ProductClient } from './product-client';
+import { api } from "@/lib/api"
+import { notFound } from "next/navigation"
+import type { Metadata } from "next"
+import { ProductClient } from "./product-client"
 
-async function getProduct(slug: string) {
+export const revalidate = 60
+
+type PageProps = {
+  params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  // Si falla el fetch, igual devolvemos algo razonable
   try {
-    const response = await api.get(`/products/slug/${slug}`);
-    return response.data;
-  } catch (error) {
-    return null;
+    const response = await api.get(`/products/slug/${encodeURIComponent(slug)}`)
+    const product: any = response.data
+    return {
+      title: product?.name ? `${product.name} | Habaluna` : "Producto | Habaluna",
+      description: product?.shortDescription || product?.description || undefined,
+    }
+  } catch {
+    return { title: "Producto | Habaluna" }
   }
 }
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const product = await getProduct(params.slug);
+export default async function ProductPage({ params }: PageProps) {
+  const { slug } = await params
 
-  if (!product) {
-    notFound();
+  let product: any
+  try {
+    const response = await api.get(`/products/slug/${encodeURIComponent(slug)}`)
+    product = response.data
+  } catch {
+    notFound()
   }
 
-  return <ProductClient product={product} />;
-}
+  let relatedProducts: any[] = []
+  try {
+    // Usar el nuevo endpoint de productos relacionados
+    if (product?.id) {
+      relatedProducts = await api.getRelatedProducts(product.id, 8)
+    }
+  } catch {
+    // Fallback a búsqueda manual si el endpoint falla
+    try {
+      if (product?.categoryId) {
+        const res = await api.getProducts({ page: 1, limit: 24, categoryId: product.categoryId })
+        relatedProducts = (res.data || []).filter((p: any) => p.id !== product.id).slice(0, 8)
+      }
+    } catch {
+      relatedProducts = []
+    }
+  }
 
+  let reviewsData: any = null
+  try {
+    if (product?.id) {
+      reviewsData = await api.getProductReviews(product.id, 1, 5)
+    }
+  } catch {
+    reviewsData = null
+  }
+
+  return (
+    <ProductClient
+      product={product}
+      relatedProducts={relatedProducts}
+      initialReviews={reviewsData?.data || []}
+      initialReviewsMeta={reviewsData?.meta}
+    />
+  )
+}

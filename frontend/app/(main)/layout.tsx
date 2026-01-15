@@ -1,17 +1,11 @@
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
+import type React from "react"
+import { ConditionalLayout } from "@/components/layout/conditional-layout"
 
 export default function MainLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  return (
-    <>
-      <Header />
-      <main>{children}</main>
-      <Footer />
-    </>
-  );
+  // PageTransition ahora está dentro de ConditionalLayout para evitar doble wrapping
+  return <ConditionalLayout>{children}</ConditionalLayout>
 }
-
