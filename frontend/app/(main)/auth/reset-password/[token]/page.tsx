@@ -1,208 +1,36 @@
-"use client"
+import { notFound } from "next/navigation"
+import type { Metadata } from "next"
+import { ResetPasswordClient } from "./reset-password-client"
 
-// Configuración crítica para rutas dinámicas en producción
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
+export const revalidate = 0
 
-import { useMemo, useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter, useParams } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { api } from "@/lib/api"
-import { passwordSchema, validatePasswordStrength, getPasswordStrengthLabel } from "@/lib/validations/password"
+type PageProps = {
+  params: Promise<{ token: string }>
+}
 
-const schema = z
-  .object({
-    newPassword: passwordSchema,
-    confirmPassword: z.string().min(8, "Confirma tu contraseña"),
-  })
-  .refine((d) => d.newPassword === d.confirmPassword, {
-    message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
-  })
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  await params // Asegurar que params se resuelva
+  return {
+    title: "Restablecer contraseña | Habaluna",
+    description: "Restablece tu contraseña de Habaluna",
+    robots: "noindex, nofollow", // No indexar páginas de reset
+  }
+}
 
-type Form = z.infer<typeof schema>
+export default async function ResetPasswordPage({ params }: PageProps) {
+  const { token } = await params
 
-export default function ResetPasswordPage() {
-  const router = useRouter()
-  const params = useParams()
-  const token = useMemo(() => {
-    const tokenParam = (params?.token as string) || ""
-    try {
-      return decodeURIComponent(tokenParam)
-    } catch (e) {
-      // Si falla el decode, usar el token tal cual
-      return tokenParam
-    }
-  }, [params])
-  const [message, setMessage] = useState<string>("")
-  const [error, setError] = useState<string>("")
-  const [isLoading, setIsLoading] = useState(true)
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<Form>({ resolver: zodResolver(schema) })
-
-  const newPassword = watch("newPassword") || ""
-  const passwordStrength = newPassword ? validatePasswordStrength(newPassword) : { score: 0, feedback: [] }
-  const strengthLabel = getPasswordStrengthLabel(passwordStrength.score)
-
-  // Verificar que el token existe al cargar
-  useEffect(() => {
-    if (!token || token.trim() === "") {
-      setError("Token inválido. El enlace de recuperación no es válido.")
-    }
-    setIsLoading(false)
-  }, [token])
-
-  const onSubmit = async (data: Form) => {
-    if (!token || token.trim() === "") {
-      setError("Token inválido. Por favor, solicita un nuevo enlace de recuperación.")
-      return
-    }
-
-    try {
-      setError("")
-      setMessage("")
-      const res = await api.resetPassword(token, data.newPassword)
-      setMessage(res.message || "Contraseña actualizada correctamente.")
-      setTimeout(() => router.push("/auth/login"), 1200)
-    } catch (err: any) {
-      const msg =
-        err.response?.data?.message ||
-        err.message ||
-        "No se pudo actualizar la contraseña. El enlace puede haber expirado o ser inválido. Por favor, solicita un nuevo enlace."
-      setError(msg)
-    }
+  if (!token || typeof token !== "string" || token.trim() === "") {
+    notFound()
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-4">
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-sky-500 transition-colors">
-            Home
-          </Link>
-          <span>&gt;</span>
-          <span className="text-foreground">Restablecer contraseña</span>
-        </nav>
-      </div>
+  // Decodificar el token
+  let decodedToken: string
+  try {
+    decodedToken = decodeURIComponent(token)
+  } catch {
+    decodedToken = token
+  }
 
-      <div className="container mx-auto px-4 py-8 md:py-16">
-        <div className="max-w-lg mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Restablecer contraseña</h1>
-            <p className="text-muted-foreground">El enlace es válido por 1 hora.</p>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 shadow-sm">
-            {isLoading ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">Cargando...</p>
-              </div>
-            ) : !token || token.trim() === "" ? (
-              <div className="space-y-4">
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-                  Token inválido. El enlace de recuperación no es válido.
-                </div>
-                <Link
-                  href="/auth/forgot-password"
-                  className="block text-center text-sky-500 hover:text-sky-600 hover:underline font-medium"
-                >
-                  Solicitar nuevo enlace de recuperación
-                </Link>
-              </div>
-            ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{error}</div>
-              )}
-              {message && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-700">
-                  {message}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <label htmlFor="newPassword" className="block text-sm font-medium text-foreground">
-                  Nueva contraseña <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="newPassword"
-                  type="password"
-                  {...register("newPassword")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
-                />
-                
-                {/* Indicador de fortaleza de contraseña */}
-                {newPassword && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full transition-all duration-300 ${strengthLabel.bgColor}`}
-                          style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
-                        />
-                      </div>
-                      <span className={`text-xs font-medium ${strengthLabel.color}`}>
-                        {strengthLabel.label}
-                      </span>
-                    </div>
-                    {passwordStrength.feedback.length > 0 && (
-                      <ul className="text-xs text-muted-foreground space-y-1">
-                        {passwordStrength.feedback.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-1">
-                            <span className="text-red-500">•</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                )}
-                
-                <p className="text-xs text-muted-foreground">
-                  La contraseña debe tener mínimo 8 caracteres e incluir mayúsculas, minúsculas, números y símbolos
-                </p>
-                {errors.newPassword && <p className="text-sm text-red-500">{errors.newPassword.message}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground">
-                  Confirmar contraseña <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  {...register("confirmPassword")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
-                />
-                {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? "Actualizando..." : "Actualizar contraseña"}
-              </button>
-
-              <p className="text-center text-sm text-muted-foreground">
-                <Link href="/auth/login" className="text-sky-500 hover:text-sky-600 hover:underline font-medium">
-                  Volver a iniciar sesión
-                </Link>
-              </p>
-            </form>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  return <ResetPasswordClient token={decodedToken} />
 }
