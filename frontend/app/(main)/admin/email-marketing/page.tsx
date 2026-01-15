@@ -49,16 +49,24 @@ export default function AdminEmailMarketingPage() {
   const [campSubject, setCampSubject] = useState("")
   const [campPreheader, setCampPreheader] = useState("")
   const [campHtml, setCampHtml] = useState(defaultCampaignHtml)
-
-  // Preview HTML con variables reemplazadas
-  const previewHtml = useMemo(() => {
-    if (!campHtml) return ""
-    return campHtml
-      .replace(/\{\{\s*firstName\s*\}\}/g, "Cliente")
-      .replace(/\{\{\s*email\s*\}\}/g, "cliente@email.com")
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remover scripts por seguridad
-  }, [campHtml])
   const [campText, setCampText] = useState("")
+
+  // Preview HTML con variables reemplazadas (procesado de forma segura)
+  const previewHtml = useMemo(() => {
+    try {
+      if (!campHtml || typeof campHtml !== "string") return ""
+      let processed = String(campHtml)
+      // Reemplazar variables de template de forma segura
+      processed = processed.replace(/\{\{\s*firstName\s*\}\}/g, "Cliente")
+      processed = processed.replace(/\{\{\s*email\s*\}\}/g, "cliente@email.com")
+      // Remover scripts por seguridad
+      processed = processed.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+      return processed
+    } catch (error) {
+      console.error("Error procesando preview HTML:", error)
+      return ""
+    }
+  }, [campHtml])
 
   const [testTo, setTestTo] = useState("")
   const [sendingTest, setSendingTest] = useState(false)
