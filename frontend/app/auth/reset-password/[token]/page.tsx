@@ -3,9 +3,6 @@
 // Configuración crítica para rutas dinámicas en producción
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
-export const revalidate = 0
-// Asegurar que la ruta se genere en runtime
-export const runtime = 'nodejs'
 
 import { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
