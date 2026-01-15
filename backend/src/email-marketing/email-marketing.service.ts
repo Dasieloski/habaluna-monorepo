@@ -5,6 +5,12 @@ import { CreateSubscriberDto } from './dto/create-subscriber.dto';
 import { NewsletterSubscriberStatusDto, UpdateSubscriberDto } from './dto/update-subscriber.dto';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
+import {
+  allTemplates,
+  getTemplatesByCategory,
+  getTemplateById,
+  type EmailTemplate,
+} from './templates/email-templates';
 
 @Injectable()
 export class EmailMarketingService {
@@ -17,6 +23,85 @@ export class EmailMarketingService {
 
   private normalizeEmail(raw: string) {
     return (raw || '').trim().toLowerCase();
+  }
+
+  /**
+   * Obtener todas las plantillas disponibles
+   */
+  getTemplates(category?: string) {
+    if (category) {
+      return getTemplatesByCategory(category as EmailTemplate['category']);
+    }
+    return allTemplates;
+  }
+
+  /**
+   * Obtener una plantilla por ID
+   */
+  getTemplate(templateId: string) {
+    const template = getTemplateById(templateId);
+    if (!template) {
+      throw new BadRequestException(`Plantilla con ID ${templateId} no encontrada`);
+    }
+    return template;
+  }
+
+  /**
+   * Renderizar una plantilla con variables
+   */
+  renderTemplate(templateId: string, variables: Record<string, string> = {}) {
+    const template = this.getTemplate(templateId);
+    let html = template.html;
+
+    // Obtener frontend URL del config service
+    const config = this.email['config'] as any;
+    const frontendUrl = config?.get?.('FRONTEND_URL') || 'https://habaluna.com';
+
+    // Variables por defecto
+    const defaultVars = {
+      frontendUrl: frontendUrl.replace(/\/$/, ''),
+      firstName: variables.firstName || 'Cliente',
+      email: variables.email || 'cliente@email.com',
+      resetUrl: variables.resetUrl || `${frontendUrl}/auth/reset-password/token`,
+      subject: variables.subject || 'Mensaje de Habanaluna',
+      content: variables.content || 'Contenido del mensaje',
+      ...variables,
+    };
+
+    // Reemplazar variables
+    for (const [key, value] of Object.entries(defaultVars)) {
+      const escapedValue = this.escapeHtml(String(value));
+      const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+      html = html.replace(regex, escapedValue);
+    }
+
+    return html;
+  }
+
+  /**
+   * Renderizar preview completo del email (con template de Habaluna)
+   */
+  renderFullPreview(params: { subject: string; preheader?: string; html: string }): string {
+    const firstName = 'Cliente';
+    const email = 'cliente@email.com';
+    
+    // Renderizar el contenido con variables
+    let body = params.html;
+    body = body.replace(/\{\{\s*firstName\s*\}\}/g, firstName);
+    body = body.replace(/\{\{\s*email\s*\}\}/g, email);
+    
+    // Envolver con el template de Habaluna
+    const wrapped = this.email.wrapTemplate({
+      title: params.subject,
+      preheader: params.preheader || undefined,
+      greeting: `¡Hola ${firstName}!`,
+      content: body,
+      buttonText: undefined,
+      buttonUrl: undefined,
+      toEmail: email,
+    });
+
+    return wrapped as string;
   }
 
   /**

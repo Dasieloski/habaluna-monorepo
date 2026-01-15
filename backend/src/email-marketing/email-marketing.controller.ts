@@ -132,5 +132,45 @@ export class EmailMarketingController {
   async sendCampaign(@Param('id') id: string) {
     return this.svc.startSendCampaign(id);
   }
+
+  // --- Admin: templates ---
+  @Get('admin/templates')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get email templates (Admin)' })
+  async getTemplates(@Query('category') category?: string) {
+    return this.svc.getTemplates(category);
+  }
+
+  @Get('admin/templates/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get template by ID (Admin)' })
+  async getTemplate(@Param('id') id: string) {
+    return this.svc.getTemplate(id);
+  }
+
+  @Post('admin/templates/:id/render')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Render template with variables (Admin)' })
+  async renderTemplate(
+    @Param('id') id: string,
+    @Body() variables: Record<string, string>,
+  ) {
+    return { html: this.svc.renderTemplate(id, variables) };
+  }
+
+  @Post('admin/campaigns/preview')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Render full email preview with Habaluna template (Admin)' })
+  async previewCampaign(@Body() dto: { subject: string; preheader?: string; html: string }) {
+    return { html: this.svc.renderFullPreview(dto) };
+  }
 }
 

@@ -1275,6 +1275,54 @@ export const api = {
     const res = await api.post(`/email-marketing/admin/campaigns/${id}/send`, {})
     return res.data as { started: boolean }
   },
+
+  // Email Templates
+  getEmailTemplates: async (category?: string): Promise<Array<{
+    id: string
+    name: string
+    category: string
+    description: string
+    html: string
+  }>> => {
+    const qp = new URLSearchParams()
+    if (category) qp.append("category", category)
+    const endpoint = `/email-marketing/admin/templates${qp.toString() ? `?${qp.toString()}` : ""}`
+    const res = await api.get(endpoint)
+    return res.data as Array<{
+      id: string
+      name: string
+      category: string
+      description: string
+      html: string
+    }>
+  },
+
+  getEmailTemplate: async (id: string): Promise<{
+    id: string
+    name: string
+    category: string
+    description: string
+    html: string
+  }> => {
+    const res = await api.get(`/email-marketing/admin/templates/${id}`)
+    return res.data as {
+      id: string
+      name: string
+      category: string
+      description: string
+      html: string
+    }
+  },
+
+  renderEmailTemplate: async (id: string, variables: Record<string, string>): Promise<{ html: string }> => {
+    const res = await api.post(`/email-marketing/admin/templates/${id}/render`, variables)
+    return res.data as { html: string }
+  },
+
+  previewEmailCampaign: async (data: { subject: string; preheader?: string; html: string }): Promise<{ html: string }> => {
+    const res = await api.post("/email-marketing/admin/campaigns/preview", data)
+    return res.data as { html: string }
+  },
 }
 
 // Función para normalizar URLs de imágenes

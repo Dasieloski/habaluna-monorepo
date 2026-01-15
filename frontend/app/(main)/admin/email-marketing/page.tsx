@@ -2,30 +2,26 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { api, type EmailCampaign, type NewsletterSubscriber, type PagedResponse } from "@/lib/api"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label"
-import { Loader2, MailPlus, Send, Users } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Loader2, MailPlus, Send, Users, FileText, Eye, Sparkles } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
-// Template HTML por defecto - usando función para evitar problemas de evaluación en build
-function getDefaultCampaignHtml(): string {
-  return [
-    '<p style="margin:0 0 10px;">{{firstName}}, tenemos algo bueno para ti.</p>',
-    '<p style="margin:0 0 10px;">Este correo está diseñado para verse perfecto con el estilo de Habaluna (colores + logo).</p>',
-    '<ul style="margin:0; padding-left:18px;">',
-    '  <li>Producto destacado de la semana</li>',
-    '  <li>Oferta limitada</li>',
-    '  <li>Un combo recomendado</li>',
-    '</ul>',
-    '<p style="margin:14px 0 0;">¿Listo? Entra y mira las novedades.</p>',
-  ].join('\n');
-}
+type TemplateCategory = "welcome" | "password-reset" | "campaign" | "promotion" | "newsletter" | "all"
 
-const defaultCampaignHtml = getDefaultCampaignHtml();
+interface EmailTemplate {
+  id: string
+  name: string
+  category: string
+  description: string
+  html: string
+}
 
 export default function AdminEmailMarketingPage() {
   const [tab, setTab] = useState<"subscribers" | "campaigns">("subscribers")
@@ -53,29 +49,21 @@ export default function AdminEmailMarketingPage() {
   const [campName, setCampName] = useState("")
   const [campSubject, setCampSubject] = useState("")
   const [campPreheader, setCampPreheader] = useState("")
-  const [campHtml, setCampHtml] = useState(defaultCampaignHtml)
+  const [campHtml, setCampHtml] = useState("")
   const [campText, setCampText] = useState("")
 
-  // Preview HTML con variables reemplazadas (procesado de forma segura)
-  const previewHtml = useMemo(() => {
-    try {
-      if (!campHtml || typeof campHtml !== "string") return ""
-      let processed = String(campHtml)
-      // Reemplazar variables de template de forma segura
-      processed = processed.replace(/\{\{\s*firstName\s*\}\}/g, "Cliente")
-      processed = processed.replace(/\{\{\s*email\s*\}\}/g, "cliente@email.com")
-      // Remover scripts por seguridad
-      processed = processed.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-      return processed
-    } catch (error) {
-      console.error("Error procesando preview HTML:", error)
-      return ""
-    }
-  }, [campHtml])
+  // Templates
+  const [templates, setTemplates] = useState<EmailTemplate[]>([])
+  const [templatesLoading, setTemplatesLoading] = useState(false)
+  const [templateCategory, setTemplateCategory] = useState<TemplateCategory>("all")
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
+  const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(null)
+  const [templatePreviewHtml, setTemplatePreviewHtml] = useState<string>("")
 
-  const [testTo, setTestTo] = useState("")
-  const [sendingTest, setSendingTest] = useState(false)
-  const [sendingCampaign, setSendingCampaign] = useState(false)
+  // Full email preview
+  const [fullPreviewHtml, setFullPreviewHtml] = useState<string>("")
+  const [previewLoading, setPreviewLoading] = useState(false)
+  const [showFullPreview, setShowFullPreview] = useState(false)
 
   const loadSubscribers = async () => {
     setSubLoading(true)
@@ -104,6 +92,69 @@ export default function AdminEmailMarketingPage() {
     }
   }
 
+  const loadTemplates = async (category?: string) => {
+    setTemplatesLoading(true)
+    try {
+      const res = await api.getEmailTemplates(category)
+      setTemplates(res)
+    } catch (e: any) {
+      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudieron cargar plantillas.", variant: "destructive" })
+    } finally {
+      setTemplatesLoading(false)
+    }
+  }
+
+  const loadFullPreview = async () => {
+    if (!campSubject.trim() || !campHtml.trim()) {
+      toast({ title: "Error", description: "Necesitas un asunto y contenido HTML para previsualizar.", variant: "destructive" })
+      return
+    }
+
+    setPreviewLoading(true)
+    try {
+      const res = await api.previewEmailCampaign({
+        subject: campSubject,
+        preheader: campPreheader || undefined,
+        html: campHtml,
+      })
+      setFullPreviewHtml(res.html)
+      setShowFullPreview(true)
+    } catch (e: any) {
+      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo generar el preview.", variant: "destructive" })
+    } finally {
+      setPreviewLoading(false)
+    }
+  }
+
+  const previewTemplate = async (templateId: string) => {
+    setPreviewTemplateId(templateId)
+    try {
+      const template = await api.getEmailTemplate(templateId)
+      const rendered = await api.renderEmailTemplate(templateId, {
+        firstName: "Cliente",
+        email: "cliente@email.com",
+        frontendUrl: window.location.origin,
+        subject: "Ejemplo de Asunto",
+        content: "Este es un ejemplo de contenido para la plantilla.",
+        resetUrl: `${window.location.origin}/auth/reset-password/token`,
+      })
+      setTemplatePreviewHtml(rendered.html)
+    } catch (e: any) {
+      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo previsualizar la plantilla.", variant: "destructive" })
+    }
+  }
+
+  const selectTemplate = async (templateId: string) => {
+    try {
+      const template = await api.getEmailTemplate(templateId)
+      setCampHtml(template.html)
+      setSelectedTemplateId(templateId)
+      toast({ title: "Éxito", description: `Plantilla "${template.name}" cargada. Puedes editarla antes de guardar.` })
+    } catch (e: any) {
+      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo cargar la plantilla.", variant: "destructive" })
+    }
+  }
+
   useEffect(() => {
     void loadSubscribers()
   }, [])
@@ -113,12 +164,17 @@ export default function AdminEmailMarketingPage() {
   }, [])
 
   useEffect(() => {
+    void loadTemplates(templateCategory === "all" ? undefined : templateCategory)
+  }, [templateCategory])
+
+  useEffect(() => {
     if (!selectedCampaign) return
     setCampName(selectedCampaign.name || "")
     setCampSubject(selectedCampaign.subject || "")
     setCampPreheader(selectedCampaign.preheader || "")
     setCampHtml(selectedCampaign.html || "")
     setCampText(selectedCampaign.text || "")
+    setSelectedTemplateId(null)
   }, [selectedCampaignId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAddSubscriber = async () => {
@@ -191,12 +247,16 @@ export default function AdminEmailMarketingPage() {
     }
   }
 
+  const [testTo, setTestTo] = useState("")
+  const [sendingTest, setSendingTest] = useState(false)
+  const [sendingCampaign, setSendingCampaign] = useState(false)
+
   const handleSendTest = async () => {
     if (!selectedCampaignId) return
     setSendingTest(true)
     try {
       await api.sendTestEmailCampaign(selectedCampaignId, testTo.trim())
-      toast({ title: "Éxito", description: "Correo de prueba enviado (si SMTP está configurado)." })
+      toast({ title: "Éxito", description: "Correo de prueba enviado." })
     } catch (e: any) {
       toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo enviar prueba.", variant: "destructive" })
     } finally {
@@ -218,12 +278,39 @@ export default function AdminEmailMarketingPage() {
     }
   }
 
+  // Preview HTML básico (solo contenido, sin wrapper)
+  const basicPreviewHtml = useMemo(() => {
+    try {
+      if (!campHtml || typeof campHtml !== "string") return ""
+      let processed = String(campHtml)
+      processed = processed.replace(/\{\{\s*firstName\s*\}\}/g, "Cliente")
+      processed = processed.replace(/\{\{\s*email\s*\}\}/g, "cliente@email.com")
+      processed = processed.replace(/\{\{\s*frontendUrl\s*\}\}/g, window.location.origin)
+      processed = processed.replace(/\{\{\s*subject\s*\}\}/g, campSubject || "Asunto")
+      processed = processed.replace(/\{\{\s*content\s*\}\}/g, "Contenido del mensaje")
+      processed = processed.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+      return processed
+    } catch (error) {
+      console.error("Error procesando preview HTML:", error)
+      return ""
+    }
+  }, [campHtml, campSubject])
+
+  const categoryLabels: Record<TemplateCategory, string> = {
+    all: "Todas",
+    welcome: "Bienvenida",
+    "password-reset": "Recuperación",
+    campaign: "Campañas",
+    promotion: "Promociones",
+    newsletter: "Newsletter",
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Email Marketing</h1>
-          <p className="text-sm text-muted-foreground">Campañas, suscriptores, pruebas y envío masivo.</p>
+          <p className="text-sm text-muted-foreground">Campañas, suscriptores, plantillas y envío masivo.</p>
         </div>
       </div>
 
@@ -355,6 +442,101 @@ export default function AdminEmailMarketingPage() {
 
             <Card className="border-0 shadow-md lg:col-span-2">
               <CardContent className="p-5 space-y-5">
+                {/* Selector de Plantillas */}
+                <Card className="border-2 border-dashed">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                      <CardTitle className="text-lg">Plantillas Predefinidas</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid gap-2">
+                      <Label>Categoría</Label>
+                      <Select value={templateCategory} onValueChange={(v) => setTemplateCategory(v as TemplateCategory)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(Object.keys(categoryLabels) as TemplateCategory[]).map((cat) => (
+                            <SelectItem key={cat} value={cat}>
+                              {categoryLabels[cat]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {templatesLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : templates.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">No hay plantillas en esta categoría.</p>
+                    ) : (
+                      <div className="grid gap-3">
+                        {templates.map((template) => (
+                          <div
+                            key={template.id}
+                            className="border rounded-lg p-4 hover:border-primary/50 transition-colors"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-semibold text-foreground">{template.name}</h4>
+                                  {selectedTemplateId === template.id && (
+                                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">Seleccionada</span>
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground mb-3">{template.description}</p>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => selectTemplate(template.id)}
+                                    className="flex-1"
+                                  >
+                                    <FileText className="w-3 h-3 mr-1" />
+                                    Usar
+                                  </Button>
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => previewTemplate(template.id)}
+                                      >
+                                        <Eye className="w-3 h-3 mr-1" />
+                                        Vista Previa
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                                      <DialogHeader>
+                                        <DialogTitle>{template.name}</DialogTitle>
+                                        <DialogDescription>{template.description}</DialogDescription>
+                                      </DialogHeader>
+                                      {templatePreviewHtml && previewTemplateId === template.id ? (
+                                        <div
+                                          className="border rounded-lg p-4 bg-white"
+                                          dangerouslySetInnerHTML={{ __html: templatePreviewHtml }}
+                                        />
+                                      ) : (
+                                        <div className="flex items-center justify-center py-8">
+                                          <Loader2 className="w-6 h-6 animate-spin" />
+                                        </div>
+                                      )}
+                                    </DialogContent>
+                                  </Dialog>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
                     <Label>Nombre (opcional)</Label>
@@ -369,8 +551,19 @@ export default function AdminEmailMarketingPage() {
                     <Input value={campPreheader} onChange={(e) => setCampPreheader(e.target.value)} placeholder="Texto corto que aparece en la bandeja..." />
                   </div>
                   <div className="md:col-span-2">
-                    <Label>HTML (soporta variables: {"{{firstName}}"}, {"{{email}}"})</Label>
-                    <Textarea value={campHtml} onChange={(e) => setCampHtml(e.target.value)} className="min-h-48 font-mono text-xs" />
+                    <div className="flex items-center justify-between mb-2">
+                      <Label>HTML (soporta variables: {"{{firstName}}"}, {"{{email}}"}, {"{{frontendUrl}}"})</Label>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={loadFullPreview}
+                        disabled={previewLoading || !campSubject.trim() || !campHtml.trim()}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        Preview Completo
+                      </Button>
+                    </div>
+                    <Textarea value={campHtml} onChange={(e) => setCampHtml(e.target.value)} className="min-h-64 font-mono text-xs" />
                   </div>
                   <div className="md:col-span-2">
                     <Label>Texto plano (opcional)</Label>
@@ -406,32 +599,56 @@ export default function AdminEmailMarketingPage() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border bg-background/60">
-                  <div className="p-3 border-b text-sm text-muted-foreground">Preview (se envuelve con el template de Habaluna en el backend)</div>
-                  <div className="p-4">
-                    <div className="rounded-lg border bg-white">
-                      {previewHtml ? (
-                        <div
-                          className="p-4 text-sm"
-                          // Preview del contenido (no del wrapper completo).
-                          // El wrapper final se ve igual en el email real.
-                          dangerouslySetInnerHTML={{ __html: previewHtml }}
-                        />
-                      ) : (
-                        <div className="p-4 text-sm text-muted-foreground">No hay contenido para previsualizar.</div>
-                      )}
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Nota: el email real incluye logo, colores, footer y link de baja (unsubscribe).
-                    </p>
-                  </div>
-                </div>
+                {/* Preview Básico */}
+                <Card className="border">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Vista Previa del Contenido</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {basicPreviewHtml ? (
+                      <div
+                        className="rounded-lg border bg-white p-4"
+                        style={{ minHeight: "200px" }}
+                        dangerouslySetInnerHTML={{ __html: basicPreviewHtml }}
+                      />
+                    ) : (
+                      <div className="rounded-lg border bg-muted/50 p-8 text-center text-sm text-muted-foreground">
+                        Agrega contenido HTML para ver la vista previa
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Dialog para Preview Completo */}
+      <Dialog open={showFullPreview} onOpenChange={setShowFullPreview}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Vista Previa Completa del Email</DialogTitle>
+            <DialogDescription>
+              Así se verá el email cuando se envíe (incluye logo, colores y footer de Habanaluna)
+            </DialogDescription>
+          </DialogHeader>
+          {previewLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : fullPreviewHtml ? (
+            <div
+              className="border rounded-lg bg-white"
+              dangerouslySetInnerHTML={{ __html: fullPreviewHtml }}
+            />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No hay preview disponible
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
-
