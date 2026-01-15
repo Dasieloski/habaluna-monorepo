@@ -49,6 +49,15 @@ export default function AdminEmailMarketingPage() {
   const [campSubject, setCampSubject] = useState("")
   const [campPreheader, setCampPreheader] = useState("")
   const [campHtml, setCampHtml] = useState(defaultCampaignHtml)
+
+  // Preview HTML con variables reemplazadas
+  const previewHtml = useMemo(() => {
+    if (!campHtml) return ""
+    return campHtml
+      .replace(/\{\{\s*firstName\s*\}\}/g, "Cliente")
+      .replace(/\{\{\s*email\s*\}\}/g, "cliente@email.com")
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remover scripts por seguridad
+  }, [campHtml])
   const [campText, setCampText] = useState("")
 
   const [testTo, setTestTo] = useState("")
@@ -392,9 +401,7 @@ export default function AdminEmailMarketingPage() {
                         className="p-4 text-sm"
                         // Preview del contenido (no del wrapper completo).
                         // El wrapper final se ve igual en el email real.
-                        dangerouslySetInnerHTML={{
-                          __html: (campHtml || "").replace(/\{\{\s*firstName\s*\}\}/g, "Cliente").replace(/\{\{\s*email\s*\}\}/g, "cliente@email.com"),
-                        }}
+                        dangerouslySetInnerHTML={{ __html: previewHtml }}
                       />
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground">
