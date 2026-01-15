@@ -53,7 +53,9 @@ export async function middleware(req: NextRequest) {
 
   // CRÍTICO: Bypass inmediato y absoluto para todas las rutas de auth
   // Esto debe ser lo PRIMERO que se ejecute, antes de cualquier otra lógica
+  // Incluye todas las subrutas como /auth/reset-password/[token]
   if (pathname.startsWith("/auth")) {
+    // Devolver inmediatamente sin procesar nada más
     return NextResponse.next()
   }
 
