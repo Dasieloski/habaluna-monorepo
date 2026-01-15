@@ -1,5 +1,10 @@
 "use client"
 
+// Forzar generación dinámica en runtime - esto es crítico para rutas dinámicas
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = 0
+
 import { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter, useParams } from "next/navigation"

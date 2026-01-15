@@ -67,6 +67,8 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
+  // Excluir completamente las rutas de auth del middleware
+  // Esto asegura que Next.js procese las rutas dinámicas sin interferencia
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
@@ -74,10 +76,11 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - auth (auth routes including reset-password with dynamic segments)
+     * - auth (auth routes including reset-password with dynamic segments) - COMPLETAMENTE EXCLUIDO
      * - admin (admin routes)
+     * - maintenance and coming-soon pages
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|auth|admin|maintenance|coming-soon).*)',
+    '/((?!api|_next|favicon.ico|auth|admin|maintenance|coming-soon).*)',
   ],
 }
 
