@@ -1,5 +1,9 @@
 'use client';
 
+// Configuración para rutas dinámicas Client Components
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
