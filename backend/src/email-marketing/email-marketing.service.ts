@@ -19,12 +19,46 @@ export class EmailMarketingService {
     return (raw || '').trim().toLowerCase();
   }
 
+  /**
+   * Escapa HTML entities para prevenir XSS.
+   */
+  private escapeHtml(text: string): string {
+    const map: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+    };
+    return text.replace(/[&<>"']/g, (m) => map[m]);
+  }
+
+  /**
+   * Sanitiza HTML básico removiendo scripts y eventos peligrosos.
+   * Nota: esto es una sanitización básica. Para producción avanzada, usar DOMPurify.
+   */
+  private sanitizeHtml(html: string): string {
+    let sanitized = html;
+    // Remover <script> tags y contenido
+    sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    // Remover event handlers (onclick, onerror, etc.)
+    sanitized = sanitized.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
+    sanitized = sanitized.replace(/\s*on\w+\s*=\s*[^\s>]*/gi, '');
+    // Remover javascript: URLs
+    sanitized = sanitized.replace(/javascript:/gi, '');
+    // Remover data: URLs peligrosos (permitir data:image para imágenes inline)
+    sanitized = sanitized.replace(/data:(?!image\/[a-z]+;base64,)/gi, '');
+    return sanitized;
+  }
+
   private renderWithVars(html: string, vars: Record<string, string>) {
     let out = html || '';
     for (const [k, v] of Object.entries(vars)) {
       // soporta {{firstName}} y {{ firstName }}
+      // IMPORTANTE: Escapar HTML para prevenir XSS
+      const escaped = this.escapeHtml(v);
       const r = new RegExp(`\\{\\{\\s*${k}\\s*\\}\\}`, 'g');
-      out = out.replace(r, v);
+      out = out.replace(r, escaped);
     }
     return out;
   }
@@ -162,12 +196,16 @@ export class EmailMarketingService {
     const html = (dto.html || '').trim();
     if (!html) throw new BadRequestException('HTML requerido');
 
+    // Sanitizar HTML básico: remover scripts y eventos peligrosos
+    // Nota: esto es una sanitización básica. Para producción, considerar usar DOMPurify o similar.
+    const sanitizedHtml = this.sanitizeHtml(html);
+
     return this.prisma.emailCampaign.create({
       data: {
         name: dto.name?.trim() || null,
         subject,
         preheader: dto.preheader?.trim() || null,
-        html,
+        html: sanitizedHtml,
         text: dto.text?.trim() || null,
         status: 'DRAFT',
       },
@@ -179,15 +217,21 @@ export class EmailMarketingService {
   }
 
   async updateCampaign(id: string, dto: UpdateCampaignDto) {
+    const updateData: any = {
+      ...(dto.name !== undefined ? { name: dto.name?.trim() || null } : {}),
+      ...(dto.subject !== undefined ? { subject: dto.subject?.trim() || '' } : {}),
+      ...(dto.preheader !== undefined ? { preheader: dto.preheader?.trim() || null } : {}),
+      ...(dto.text !== undefined ? { text: dto.text?.trim() || null } : {}),
+    };
+
+    // Sanitizar HTML si se actualiza
+    if (dto.html !== undefined) {
+      updateData.html = this.sanitizeHtml(dto.html);
+    }
+
     return this.prisma.emailCampaign.update({
       where: { id },
-      data: {
-        ...(dto.name !== undefined ? { name: dto.name?.trim() || null } : {}),
-        ...(dto.subject !== undefined ? { subject: dto.subject?.trim() || '' } : {}),
-        ...(dto.preheader !== undefined ? { preheader: dto.preheader?.trim() || null } : {}),
-        ...(dto.html !== undefined ? { html: dto.html } : {}),
-        ...(dto.text !== undefined ? { text: dto.text?.trim() || null } : {}),
-      },
+      data: updateData,
     });
   }
 

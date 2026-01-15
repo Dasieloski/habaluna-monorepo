@@ -13,7 +13,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UploadService } from './upload.service';
-import { multerOptions } from '../common/interceptors/file-upload.interceptor';
+import { multerOptions, validateFileMagicBytes } from '../common/interceptors/file-upload.interceptor';
 
 @ApiTags('upload')
 @Controller('upload')
@@ -41,6 +41,13 @@ export class UploadController {
   async uploadSingle(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
+    }
+
+    // Validar magic bytes para prevenir uploads maliciosos (ej: .exe renombrado como .jpg)
+    if (!validateFileMagicBytes(file)) {
+      throw new BadRequestException(
+        'El contenido del archivo no coincide con su tipo. Solo se permiten imágenes válidas.',
+      );
     }
 
     const uploaded = await this.uploadService.uploadImage(file);
@@ -78,6 +85,15 @@ export class UploadController {
   async uploadMultiple(@UploadedFiles() files: Express.Multer.File[]) {
     if (!files || files.length === 0) {
       throw new BadRequestException('No files uploaded');
+    }
+
+    // Validar magic bytes para cada archivo
+    for (const file of files) {
+      if (!validateFileMagicBytes(file)) {
+        throw new BadRequestException(
+          `El archivo "${file.originalname}" no es una imagen válida. Solo se permiten imágenes válidas.`,
+        );
+      }
     }
 
     const results = await Promise.all(files.map((f) => this.uploadService.uploadImage(f)));

@@ -11,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -20,6 +21,7 @@ import { UpdateSubscriberDto } from './dto/update-subscriber.dto';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
 import { SendTestDto } from './dto/send-test.dto';
+import { UnsubscribeDto } from './dto/unsubscribe.dto';
 
 @ApiTags('email-marketing')
 @Controller('email-marketing')
@@ -28,9 +30,11 @@ export class EmailMarketingController {
 
   // --- Public: unsubscribe ---
   @Get('unsubscribe')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests por minuto
   @ApiOperation({ summary: 'Unsubscribe (public)' })
-  async unsubscribe(@Query('e') email: string, @Query('t') token: string) {
-    return this.svc.unsubscribe(email, token);
+  async unsubscribe(@Query() dto: UnsubscribeDto) {
+    return this.svc.unsubscribe(dto.e, dto.t);
   }
 
   // --- Admin: subscribers ---
@@ -110,8 +114,9 @@ export class EmailMarketingController {
   }
 
   @Post('admin/campaigns/:id/send-test')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Roles('ADMIN')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 test emails por minuto
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Send test email (Admin)' })
   async sendTest(@Param('id') id: string, @Body() dto: SendTestDto) {
