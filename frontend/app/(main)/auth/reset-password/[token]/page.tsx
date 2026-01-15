@@ -1,3 +1,9 @@
+// LOG CRÍTICO: Verificar que el módulo se carga
+console.log('[ResetPassword] ========== MÓDULO CARGADO ==========')
+console.log('[ResetPassword] Timestamp carga módulo:', new Date().toISOString())
+console.log('[ResetPassword] Entorno:', process.env.NODE_ENV)
+console.log('[ResetPassword] ====================================')
+
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { ResetPasswordClient } from "./reset-password-client"
@@ -6,6 +12,12 @@ import { ResetPasswordClient } from "./reset-password-client"
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 export const revalidate = 0
+
+console.log('[ResetPassword] Configuraciones exportadas:', {
+  dynamic,
+  dynamicParams,
+  revalidate
+})
 
 type PageProps = {
   params: Promise<{ token: string }>

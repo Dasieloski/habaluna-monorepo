@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Comentar standalone temporalmente para verificar si funciona sin él
-  // output: 'standalone',
+  // CRÍTICO: Railway necesita output: 'standalone' para servir rutas dinámicas correctamente
+  output: 'standalone',
   typescript: {
     // Permite que `next build` (y por ende Vercel) no falle por errores de TypeScript.
     // Úsalo solo si lo necesitas temporalmente; puede ocultar bugs reales.
