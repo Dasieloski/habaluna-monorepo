@@ -285,6 +285,37 @@ export interface AdminCustomersResponse {
   }
 }
 
+export interface NewsletterSubscriber {
+  id: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  status: "SUBSCRIBED" | "UNSUBSCRIBED"
+  source?: string | null
+  subscribedAt: string
+  unsubscribedAt?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface EmailCampaign {
+  id: string
+  name?: string | null
+  subject: string
+  preheader?: string | null
+  html: string
+  text?: string | null
+  status: "DRAFT" | "SENDING" | "SENT"
+  sentAt?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PagedResponse<T> {
+  data: T[]
+  meta: { total: number; page: number; limit: number; totalPages: number }
+}
+
 export type BackendOfferType = "PERCENTAGE" | "FIXED"
 
 export interface BackendAdminOffer {
@@ -1187,6 +1218,62 @@ export const api = {
   resetPassword: async (token: string, newPassword: string) => {
     const response = await api.post("/auth/reset-password", { token, newPassword })
     return response.data as { message: string }
+  },
+
+  // Email Marketing (Admin)
+  getEmailSubscribers: async (params?: { search?: string; page?: number; limit?: number }): Promise<PagedResponse<NewsletterSubscriber>> => {
+    const qp = new URLSearchParams()
+    if (params?.search) qp.append("search", params.search)
+    if (params?.page) qp.append("page", String(params.page))
+    if (params?.limit) qp.append("limit", String(params.limit))
+    const endpoint = `/email-marketing/admin/subscribers${qp.toString() ? `?${qp.toString()}` : ""}`
+    const res = await api.get(endpoint)
+    return res.data as PagedResponse<NewsletterSubscriber>
+  },
+
+  upsertEmailSubscriber: async (data: { email: string; firstName?: string; lastName?: string }): Promise<NewsletterSubscriber> => {
+    const res = await api.post("/email-marketing/admin/subscribers", data)
+    return res.data as NewsletterSubscriber
+  },
+
+  updateEmailSubscriber: async (
+    id: string,
+    data: Partial<{ status: "SUBSCRIBED" | "UNSUBSCRIBED"; firstName: string; lastName: string }>,
+  ): Promise<NewsletterSubscriber> => {
+    const res = await api.patch(`/email-marketing/admin/subscribers/${id}`, data)
+    return res.data as NewsletterSubscriber
+  },
+
+  getEmailCampaigns: async (params?: { page?: number; limit?: number }): Promise<PagedResponse<EmailCampaign>> => {
+    const qp = new URLSearchParams()
+    if (params?.page) qp.append("page", String(params.page))
+    if (params?.limit) qp.append("limit", String(params.limit))
+    const endpoint = `/email-marketing/admin/campaigns${qp.toString() ? `?${qp.toString()}` : ""}`
+    const res = await api.get(endpoint)
+    return res.data as PagedResponse<EmailCampaign>
+  },
+
+  createEmailCampaign: async (data: { name?: string; subject: string; preheader?: string; html: string; text?: string }): Promise<EmailCampaign> => {
+    const res = await api.post("/email-marketing/admin/campaigns", data)
+    return res.data as EmailCampaign
+  },
+
+  updateEmailCampaign: async (
+    id: string,
+    data: Partial<{ name: string; subject: string; preheader: string; html: string; text: string }>,
+  ): Promise<EmailCampaign> => {
+    const res = await api.patch(`/email-marketing/admin/campaigns/${id}`, data)
+    return res.data as EmailCampaign
+  },
+
+  sendTestEmailCampaign: async (id: string, to: string) => {
+    const res = await api.post(`/email-marketing/admin/campaigns/${id}/send-test`, { to })
+    return res.data as { ok: boolean }
+  },
+
+  sendEmailCampaign: async (id: string) => {
+    const res = await api.post(`/email-marketing/admin/campaigns/${id}/send`, {})
+    return res.data as { started: boolean }
   },
 }
 

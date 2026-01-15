@@ -115,6 +115,22 @@ enum MarketingEmailType {
   REVIEW_REQUEST
 }
 
+enum NewsletterSubscriberStatus {
+  SUBSCRIBED
+  UNSUBSCRIBED
+}
+
+enum EmailCampaignStatus {
+  DRAFT
+  SENDING
+  SENT
+}
+
+enum EmailCampaignSendStatus {
+  SENT
+  FAILED
+}
+
 /// Log simple para evitar enviar automatizaciones repetidas (dedupe).
 model MarketingEmailLog {
   id        String            @id @default(uuid())
@@ -131,6 +147,62 @@ model MarketingEmailLog {
   @@index([email])
   @@index([sentAt])
   @@map("marketing_email_logs")
+}
+
+model NewsletterSubscriber {
+  id             String                    @id @default(uuid())
+  email          String                    @unique
+  firstName      String?
+  lastName       String?
+  status         NewsletterSubscriberStatus @default(SUBSCRIBED)
+  source         String? // ADMIN | CHECKOUT | POPUP | etc
+  subscribedAt   DateTime                  @default(now())
+  unsubscribedAt DateTime?
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+
+  sends EmailCampaignSend[]
+
+  @@index([status])
+  @@index([subscribedAt])
+  @@map("newsletter_subscribers")
+}
+
+model EmailCampaign {
+  id        String             @id @default(uuid())
+  name      String?
+  subject   String
+  preheader String?
+  html      String             @db.Text
+  text      String?            @db.Text
+  status    EmailCampaignStatus @default(DRAFT)
+  sentAt    DateTime?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  sends EmailCampaignSend[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("email_campaigns")
+}
+
+model EmailCampaignSend {
+  id           String                 @id @default(uuid())
+  campaignId   String
+  subscriberId String?
+  email        String
+  status       EmailCampaignSendStatus
+  error        String?
+  sentAt       DateTime               @default(now())
+
+  campaign   EmailCampaign         @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  subscriber NewsletterSubscriber? @relation(fields: [subscriberId], references: [id], onDelete: SetNull)
+
+  @@index([campaignId])
+  @@index([email])
+  @@index([sentAt])
+  @@map("email_campaign_sends")
 }
 
 model PasswordResetToken {

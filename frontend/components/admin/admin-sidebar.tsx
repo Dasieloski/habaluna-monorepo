@@ -11,6 +11,7 @@ import {
   Users,
   Percent,
   MessageSquare,
+  Mail,
   Settings,
   Images,
   ChevronLeft,
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/admin/offers", label: "Ofertas", icon: Percent },
   { href: "/admin/banners", label: "Carrusel", icon: Images },
   { href: "/admin/reviews", label: "Reseñas", icon: MessageSquare },
+  { href: "/admin/email-marketing", label: "Email Marketing", icon: Mail },
   { href: "/admin/settings", label: "Configuración", icon: Settings },
 ]
 

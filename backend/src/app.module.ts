@@ -25,6 +25,7 @@ import { SearchModule } from './search/search.module';
 import { ReportsModule } from './reports/reports.module';
 import { CacheModule } from './common/cache/cache.module';
 import { MediaModule } from './media/media.module';
+import { EmailMarketingModule } from './email-marketing/email-marketing.module';
 
 @Module({
   imports: [
@@ -96,6 +97,7 @@ import { MediaModule } from './media/media.module';
     ReportsModule,
     CacheModule,
     MediaModule,
+    EmailMarketingModule,
   ],
   providers: [
     HttpExceptionFilter,
