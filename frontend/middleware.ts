@@ -56,6 +56,7 @@ export async function middleware(req: NextRequest) {
   // Incluye todas las subrutas como /auth/reset-password/[token]
   if (pathname.startsWith("/auth")) {
     // Devolver inmediatamente sin procesar nada más
+    // Esto asegura que Next.js procese la ruta dinámica sin interferencia
     return NextResponse.next()
   }
 
