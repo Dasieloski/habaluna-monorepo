@@ -20,14 +20,39 @@ export class EmailService {
     const pass = this.config.get<string>('SMTP_PASS');
     const secure = String(this.config.get<string>('SMTP_SECURE') ?? 'false') === 'true';
 
-    if (!host || !user || !pass) return null;
+    if (!host || !user || !pass) {
+      this.logger.warn('SMTP no configurado: faltan host, user o pass');
+      return null;
+    }
 
-    return nodemailer.createTransport({
-      host,
-      port,
-      secure,
-      auth: { user, pass },
-    });
+    try {
+      const transport = nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: { user, pass },
+        // Agregar opciones adicionales para mejor compatibilidad
+        tls: {
+          rejectUnauthorized: false, // Permitir certificados autofirmados (útil para algunos servidores SMTP)
+        },
+      });
+
+      // Verificar la conexión
+      transport.verify((error) => {
+        if (error) {
+          this.logger.error(`Error verificando conexión SMTP: ${error.message}`);
+        } else {
+          this.logger.log('Conexión SMTP verificada correctamente');
+        }
+      });
+
+      return transport;
+    } catch (error) {
+      this.logger.error(
+        `Error creando transporte SMTP: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return null;
+    }
   }
 
   async sendPasswordResetEmail(params: { to: string; resetUrl: string }) {

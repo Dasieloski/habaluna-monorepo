@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label"
 import { Loader2, MailPlus, Send, Users } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
-const defaultCampaignHtml = `
+// Template HTML por defecto - usando String() para evitar problemas de evaluación
+const defaultCampaignHtml = String.raw`
 <p style="margin:0 0 10px;">{{firstName}}, tenemos algo bueno para ti.</p>
 <p style="margin:0 0 10px;">Este correo está diseñado para verse perfecto con el estilo de Habaluna (colores + logo).</p>
 <ul style="margin:0; padding-left:18px;">
