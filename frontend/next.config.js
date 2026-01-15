@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  // Comentar standalone temporalmente para verificar si funciona sin él
+  // output: 'standalone',
   typescript: {
     // Permite que `next build` (y por ende Vercel) no falle por errores de TypeScript.
     // Úsalo solo si lo necesitas temporalmente; puede ocultar bugs reales.
