@@ -23,53 +23,133 @@ function getApiBaseUrl(): string {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  await params
-  return {
-    title: "Restablecer contraseña | Habaluna",
-    description: "Restablece tu contraseña de Habaluna",
-    robots: "noindex, nofollow",
+  console.log('[ResetPassword] [generateMetadata] INICIO - Generando metadata')
+  try {
+    const resolvedParams = await params
+    console.log('[ResetPassword] [generateMetadata] Params resueltos:', {
+      token: resolvedParams.token?.substring(0, 10) + '...',
+      tokenLength: resolvedParams.token?.length
+    })
+    
+    const metadata = {
+      title: "Restablecer contraseña | Habaluna",
+      description: "Restablece tu contraseña de Habaluna",
+      robots: "noindex, nofollow" as const,
+    }
+    
+    console.log('[ResetPassword] [generateMetadata] FIN - Metadata generada:', metadata)
+    return metadata
+  } catch (error) {
+    console.error('[ResetPassword] [generateMetadata] ERROR:', error)
+    throw error
   }
 }
 
 export default async function ResetPasswordPage({ params }: PageProps) {
-  const { token } = await params
-
-  if (!token || typeof token !== "string" || token.trim() === "") {
-    notFound()
-  }
-
-  // Decodificar el token
-  let decodedToken: string
+  console.log('[ResetPassword] [PAGE] ========== INICIO RENDERIZADO ==========')
+  console.log('[ResetPassword] [PAGE] Timestamp:', new Date().toISOString())
+  
   try {
-    decodedToken = decodeURIComponent(token)
-  } catch {
-    decodedToken = token
-  }
-
-  // CRÍTICO: Hacer un fetch al backend para activar el procesamiento de Next.js en producción
-  // Esto es similar a cómo /products/[slug] hace fetch al backend
-  // Next.js 16 necesita trabajo asíncrono real (fetch) para reconocer rutas dinámicas en Railway
-  // 
-  // NOTA: No podemos validar el token aquí sin efectos secundarios porque el endpoint
-  // POST /api/auth/reset-password marca el token como usado. La validación real
-  // se hace en el cliente cuando el usuario envía el formulario.
-  // 
-  // Este fetch solo sirve para activar el procesamiento de Next.js, no para validar.
-  try {
-    const apiBaseUrl = getApiBaseUrl()
-    
-    // Hacer un fetch ligero al backend para activar el procesamiento
-    // Usamos un endpoint que sabemos que existe y no tiene efectos secundarios
-    await fetch(`${apiBaseUrl}/api/ui-settings/public`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    }).catch(() => {
-      // Si falla, no importa - el fetch ya activó el procesamiento de Next.js
+    // Paso 1: Resolver params
+    console.log('[ResetPassword] [PAGE] Paso 1: Resolviendo params...')
+    const startParams = Date.now()
+    const resolvedParams = await params
+    const paramsTime = Date.now() - startParams
+    console.log('[ResetPassword] [PAGE] Paso 1 COMPLETADO - Params resueltos en', paramsTime, 'ms:', {
+      token: resolvedParams.token?.substring(0, 20) + '...',
+      tokenLength: resolvedParams.token?.length,
+      tokenType: typeof resolvedParams.token
     })
-  } catch {
-    // Ignorar errores, el fetch ya activó el procesamiento
-  }
+    
+    const { token } = resolvedParams
 
-  return <ResetPasswordClient token={decodedToken} />
+    // Paso 2: Validar token
+    console.log('[ResetPassword] [PAGE] Paso 2: Validando token...')
+    if (!token || typeof token !== "string" || token.trim() === "") {
+      console.error('[ResetPassword] [PAGE] Paso 2 ERROR - Token inválido:', {
+        token: token,
+        type: typeof token,
+        isEmpty: !token,
+        isString: typeof token === "string",
+        isTrimmedEmpty: typeof token === "string" && token.trim() === ""
+      })
+      notFound()
+    }
+    console.log('[ResetPassword] [PAGE] Paso 2 COMPLETADO - Token válido')
+
+    // Paso 3: Decodificar token
+    console.log('[ResetPassword] [PAGE] Paso 3: Decodificando token...')
+    let decodedToken: string
+    try {
+      decodedToken = decodeURIComponent(token)
+      console.log('[ResetPassword] [PAGE] Paso 3 COMPLETADO - Token decodificado:', {
+        originalLength: token.length,
+        decodedLength: decodedToken.length,
+        preview: decodedToken.substring(0, 20) + '...'
+      })
+    } catch (decodeError) {
+      console.warn('[ResetPassword] [PAGE] Paso 3 WARNING - Error decodificando, usando token original:', decodeError)
+      decodedToken = token
+    }
+
+    // Paso 4: Obtener API URL
+    console.log('[ResetPassword] [PAGE] Paso 4: Obteniendo API URL...')
+    const apiBaseUrl = getApiBaseUrl()
+    console.log('[ResetPassword] [PAGE] Paso 4 COMPLETADO - API URL:', apiBaseUrl)
+
+    // Paso 5: Fetch al backend
+    console.log('[ResetPassword] [PAGE] Paso 5: Iniciando fetch al backend...')
+    console.log('[ResetPassword] [PAGE] URL del fetch:', `${apiBaseUrl}/api/ui-settings/public`)
+    
+    const fetchStart = Date.now()
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/ui-settings/public`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      })
+      
+      const fetchTime = Date.now() - fetchStart
+      console.log('[ResetPassword] [PAGE] Paso 5 COMPLETADO - Fetch exitoso en', fetchTime, 'ms:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      })
+      
+      if (!response.ok) {
+        console.warn('[ResetPassword] [PAGE] Paso 5 WARNING - Fetch no OK pero continuando:', response.status)
+      }
+    } catch (fetchError: any) {
+      const fetchTime = Date.now() - fetchStart
+      console.error('[ResetPassword] [PAGE] Paso 5 ERROR - Fetch falló después de', fetchTime, 'ms:', {
+        error: fetchError?.message,
+        stack: fetchError?.stack,
+        name: fetchError?.name
+      })
+      // Continuar de todas formas
+    }
+
+    // Paso 6: Renderizar componente
+    console.log('[ResetPassword] [PAGE] Paso 6: Renderizando ResetPasswordClient...')
+    console.log('[ResetPassword] [PAGE] Token que se pasa al cliente:', {
+      preview: decodedToken.substring(0, 20) + '...',
+      length: decodedToken.length
+    })
+    
+    const component = <ResetPasswordClient token={decodedToken} />
+    console.log('[ResetPassword] [PAGE] Paso 6 COMPLETADO - Componente creado')
+    console.log('[ResetPassword] [PAGE] ========== FIN RENDERIZADO EXITOSO ==========')
+    
+    return component
+  } catch (error: any) {
+    console.error('[ResetPassword] [PAGE] ========== ERROR CRÍTICO ==========')
+    console.error('[ResetPassword] [PAGE] Error:', {
+      message: error?.message,
+      stack: error?.stack,
+      name: error?.name
+    })
+    console.error('[ResetPassword] [PAGE] ==========================================')
+    throw error
+  }
 }

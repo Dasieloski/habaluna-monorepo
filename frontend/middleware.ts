@@ -50,18 +50,37 @@ function isBypassedPath(pathname: string) {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
+  const isResetPassword = pathname.startsWith("/auth/reset-password")
+
+  // DEBUG: Log para rutas de reset-password
+  if (isResetPassword) {
+    console.log('[Middleware] ========== PROCESANDO RESET-PASSWORD ==========')
+    console.log('[Middleware] Pathname:', pathname)
+    console.log('[Middleware] URL completa:', req.url)
+    console.log('[Middleware] Method:', req.method)
+    console.log('[Middleware] Headers:', Object.fromEntries(req.headers.entries()))
+  }
 
   // CRÍTICO: Bypass inmediato y absoluto para todas las rutas de auth
   // Esto debe ser lo PRIMERO que se ejecute, antes de cualquier otra lógica
   // Incluye todas las subrutas como /auth/reset-password/[token]
   if (pathname.startsWith("/auth")) {
+    if (isResetPassword) {
+      console.log('[Middleware] Ruta /auth detectada - Bypass inmediato (NO debería ejecutarse por matcher)')
+      console.log('[Middleware] ========== BYPASS RESET-PASSWORD ==========')
+    }
     // Devolver inmediatamente sin procesar nada más
     // Esto asegura que Next.js procese la ruta dinámica sin interferencia
     return NextResponse.next()
   }
 
   // También verificar isBypassedPath por si acaso
-  if (isBypassedPath(pathname)) return NextResponse.next()
+  if (isBypassedPath(pathname)) {
+    if (isResetPassword) {
+      console.log('[Middleware] Ruta en isBypassedPath - Bypass (NO debería llegar aquí)')
+    }
+    return NextResponse.next()
+  }
 
   const mode = await getSiteMode()
   if (mode === "LIVE") return NextResponse.next()

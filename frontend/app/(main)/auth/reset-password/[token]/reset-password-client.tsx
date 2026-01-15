@@ -26,10 +26,20 @@ interface ResetPasswordClientProps {
 }
 
 export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
+  console.log('[ResetPasswordClient] ========== INICIO RENDERIZADO CLIENTE ==========')
+  console.log('[ResetPasswordClient] Timestamp:', new Date().toISOString())
+  console.log('[ResetPasswordClient] Token recibido:', {
+    preview: token?.substring(0, 20) + '...',
+    length: token?.length,
+    isEmpty: !token || token.trim() === ""
+  })
+
   const router = useRouter()
   const [message, setMessage] = useState<string>("")
   const [error, setError] = useState<string>("")
   const [isLoading, setIsLoading] = useState(true)
+
+  console.log('[ResetPasswordClient] Estados iniciales:', { isLoading, error, message })
 
   const {
     register,
@@ -44,11 +54,24 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
 
   // Verificar que el token existe al cargar
   useEffect(() => {
+    console.log('[ResetPasswordClient] [useEffect] Ejecutando efecto de carga')
+    console.log('[ResetPasswordClient] [useEffect] Token en efecto:', {
+      preview: token?.substring(0, 20) + '...',
+      isEmpty: !token || token.trim() === ""
+    })
+    
     if (!token || token.trim() === "") {
+      console.error('[ResetPasswordClient] [useEffect] Token inválido detectado')
       setError("Token inválido. El enlace de recuperación no es válido.")
+    } else {
+      console.log('[ResetPasswordClient] [useEffect] Token válido')
     }
+    
     setIsLoading(false)
+    console.log('[ResetPasswordClient] [useEffect] Loading desactivado')
   }, [token])
+  
+  console.log('[ResetPasswordClient] ========== FIN RENDERIZADO CLIENTE ==========')
 
   const onSubmit = async (data: Form) => {
     if (!token || token.trim() === "") {
