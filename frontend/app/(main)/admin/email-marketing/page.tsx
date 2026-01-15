@@ -11,17 +11,21 @@ import { Label } from "@/components/ui/label"
 import { Loader2, MailPlus, Send, Users } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
-// Template HTML por defecto - usando String() para evitar problemas de evaluación
-const defaultCampaignHtml = String.raw`
-<p style="margin:0 0 10px;">{{firstName}}, tenemos algo bueno para ti.</p>
-<p style="margin:0 0 10px;">Este correo está diseñado para verse perfecto con el estilo de Habaluna (colores + logo).</p>
-<ul style="margin:0; padding-left:18px;">
-  <li>Producto destacado de la semana</li>
-  <li>Oferta limitada</li>
-  <li>Un combo recomendado</li>
-</ul>
-<p style="margin:14px 0 0;">¿Listo? Entra y mira las novedades.</p>
-`
+// Template HTML por defecto - usando función para evitar problemas de evaluación en build
+function getDefaultCampaignHtml(): string {
+  return [
+    '<p style="margin:0 0 10px;">{{firstName}}, tenemos algo bueno para ti.</p>',
+    '<p style="margin:0 0 10px;">Este correo está diseñado para verse perfecto con el estilo de Habaluna (colores + logo).</p>',
+    '<ul style="margin:0; padding-left:18px;">',
+    '  <li>Producto destacado de la semana</li>',
+    '  <li>Oferta limitada</li>',
+    '  <li>Un combo recomendado</li>',
+    '</ul>',
+    '<p style="margin:14px 0 0;">¿Listo? Entra y mira las novedades.</p>',
+  ].join('\n');
+}
+
+const defaultCampaignHtml = getDefaultCampaignHtml();
 
 export default function AdminEmailMarketingPage() {
   const [tab, setTab] = useState<"subscribers" | "campaigns">("subscribers")
