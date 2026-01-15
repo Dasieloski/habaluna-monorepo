@@ -315,28 +315,42 @@ export class AuthService {
     const user = await this.usersService.findByEmail(normalizedEmail);
 
     if (user?.isActive) {
-      const rawToken = randomBytes(32).toString('hex');
-      const tokenHash = this.hashResetToken(rawToken);
+      try {
+        const rawToken = randomBytes(32).toString('hex');
+        const tokenHash = this.hashResetToken(rawToken);
 
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
-      // Invalidar tokens previos no usados (opcional pero recomendable)
-      await this.prisma.passwordResetToken.updateMany({
-        where: { userId: user.id, used: false },
-        data: { used: true },
-      });
+        // Invalidar tokens previos no usados (opcional pero recomendable)
+        await this.prisma.passwordResetToken.updateMany({
+          where: { userId: user.id, used: false },
+          data: { used: true },
+        });
 
-      await this.prisma.passwordResetToken.create({
-        data: {
-          userId: user.id,
-          token: tokenHash,
-          expiresAt,
-          used: false,
-        },
-      });
+        await this.prisma.passwordResetToken.create({
+          data: {
+            userId: user.id,
+            token: tokenHash,
+            expiresAt,
+            used: false,
+          },
+        });
 
-      const resetUrl = `${this.getFrontendBaseUrl()}/auth/reset-password/${rawToken}`;
-      await this.email.sendPasswordResetEmail({ to: user.email, resetUrl });
+        const resetUrl = `${this.getFrontendBaseUrl()}/auth/reset-password/${rawToken}`;
+        const emailResult = await this.email.sendPasswordResetEmail({ to: user.email, resetUrl });
+        
+        if (!emailResult.sent) {
+          this.logger.warn(
+            `No se pudo enviar email de recuperación a ${user.email}. SMTP puede no estar configurado o hay un error de conexión.`,
+          );
+        }
+      } catch (error) {
+        // No fallar el endpoint si hay error enviando el email (seguridad: no revelar si el usuario existe)
+        this.logger.error(
+          `Error en forgotPassword para ${normalizedEmail}`,
+          error instanceof Error ? error.stack : String(error),
+        );
+      }
     }
 
     return {

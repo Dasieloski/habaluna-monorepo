@@ -41,24 +41,8 @@ export class EmailService {
       <p>Si no lo solicitaste, ignora este correo.</p>
     `;
 
-    const transport = this.createTransport();
-    if (!transport) {
-      // Fallback seguro para dev: no fallar el endpoint, solo loggear.
-      this.logger.warn(
-        `SMTP no configurado. No se envió email. resetUrl para ${params.to}: ${params.resetUrl}`,
-      );
-      return { sent: false };
-    }
-
-    await transport.sendMail({
-      from,
-      to: params.to,
-      subject,
-      text,
-      html,
-    });
-
-    return { sent: true };
+    // Usar sendEmail para tener manejo de errores consistente
+    return this.sendEmail({ from, to: params.to, subject, text, html });
   }
 
   async sendWelcomeEmail(params: { to: string; firstName?: string }) {
