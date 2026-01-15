@@ -51,11 +51,13 @@ function isBypassedPath(pathname: string) {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
-  // Bypass explícito para rutas de auth (incluyendo rutas dinámicas como reset-password/[token])
+  // CRÍTICO: Bypass inmediato y absoluto para todas las rutas de auth
+  // Esto debe ser lo PRIMERO que se ejecute, antes de cualquier otra lógica
   if (pathname.startsWith("/auth")) {
     return NextResponse.next()
   }
 
+  // También verificar isBypassedPath por si acaso
   if (isBypassedPath(pathname)) return NextResponse.next()
 
   const mode = await getSiteMode()
