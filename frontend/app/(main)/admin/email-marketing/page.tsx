@@ -405,12 +405,16 @@ export default function AdminEmailMarketingPage() {
                   <div className="p-3 border-b text-sm text-muted-foreground">Preview (se envuelve con el template de Habaluna en el backend)</div>
                   <div className="p-4">
                     <div className="rounded-lg border bg-white">
-                      <div
-                        className="p-4 text-sm"
-                        // Preview del contenido (no del wrapper completo).
-                        // El wrapper final se ve igual en el email real.
-                        dangerouslySetInnerHTML={{ __html: previewHtml }}
-                      />
+                      {previewHtml ? (
+                        <div
+                          className="p-4 text-sm"
+                          // Preview del contenido (no del wrapper completo).
+                          // El wrapper final se ve igual en el email real.
+                          dangerouslySetInnerHTML={{ __html: previewHtml }}
+                        />
+                      ) : (
+                        <div className="p-4 text-sm text-muted-foreground">No hay contenido para previsualizar.</div>
+                      )}
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground">
                       Nota: el email real incluye logo, colores, footer y link de baja (unsubscribe).
