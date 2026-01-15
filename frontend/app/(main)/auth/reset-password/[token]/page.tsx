@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -47,13 +47,11 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
   const strengthLabel = getPasswordStrengthLabel(passwordStrength.score)
 
   // Verificar que el token existe al cargar
-  useMemo(() => {
+  useEffect(() => {
     if (!token || token.trim() === "") {
       setError("Token inválido. El enlace de recuperación no es válido.")
-      setIsLoading(false)
-    } else {
-      setIsLoading(false)
     }
+    setIsLoading(false)
   }, [token])
 
   const onSubmit = async (data: Form) => {
