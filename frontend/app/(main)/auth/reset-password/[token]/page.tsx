@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -21,16 +21,18 @@ const schema = z
 
 type Form = z.infer<typeof schema>
 
-export default function ResetPasswordPage({ params }: { params: { token: string } }) {
+export default function ResetPasswordPage() {
   const router = useRouter()
+  const params = useParams()
   const token = useMemo(() => {
+    const tokenParam = (params?.token as string) || ""
     try {
-      return decodeURIComponent(params.token || "")
+      return decodeURIComponent(tokenParam)
     } catch (e) {
       // Si falla el decode, usar el token tal cual
-      return params.token || ""
+      return tokenParam
     }
-  }, [params.token])
+  }, [params])
   const [message, setMessage] = useState<string>("")
   const [error, setError] = useState<string>("")
   const [isLoading, setIsLoading] = useState(true)
