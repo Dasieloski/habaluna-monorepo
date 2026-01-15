@@ -95,6 +95,23 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 shadow-sm">
+            {isLoading ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Cargando...</p>
+              </div>
+            ) : !token || token.trim() === "" ? (
+              <div className="space-y-4">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                  Token inválido. El enlace de recuperación no es válido.
+                </div>
+                <Link
+                  href="/auth/forgot-password"
+                  className="block text-center text-sky-500 hover:text-sky-600 hover:underline font-medium"
+                >
+                  Solicitar nuevo enlace de recuperación
+                </Link>
+              </div>
+            ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{error}</div>
