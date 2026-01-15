@@ -23,9 +23,17 @@ type Form = z.infer<typeof schema>
 
 export default function ResetPasswordPage({ params }: { params: { token: string } }) {
   const router = useRouter()
-  const token = useMemo(() => decodeURIComponent(params.token || ""), [params.token])
+  const token = useMemo(() => {
+    try {
+      return decodeURIComponent(params.token || "")
+    } catch (e) {
+      // Si falla el decode, usar el token tal cual
+      return params.token || ""
+    }
+  }, [params.token])
   const [message, setMessage] = useState<string>("")
   const [error, setError] = useState<string>("")
+  const [isLoading, setIsLoading] = useState(true)
 
   const {
     register,
@@ -38,7 +46,22 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
   const passwordStrength = newPassword ? validatePasswordStrength(newPassword) : { score: 0, feedback: [] }
   const strengthLabel = getPasswordStrengthLabel(passwordStrength.score)
 
+  // Verificar que el token existe al cargar
+  useMemo(() => {
+    if (!token || token.trim() === "") {
+      setError("Token inválido. El enlace de recuperación no es válido.")
+      setIsLoading(false)
+    } else {
+      setIsLoading(false)
+    }
+  }, [token])
+
   const onSubmit = async (data: Form) => {
+    if (!token || token.trim() === "") {
+      setError("Token inválido. Por favor, solicita un nuevo enlace de recuperación.")
+      return
+    }
+
     try {
       setError("")
       setMessage("")
@@ -49,7 +72,7 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
       const msg =
         err.response?.data?.message ||
         err.message ||
-        "No se pudo actualizar la contraseña. Verifica el enlace e inténtalo nuevamente."
+        "No se pudo actualizar la contraseña. El enlace puede haber expirado o ser inválido. Por favor, solicita un nuevo enlace."
       setError(msg)
     }
   }
@@ -155,6 +178,7 @@ export default function ResetPasswordPage({ params }: { params: { token: string 
                 </Link>
               </p>
             </form>
+            )}
           </div>
         </div>
       </div>

@@ -36,6 +36,8 @@ async function getSiteMode(): Promise<SiteMode> {
 function isBypassedPath(pathname: string) {
   if (pathname.startsWith("/admin")) return true
   if (pathname === "/maintenance" || pathname === "/coming-soon") return true
+  // Rutas de autenticación (incluyendo reset-password) deben ser accesibles siempre
+  if (pathname.startsWith("/auth")) return true
   // Next internals / assets
   if (pathname.startsWith("/_next")) return true
   // Static files served by Next/public (importante: no romper imágenes/css/favicon en modo mantenimiento)

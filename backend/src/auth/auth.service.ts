@@ -336,7 +336,9 @@ export class AuthService {
           },
         });
 
-        const resetUrl = `${this.getFrontendBaseUrl()}/auth/reset-password/${rawToken}`;
+        // Codificar el token para la URL (por si tiene caracteres especiales)
+        const encodedToken = encodeURIComponent(rawToken);
+        const resetUrl = `${this.getFrontendBaseUrl()}/auth/reset-password/${encodedToken}`;
         const emailResult = await this.email.sendPasswordResetEmail({ to: user.email, resetUrl });
         
         if (!emailResult.sent) {
