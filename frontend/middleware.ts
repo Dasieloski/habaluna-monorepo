@@ -10,7 +10,26 @@ function normalizeApiBaseUrl(raw: string): string {
   return url
 }
 
-const API_BASE_URL = normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000")
+// Función para obtener la URL de la API de forma robusta
+function getApiBaseUrl(): string {
+  let url = process.env.NEXT_PUBLIC_API_URL
+  
+  // Si no hay URL configurada y estamos en producción (Railway), usar la URL conocida
+  if (!url) {
+    // En Railway, si la variable no está configurada durante el build,
+    // usar la URL conocida del backend
+    url = "https://habanaluna-backend-production.up.railway.app"
+  }
+  
+  // Si aún no hay URL (desarrollo local), usar localhost
+  if (!url) {
+    url = "http://localhost:4000"
+  }
+  
+  return normalizeApiBaseUrl(url)
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 let cachedMode: { value: SiteMode; ts: number } | null = null
 

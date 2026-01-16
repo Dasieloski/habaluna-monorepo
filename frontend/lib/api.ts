@@ -12,8 +12,47 @@ function normalizeApiBaseUrl(raw: string): string {
   return url
 }
 
+// Función para obtener la URL de la API de forma robusta
+// Intenta leer desde diferentes fuentes para funcionar en build y runtime
+function getApiBaseUrl(): string {
+  // 1. Intentar desde process.env (build time y server-side)
+  let url = process.env.NEXT_PUBLIC_API_URL
+  
+  // 2. Si estamos en el cliente y no está disponible, intentar desde window (runtime)
+  if (typeof window !== 'undefined' && !url) {
+    // @ts-ignore - window.__ENV__ puede estar definido en runtime
+    url = window.__ENV__?.NEXT_PUBLIC_API_URL
+  }
+  
+  // 3. Si aún no hay URL, usar fallback
+  if (!url) {
+    // En producción (Railway), si no hay variable configurada, usar la URL del backend conocida
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      // Estamos en producción pero la variable no está configurada
+      // Intentar inferir desde el hostname o usar la URL conocida de Railway
+      url = "https://habanaluna-backend-production.up.railway.app"
+    } else {
+      // Desarrollo local
+      url = "http://localhost:4000"
+    }
+  }
+  
+  return normalizeApiBaseUrl(url)
+}
+
 // Asegurar que API_BASE_URL no termine con /api y que sea URL válida (con protocolo)
-let API_BASE_URL = normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000")
+let API_BASE_URL = getApiBaseUrl()
+
+// Exponer la URL de la API en window para debugging (solo en desarrollo o para verificación)
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.__HABANALUNA_API_CONFIG = {
+    baseUrl: API_BASE_URL,
+    fullApiUrl: `${API_BASE_URL}/api`,
+    envVar: process.env.NEXT_PUBLIC_API_URL || 'not set',
+    hostname: window.location.hostname,
+  }
+}
 
 // Token en memoria (Zustand). El refresh token vive en cookie HttpOnly (backend).
 const getAuthToken = (): string | null => {
