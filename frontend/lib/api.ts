@@ -12,54 +12,27 @@ function normalizeApiBaseUrl(raw: string): string {
   return url
 }
 
-// Función para obtener la URL de la API de forma robusta
-// IMPORTANTE: Esta función se ejecuta en cada llamada, no solo al cargar el módulo
-// Esto asegura que siempre tenga acceso a las variables de entorno actuales
-function getApiBaseUrl(): string {
-  // 1. Intentar desde process.env (build time y server-side)
-  // En Next.js, NEXT_PUBLIC_* se inyecta en build time pero está disponible en runtime
-  let url = process.env.NEXT_PUBLIC_API_URL
-  
-  // 2. Si estamos en el cliente y no está disponible, intentar desde window (runtime)
-  if (typeof window !== 'undefined' && !url) {
-    // @ts-ignore - window.__ENV__ puede estar definido en runtime
-    url = window.__ENV__?.NEXT_PUBLIC_API_URL
-  }
-  
-  // 3. Si aún no hay URL, usar fallback inteligente
-  if (!url) {
-    // En producción (Railway), detectar por hostname
-    if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname
-      // Si no es localhost, estamos en producción
-      if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-        url = "https://habanaluna-backend-production.up.railway.app"
-      } else {
-        url = "http://localhost:4000"
-      }
-    } else {
-      // Server-side: verificar NODE_ENV
-      if (process.env.NODE_ENV === 'production') {
-        url = "https://habanaluna-backend-production.up.railway.app"
-      } else {
-        url = "http://localhost:4000"
-      }
-    }
-  }
-  
-  return normalizeApiBaseUrl(url)
-}
-
-// CRÍTICO: No inicializar API_BASE_URL aquí porque se ejecuta al cargar el módulo
-// En su lugar, crear una función que se llame cada vez que se necesite
-// Esto asegura que siempre use las variables de entorno actuales
-
-// Variable que se inicializa la primera vez que se usa (lazy initialization)
+// CRÍTICO: Lazy initialization para API_BASE_URL
+// Esto asegura que se ejecute en runtime, no en build time
+// Así siempre usa las variables de entorno actuales de Railway
 let API_BASE_URL: string | null = null
 
 function getApiBaseUrlLazy(): string {
   if (!API_BASE_URL) {
-    API_BASE_URL = getApiBaseUrl()
+    const raw = process.env.NEXT_PUBLIC_API_URL || ""
+    let url = raw.trim()
+    
+    if (!url) {
+      url = process.env.NODE_ENV === 'production'
+        ? "https://habanaluna-backend-production.up.railway.app"
+        : "http://localhost:4000"
+    }
+    
+    if (!/^https?:\/\//i.test(url)) {
+      url = `https://${url}`
+    }
+    
+    API_BASE_URL = url.replace(/\/api\/?$/, "")
   }
   return API_BASE_URL
 }
