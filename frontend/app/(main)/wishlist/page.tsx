@@ -169,7 +169,7 @@ export default function WishlistPage() {
                   href={`/products/${p.slug}`}
                   className="block relative aspect-square rounded-lg overflow-hidden mb-3"
                 >
-                  <Image
+                  <SmartImage
                     src={img}
                     alt={p.name || "Producto"}
                     fill
@@ -285,7 +285,7 @@ export default function WishlistPage() {
                   href={`/products/${product.slug}`}
                   className="block relative aspect-square rounded-lg overflow-hidden mb-3"
                 >
-                  <Image
+                  <SmartImage
                     src={img}
                     alt={product.name}
                     fill

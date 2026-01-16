@@ -8,7 +8,7 @@ import { ChevronRight, Home } from 'lucide-react';
 import { api, mapBackendProductToFrontend } from '@/lib/api';
 import { toNumber } from '@/lib/money';
 import { ProductFilters, SearchFilters } from '@/components/product/product-filters';
-import { OptimizedImage } from '@/components/ui/optimized-image';
+import { SmartImage } from '@/components/ui/smart-image';
 import { AnimatedList } from '@/components/ui/animated-list';
 import { ProductCard } from '@/components/product/product-card';
 import { ProductCardSkeleton } from '@/components/product/product-card-skeleton';

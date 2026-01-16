@@ -17,7 +17,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@/components/icons/streamline-icons"
-import { OptimizedImage } from "@/components/ui/optimized-image"
+import { SmartImage } from "@/components/ui/smart-image"
 
 import { ProductReviews } from "@/components/reviews/product-reviews"
 
@@ -223,7 +223,7 @@ export function ProductClient({
                         : "border-transparent hover:border-gray-200"
                     }`}
                   >
-                    <OptimizedImage
+                    <SmartImage
                       src={img || "/placeholder.svg"}
                       alt={`Vista ${idx + 1}`}
                       fill
@@ -238,7 +238,7 @@ export function ProductClient({
 
               {/* Main Image */}
               <div className="relative w-full aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl md:rounded-2xl overflow-hidden">
-                <OptimizedImage
+                <SmartImage
                   src={images[selectedImage] || "/placeholder.svg"}
                   alt={product?.name || "Producto"}
                   fill
@@ -320,7 +320,7 @@ export function ProductClient({
                     const card = (
                       <>
                         <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted shrink-0 relative">
-                          <OptimizedImage
+                          <SmartImage
                             src={item.image || "/placeholder.svg"}
                             alt={item.name}
                             fill

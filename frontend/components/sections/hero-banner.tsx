@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { ChevronRightIcon } from "@/components/icons/streamline-icons"
-import { OptimizedImage } from "@/components/ui/optimized-image"
+import { SmartImage } from "@/components/ui/smart-image"
 
 interface Banner {
   id: string
@@ -137,7 +137,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
             >
               <div className="relative h-full min-h-[450px] md:min-h-[550px]">
                 {banner.image && (
-                  <OptimizedImage
+                  <SmartImage
                     src={banner.image || "/placeholder.svg"}
                     alt={banner.title}
                     fill

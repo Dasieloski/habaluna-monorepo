@@ -9,7 +9,7 @@ import { useAuthStore } from "@/lib/store/auth-store"
 import { useCartValidation } from "@/hooks/use-cart-validation"
 import { api, mapBackendProductToFrontend } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
-import { OptimizedImage } from "@/components/ui/optimized-image"
+import { SmartImage } from "@/components/ui/smart-image"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Button } from "@/components/ui/button"
 import { CartItemSkeleton } from "@/components/cart/cart-item-skeleton"
@@ -364,7 +364,7 @@ export default function CartPage() {
                         <div key={product.id} className="flex-shrink-0 w-32 md:w-40">
                           <Link href={`/products/${product.slug}`} className="block mb-2">
                             <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative">
-                              <OptimizedImage
+                              <SmartImage
                                 src={image}
                                 alt={product.name}
                                 fill

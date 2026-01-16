@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useState, useRef } from "react"
-import { OptimizedImage } from "@/components/ui/optimized-image"
+import { SmartImage } from "@/components/ui/smart-image"
 import { getImageUrl } from "@/lib/image-utils"
 
 interface Category {
@@ -63,7 +63,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                 style={{ transitionDelay: `${index * 0.1}s` }}
               >
                 <div className="w-16 h-16 md:w-28 md:h-28 rounded-full overflow-hidden bg-gradient-to-br from-sky-100 to-blue-100 mb-2 md:mb-4 ring-2 md:ring-4 ring-transparent group-hover:ring-sky-300 transition-all duration-300 group-hover:scale-110 shadow-lg relative">
-                  <OptimizedImage
+                  <SmartImage
                     src={getImageUrl(category.image) || "/placeholder.svg"}
                     alt={category.name}
                     fill

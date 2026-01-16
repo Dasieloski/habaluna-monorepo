@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { getImageUrl } from '@/lib/image-utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { SmartImage } from '@/components/ui/smart-image';
 
 async function getCategories() {
   try {
@@ -41,11 +42,14 @@ export default async function CategoriesPage() {
                 </CardHeader>
                 <CardContent>
                   {getImageUrl(category.image) && (
-                    <div className="aspect-video bg-gray-200 rounded-lg mb-4 overflow-hidden">
-                      <img
+                    <div className="aspect-video rounded-lg mb-4 overflow-hidden">
+                      <SmartImage
                         src={getImageUrl(category.image)!}
                         alt={category.name}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        aspectRatio="16/9"
                       />
                     </div>
                   )}

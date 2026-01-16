@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { HeartIcon } from "@/components/icons/streamline-icons"
 import { toNumber } from "@/lib/money"
-import { OptimizedImage } from "@/components/ui/optimized-image"
+import { SmartImage } from "@/components/ui/smart-image"
 import { ShoppingCart } from "lucide-react"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useToast } from "@/hooks/use-toast"
@@ -122,7 +122,7 @@ export function TopSales({ products }: TopSalesProps) {
           >
             <div className="relative h-full bg-white rounded-xl md:rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
               <div className="aspect-[4/3] lg:aspect-auto lg:h-full relative overflow-hidden">
-                <OptimizedImage
+                <SmartImage
                   src={featuredProduct.images?.[0] || "/placeholder.svg?height=600&width=600&query=featured product"}
                   alt={featuredProduct.name}
                   fill
@@ -174,7 +174,7 @@ export function TopSales({ products }: TopSalesProps) {
             >
               <div className="relative bg-white rounded-xl md:rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full">
                 <div className="aspect-square relative overflow-hidden">
-                  <OptimizedImage
+                  <SmartImage
                     src={product.images?.[0] || "/placeholder.svg?height=300&width=300&query=product"}
                     alt={product.name}
                     fill
