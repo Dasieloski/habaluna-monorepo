@@ -21,7 +21,7 @@ console.log('[ResetPassword] Configuraciones exportadas:', {
 })
 
 type PageProps = {
-  params: Promise<{ slug: string }>
+  params: Promise<{ token: string[] }>
 }
 
 // Función auxiliar para obtener la URL base de la API en el servidor
@@ -55,9 +55,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   console.log('[ResetPassword] [generateMetadata] INICIO - Generando metadata')
   try {
     const resolvedParams = await params
+    const token = Array.isArray(resolvedParams.token) ? resolvedParams.token.join('/') : resolvedParams.token || ''
     console.log('[ResetPassword] [generateMetadata] Params resueltos:', {
-      slug: resolvedParams.slug?.substring(0, 10) + '...',
-      slugLength: resolvedParams.slug?.length
+      token: token?.substring(0, 10) + '...',
+      tokenLength: token?.length
     })
     
     const metadata = {
@@ -84,18 +85,22 @@ export default async function ResetPasswordPage({ params }: PageProps) {
     const startParams = Date.now()
     const resolvedParams = await params
     const paramsTime = Date.now() - startParams
-    console.log('[ResetPassword] [PAGE] Paso 1 COMPLETADO - Params resueltos en', paramsTime, 'ms:', {
-      slug: resolvedParams.slug?.substring(0, 20) + '...',
-      slugLength: resolvedParams.slug?.length,
-      slugType: typeof resolvedParams.slug
-    })
     
-    // El parámetro se llama 'slug' pero contiene el token
-    const token = resolvedParams.slug
+    // Unir el array de tokens en un string (catch-all route devuelve array)
+    const token = Array.isArray(resolvedParams.token) 
+      ? resolvedParams.token.join('/') 
+      : resolvedParams.token || ''
+    
+    console.log('[ResetPassword] [PAGE] Paso 1 COMPLETADO - Params resueltos en', paramsTime, 'ms:', {
+      token: token?.substring(0, 20) + '...',
+      tokenLength: token?.length,
+      tokenType: typeof token,
+      tokenArray: Array.isArray(resolvedParams.token) ? resolvedParams.token : 'not array'
+    })
 
     // Paso 2: Validar token (validación exhaustiva)
     console.log('[ResetPassword] [PAGE] Paso 2: Validando token...')
-    console.log('[ResetPassword] [PAGE] Token recibido (desde slug):', {
+    console.log('[ResetPassword] [PAGE] Token recibido (desde token):', {
       value: token,
       type: typeof token,
       length: token?.length,
