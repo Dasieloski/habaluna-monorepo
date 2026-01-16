@@ -217,7 +217,7 @@ export function SmartImage({
         }
       }, 100)
     }
-  }, [src])
+  }, [src, width, height])
 
   // Generar blur placeholder si no se proporciona
   useEffect(() => {
@@ -496,7 +496,7 @@ export function SmartImg({
         }
       }, 100)
     }
-  }, [src])
+  }, [src, width, height])
 
   const handleError = useCallback(() => {
     setHasError(true)
