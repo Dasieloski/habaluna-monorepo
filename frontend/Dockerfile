@@ -34,15 +34,18 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# CRÍTICO: Copiar el directorio standalone completo (incluye server.js y los assets copiados por postbuild)
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-# CRÍTICO: Copiar .next/static al lugar correcto dentro de standalone
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# CRÍTICO: Copiar public al lugar correcto dentro de standalone  
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# CRÍTICO: Copiar el directorio standalone completo manteniendo la estructura .next/standalone
+# Esto permite que tanto CMD directo como npm start funcionen
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./.next/standalone
+# CRÍTICO: Copiar .next/static al lugar correcto (dentro de standalone)
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/standalone/.next/static
+# CRÍTICO: Copiar public al lugar correcto (dentro de standalone)
+COPY --from=builder --chown=nextjs:nodejs /app/public ./.next/standalone/public
+# CRÍTICO: Copiar package.json para que npm start funcione
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
 # Verificar que server.js existe después de copiar (falla el build si no existe)
-RUN test -f /app/server.js || (echo "❌ ERROR: server.js no existe después de copiar. Verifica que el build generó .next/standalone/server.js" && ls -la /app/ && exit 1)
+RUN test -f /app/.next/standalone/server.js || (echo "❌ ERROR: server.js no existe después de copiar. Verifica que el build generó .next/standalone/server.js" && ls -la /app/.next/standalone/ 2>/dev/null || echo "Directorio .next/standalone no existe" && exit 1)
 
 USER nextjs
 
@@ -50,6 +53,6 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-# Ejecutar el servidor standalone directamente
-CMD ["node", "server.js"]
+# Ejecutar el servidor standalone (npm start ejecuta node .next/standalone/server.js)
+CMD ["npm", "start"]
 
