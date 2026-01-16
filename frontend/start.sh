@@ -1,21 +1,16 @@
 #!/bin/sh
 set -e
 
-# Verificar si el build existe
+# Verificar que el servidor standalone existe
+# El build DEBE ejecutarse antes del start (en Railway: Build Command)
 if [ ! -f ".next/standalone/server.js" ]; then
-  echo "⚠️  Servidor standalone no encontrado. Ejecutando build..."
-  echo "⚠️  Deshabilitando Turbopack para generar standalone correctamente..."
-  NEXT_PRIVATE_SKIP_TURBOPACK=1 npm run build
-  
-  # Verificar nuevamente después del build
-  if [ ! -f ".next/standalone/server.js" ]; then
-    echo "❌ Error: El build no generó el servidor standalone"
-    echo "❌ Verifica que next.config.js tenga 'output: standalone'"
-    echo "❌ Verifica los logs del build para más detalles"
-    exit 1
-  fi
-  echo "✅ Build completado exitosamente"
+  echo "❌ Error: El servidor standalone no existe"
+  echo "❌ El build debe ejecutarse ANTES del start"
+  echo "❌ Verifica que Railway ejecute 'npm run build' en el Build Command"
+  echo "❌ Verifica que next.config.js tenga 'output: standalone'"
+  echo "❌ Verifica que el build se ejecute SIN Turbopack (NEXT_PRIVATE_SKIP_TURBOPACK=1)"
+  exit 1
 fi
 
-echo "✅ Iniciando servidor standalone..."
+echo "✅ Servidor standalone encontrado. Iniciando..."
 node .next/standalone/server.js
