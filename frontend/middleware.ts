@@ -38,16 +38,33 @@ async function getSiteMode(): Promise<SiteMode> {
   if (cachedMode && now - cachedMode.ts < 30_000) return cachedMode.value
 
   try {
+    // Agregar timeout para evitar que el middleware bloquee la carga
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 2000) // 2 segundos timeout
+
     const res = await fetch(`${API_BASE_URL}/api/ui-settings/public`, {
       // Edge: mantener simple; cache corto en memoria
       method: "GET",
       headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
     })
+    
+    clearTimeout(timeoutId)
+    
+    if (!res.ok) {
+      // Si la respuesta no es OK, usar modo LIVE por defecto
+      cachedMode = { value: "LIVE", ts: now }
+      return "LIVE"
+    }
+    
     const data: any = await res.json().catch(() => null)
     const mode = (data?.siteMode as SiteMode) || "LIVE"
     cachedMode = { value: mode, ts: now }
     return mode
-  } catch {
+  } catch (error) {
+    // Si hay cualquier error (timeout, red, etc.), usar LIVE por defecto
+    // Esto asegura que la página siempre cargue
+    cachedMode = { value: "LIVE", ts: now }
     return "LIVE"
   }
 }
