@@ -13,17 +13,15 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar solo archivos de dependencias primero (mejor cacheo)
-COPY package*.json ./
+# En workspaces, package-lock.json puede estar en la raíz, copiar ambos
+COPY package.json ./
+COPY package-lock.json* ./
 COPY prisma ./prisma/
 
 # Instalar dependencias (sharp se compilará aquí, puede tardar 5-10 min)
-# Usar npm ci si package-lock.json existe y está sincronizado, sino npm install
+# En workspaces, usar npm install directamente (más flexible que npm ci)
 # --prefer-offline para usar cache si está disponible
-RUN if [ -f package-lock.json ]; then \
-      npm ci --prefer-offline --no-audit || npm install --prefer-offline --no-audit; \
-    else \
-      npm install --prefer-offline --no-audit; \
-    fi
+RUN npm install --prefer-offline --no-audit --production=false
 
 # Copiar código fuente después (para mejor cacheo de dependencias)
 COPY . .
