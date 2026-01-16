@@ -249,7 +249,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
       >
         <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border/50 bg-linear-to-b from-gray-50 via-white to-white transition-shadow duration-300 hover:shadow-xl">
         <div className="aspect-square relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100">
-          <OptimizedImage
+          <SmartImage
             src={currentImage}
             alt={product.name}
             fill

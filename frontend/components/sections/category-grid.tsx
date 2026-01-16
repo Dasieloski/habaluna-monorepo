@@ -100,7 +100,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                   transitionDelay: `${index * 0.1}s`,
                 }}
               >
-                <OptimizedImage
+                <SmartImage
                   src={getImageUrl(category.image) || "/placeholder.svg"}
                   alt={category.name}
                   fill
