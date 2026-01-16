@@ -9,12 +9,11 @@ import type { Metadata } from "next"
 import { ResetPasswordClient } from "./reset-password-client"
 
 // Configuración similar a /products/[slug] que funciona correctamente
-// No usar force-dynamic ya que puede causar problemas con standalone en Railway
+// Ruta movida fuera del route group (main) para evitar problemas con standalone
 export const revalidate = 0
 export const dynamicParams = true
 
 console.log('[ResetPassword] Configuraciones exportadas:', {
-  dynamic,
   dynamicParams,
   revalidate
 })
