@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException, Logger } from '
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { createHash, randomBytes } from 'crypto';
+import { createHash } from 'crypto';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/login.dto';
@@ -346,7 +346,7 @@ export class AuthService {
 
         // Enviar email con el código (sin URL)
         const emailResult = await this.email.sendPasswordResetEmail({ to: user.email, resetCode });
-        
+
         if (!emailResult.sent) {
           this.logger.warn(
             `No se pudo enviar email de recuperación a ${user.email}. SMTP puede no estar configurado o hay un error de conexión.`,
@@ -378,7 +378,7 @@ export class AuthService {
 
     const tokenHash = this.hashResetToken(normalizedCode);
     const record = await this.prisma.passwordResetToken.findFirst({
-      where: { 
+      where: {
         token: tokenHash,
         used: false,
         expiresAt: { gt: new Date() },
@@ -402,7 +402,7 @@ export class AuthService {
 
     const tokenHash = this.hashResetToken(normalizedCode);
     const record = await this.prisma.passwordResetToken.findFirst({
-      where: { 
+      where: {
         token: tokenHash,
         used: false,
         expiresAt: { gt: new Date() },
