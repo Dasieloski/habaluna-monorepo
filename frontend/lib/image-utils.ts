@@ -68,6 +68,7 @@ export function getImageUrl(image?: string): string | null {
   // Si después de quitar el / está vacío, retornar null
   if (!imageId) return null
   
-  // Convertir a /api/media/{id}
-  return `${base}/api/media/${imageId}`
+  // Convertir a /api/media/{id} con optimización WebP por defecto
+  // El backend optimizará automáticamente si tiene sharp instalado
+  return `${base}/api/media/${imageId}?format=webp&q=80`
 }

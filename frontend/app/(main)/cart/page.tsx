@@ -384,6 +384,7 @@ export default function CartPage() {
                           </p>
                           <button
                             onClick={() => handleAddSuggestedProduct(product)}
+                            aria-label={`Añadir ${product.name} al carrito`}
                             className="w-full bg-sky-500 hover:bg-sky-600 text-white text-xs py-2 px-3 rounded-full transition-colors"
                           >
                             Añadir al carrito
@@ -423,6 +424,7 @@ export default function CartPage() {
               {/* Cupón de descuento */}
               <button
                 onClick={() => setShowCoupon(!showCoupon)}
+                aria-label={showCoupon ? "Ocultar cupón de descuento" : "Mostrar cupón de descuento"}
                 className="flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700 mb-4"
               >
                 <span className="underline">Cupón de descuento</span>
@@ -438,7 +440,10 @@ export default function CartPage() {
                     placeholder="Código de descuento"
                     className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
                   />
-                  <button className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors">
+                  <button 
+                    aria-label="Aplicar código de descuento"
+                    className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors"
+                  >
                     Aplicar
                   </button>
                 </div>

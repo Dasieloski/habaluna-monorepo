@@ -101,6 +101,7 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
           {viewAllLink && (
             <Link
               href={viewAllLink}
+              aria-label={`Ver todos los productos de ${title}`}
               className="text-xs md:text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors flex items-center gap-1 group"
             >
               Ver todo
@@ -112,12 +113,14 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
         <div className="relative group">
           <button
             onClick={() => scroll("left")}
+            aria-label="Desplazar carrusel hacia la izquierda"
             className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 bg-white shadow-xl rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 -translate-x-2 group-hover:translate-x-0"
           >
             <ChevronLeftIcon className="w-5 h-5" />
           </button>
           <button
             onClick={() => scroll("right")}
+            aria-label="Desplazar carrusel hacia la derecha"
             className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 bg-white shadow-xl rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 translate-x-2 group-hover:translate-x-0"
           >
             <ChevronRightIcon className="w-5 h-5" />

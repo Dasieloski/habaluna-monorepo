@@ -550,12 +550,14 @@ export function ProductClient({
               <div className="hidden md:flex items-center gap-2">
                 <button
                   onClick={() => scrollRelated("left")}
+                  aria-label="Desplazar productos relacionados hacia la izquierda"
                   className="p-3 bg-muted rounded-full hover:bg-muted/80 transition-colors"
                 >
                   <ChevronLeftIcon className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => scrollRelated("right")}
+                  aria-label="Desplazar productos relacionados hacia la derecha"
                   className="p-3 bg-sky-500 text-white rounded-full hover:bg-sky-600 transition-colors"
                 >
                   <ChevronRightIcon className="w-5 h-5" />

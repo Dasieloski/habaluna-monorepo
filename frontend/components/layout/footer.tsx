@@ -18,7 +18,8 @@ export function Footer() {
               </Link>
               <div className="flex items-center gap-2 mt-5">
                 <Image src="/flags/cuba.png" alt="Cuba" width={20} height={14} className="h-4 w-auto rounded-sm" />
-                <select className="bg-transparent border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-sky-300">
+                <label htmlFor="country-select" className="sr-only">Seleccionar país</label>
+                <select id="country-select" className="bg-transparent border border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-sky-300">
                   <option>Cuba</option>
                 </select>
               </div>

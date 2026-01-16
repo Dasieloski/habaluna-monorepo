@@ -182,8 +182,22 @@ export function SmartImage({
         return
       }
       
-      // Convertir a /api/media/{id}
-      setImgSrc(`${apiBase}/api/media/${imageId}`)
+      // Convertir a /api/media/{id} con parámetros de optimización
+      // Agregar parámetros de tamaño y formato para optimización
+      const params = new URLSearchParams()
+      if (width && height) {
+        params.set('w', String(width))
+        params.set('h', String(height))
+      } else if (width) {
+        params.set('w', String(width))
+      } else if (height) {
+        params.set('h', String(height))
+      }
+      // Solicitar WebP por defecto para mejor compresión
+      params.set('format', 'webp')
+      params.set('q', '80')
+      
+      setImgSrc(`${apiBase}/api/media/${imageId}?${params.toString()}`)
       setIsUrlReady(true)
     } catch (error) {
       // Si hay error obteniendo la URL base, reintentar después de un delay
@@ -447,8 +461,22 @@ export function SmartImg({
         return
       }
       
-      // Convertir a /api/media/{id}
-      setImgSrc(`${apiBase}/api/media/${imageId}`)
+      // Convertir a /api/media/{id} con parámetros de optimización
+      // Agregar parámetros de tamaño y formato para optimización
+      const params = new URLSearchParams()
+      if (width && height) {
+        params.set('w', String(width))
+        params.set('h', String(height))
+      } else if (width) {
+        params.set('w', String(width))
+      } else if (height) {
+        params.set('h', String(height))
+      }
+      // Solicitar WebP por defecto para mejor compresión
+      params.set('format', 'webp')
+      params.set('q', '80')
+      
+      setImgSrc(`${apiBase}/api/media/${imageId}?${params.toString()}`)
       setIsUrlReady(true)
     } catch (error) {
       // Si hay error obteniendo la URL base, reintentar después de un delay

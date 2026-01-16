@@ -166,6 +166,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                     {banner.buttonText && (
                       <a
                         href={banner.link || "#"}
+                        aria-label={banner.buttonText}
                         className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md text-white px-5 md:px-6 py-2.5 md:py-3 rounded-xl font-medium hover:bg-white/30 transition-all duration-300 text-sm md:text-base border border-white/30"
                       >
                         {banner.buttonText}
