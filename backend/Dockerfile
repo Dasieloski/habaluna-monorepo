@@ -17,8 +17,13 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Instalar dependencias (sharp se compilará aquí, puede tardar 5-10 min)
-# Usar --prefer-offline para usar cache si está disponible
-RUN npm ci --prefer-offline --no-audit || npm install --prefer-offline --no-audit
+# Usar npm ci si package-lock.json existe y está sincronizado, sino npm install
+# --prefer-offline para usar cache si está disponible
+RUN if [ -f package-lock.json ]; then \
+      npm ci --prefer-offline --no-audit || npm install --prefer-offline --no-audit; \
+    else \
+      npm install --prefer-offline --no-audit; \
+    fi
 
 # Copiar código fuente después (para mejor cacheo de dependencias)
 COPY . .
