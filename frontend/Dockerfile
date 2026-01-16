@@ -70,11 +70,11 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-# CRÍTICO: Cambiar al directorio standalone antes de ejecutar
-# El servidor standalone de Next.js espera ejecutarse desde su propio directorio
-# para que las rutas relativas funcionen correctamente
-WORKDIR /app/.next/standalone
+# CRÍTICO: Mantener WORKDIR en /app para que npm start funcione
+# El servidor standalone se ejecuta con la ruta completa desde /app
+WORKDIR /app
 
-# Ejecutar el servidor standalone directamente
-CMD ["node", "server.js"]
+# Ejecutar el servidor standalone usando npm start
+# Esto ejecutará: node .next/standalone/server.js desde /app
+CMD ["npm", "start"]
 
