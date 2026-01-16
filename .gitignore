@@ -51,5 +51,6 @@ yarn-error.log*
 
 # Railway
 .railway/
-railway.json
+# Ignorar railway.json en raíz, pero permitir en subdirectorios
+/railway.json
 
