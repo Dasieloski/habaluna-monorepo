@@ -4,6 +4,13 @@ const nextConfig = {
   output: 'standalone',
   // Asegurar que todas las rutas se sirvan correctamente
   trailingSlash: false,
+  // Asegurar que las rutas dinámicas se generen correctamente
+  experimental: {
+    // Asegurar que las rutas dinámicas funcionen en producción
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
   typescript: {
     // Permite que `next build` (y por ende Vercel) no falle por errores de TypeScript.
     // Úsalo solo si lo necesitas temporalmente; puede ocultar bugs reales.

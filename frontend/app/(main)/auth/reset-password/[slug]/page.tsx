@@ -8,11 +8,10 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { ResetPasswordClient } from "./reset-password-client"
 
-// CRÍTICO: Forzar modo dinámico para Next.js 16 en producción
-// Similar a /products/[slug] pero con revalidate = 0 para no cachear
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
+// Configuración similar a /products/[slug] que funciona correctamente
+// No usar force-dynamic ya que puede causar problemas con standalone en Railway
 export const revalidate = 0
+export const dynamicParams = true
 
 console.log('[ResetPassword] Configuraciones exportadas:', {
   dynamic,
