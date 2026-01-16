@@ -7,13 +7,18 @@ import type { Metadata } from "next"
 import { ResetPasswordClient } from "./reset-password-client"
 
 // CRÍTICO: Configuración para catch-all routes en standalone
-// Para catch-all routes, NO usar force-dynamic puede ayudar en standalone
-// En su lugar, usar dynamicParams = true y revalidate = 0
+// Para catch-all routes en Next.js 16 standalone, necesitamos:
+// 1. dynamicParams = true (acepta cualquier parámetro)
+// 2. revalidate = 0 (no cachear)
+// 3. generateStaticParams debe retornar [] (fuerza dinámico)
+// 4. dynamic = 'force-dynamic' (fuerza SSR - puede ser necesario)
+export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 export const revalidate = 0
 
 // CRÍTICO: generateStaticParams debe retornar array vacío para catch-all
 // Esto le dice a Next.js que esta ruta es completamente dinámica
+// NO generar ningún parámetro estático
 export async function generateStaticParams() {
   return []
 }
