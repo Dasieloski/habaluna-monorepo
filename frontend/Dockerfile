@@ -18,6 +18,7 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Build the application (esto ejecuta build + postbuild automáticamente)
 RUN npm run build
 
 # Production image, copy all the files and run next
@@ -30,10 +31,12 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+# CRÍTICO: Copiar el directorio standalone completo (incluye server.js y los assets copiados por postbuild)
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+# CRÍTICO: Copiar .next/static al lugar correcto dentro de standalone
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# CRÍTICO: Copiar public al lugar correcto dentro de standalone
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
 
@@ -41,5 +44,6 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-CMD ["npm", "start"]
+# Ejecutar el servidor standalone directamente
+CMD ["node", "server.js"]
 
