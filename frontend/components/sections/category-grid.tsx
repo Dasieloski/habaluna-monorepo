@@ -137,7 +137,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               style={{ transitionDelay: `${index * 0.1}s` }}
             >
               <OptimizedImage
-                src={getImageUrl(category.image) || DEFAULT_CATEGORY_IMAGES[index % DEFAULT_CATEGORY_IMAGES.length]}
+                src={getImageUrl(category.image) || "/placeholder.svg"}
                 alt={category.name}
                 fill
                 className="transition-transform duration-700 group-hover:scale-110"
