@@ -7,7 +7,7 @@ import { ProductPrice } from "@/components/product/product-price"
 import { toNumber } from "@/lib/money"
 import { useToast } from "@/hooks/use-toast"
 import { showSuccess, showError } from "@/components/ui/use-toast"
-import { api } from "@/lib/api"
+import { api, getApiBaseUrlLazy } from "@/lib/api"
 import { useCartStore } from "@/lib/store/cart-store"
 import {
   HeartIcon,
@@ -48,7 +48,6 @@ function normalizeImageUrl(imagePath: string): string {
   }
   
   // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-  const { getApiBaseUrlLazy } = require("@/lib/api")
   const base = getApiBaseUrlLazy()
   
   // Priorizar URLs de la BD: /api/media/{id}

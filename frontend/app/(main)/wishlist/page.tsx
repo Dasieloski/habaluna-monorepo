@@ -9,7 +9,7 @@ import { useAuthStore } from "@/lib/store/auth-store"
 import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useToast } from "@/hooks/use-toast"
-import { api, type BackendProduct } from "@/lib/api"
+import { api, type BackendProduct, getApiBaseUrlLazy } from "@/lib/api"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Button } from "@/components/ui/button"
 import { Heart } from "lucide-react"
@@ -29,7 +29,6 @@ function normalizeImageUrl(imagePath: string): string {
   if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) return imagePath
   
   // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-  const { getApiBaseUrlLazy } = require("@/lib/api")
   const base = getApiBaseUrlLazy()
   
   // Priorizar URLs de la BD: /api/media/{id}

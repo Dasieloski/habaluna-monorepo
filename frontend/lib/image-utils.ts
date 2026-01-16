@@ -24,7 +24,6 @@ export function getImageUrl(image?: string): string | null {
   if (image.startsWith("http")) return image
   
   // Usar getApiBaseUrlLazy() para obtener la URL base correcta
-  const { getApiBaseUrlLazy } = require("@/lib/api")
   const base = getApiBaseUrlLazy()
 
   // Priorizar URLs de la BD: /api/media/{id}

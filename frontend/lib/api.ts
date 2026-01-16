@@ -17,7 +17,7 @@ function normalizeApiBaseUrl(raw: string): string {
 // Así siempre usa las variables de entorno actuales de Railway
 let API_BASE_URL: string | null = null
 
-function getApiBaseUrlLazy(): string {
+export function getApiBaseUrlLazy(): string {
   if (!API_BASE_URL) {
     const raw = process.env.NEXT_PUBLIC_API_URL || ""
     let url = raw.trim()

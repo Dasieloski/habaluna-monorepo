@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { type Product } from "@/lib/mock-data"
-import { api, type BackendCategory, mapBackendProductToFrontend } from "@/lib/api"
+import { api, type BackendCategory, mapBackendProductToFrontend, getApiBaseUrlLazy } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2, ImagePlus, X } from "lucide-react"
 import { slugify } from "@/lib/slug"
@@ -127,7 +127,6 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
     }
 
     // Cargar imágenes - eliminar Cloudinary y usar solo imágenes de la BD
-    const { getApiBaseUrlLazy } = require("@/lib/api")
     const apiBase = getApiBaseUrlLazy()
     
     const normalizedImages = (productToLoad.images || []).map(img => {

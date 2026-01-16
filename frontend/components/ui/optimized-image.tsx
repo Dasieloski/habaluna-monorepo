@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { getApiBaseUrlLazy } from "@/lib/api"
 
 interface OptimizedImageProps {
   src: string
@@ -60,7 +61,6 @@ export function OptimizedImage({
     }
     
     // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-    const { getApiBaseUrlLazy } = require("@/lib/api")
     const apiBase = getApiBaseUrlLazy()
     
     // Si es una URL relativa que empieza con /:
@@ -204,7 +204,6 @@ export function OptimizedImg({
     }
     
     // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-    const { getApiBaseUrlLazy } = require("@/lib/api")
     const apiBase = getApiBaseUrlLazy()
     
     // Si es relativa, ver si pertenece al backend (/api o /uploads)

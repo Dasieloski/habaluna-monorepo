@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { api } from '@/lib/api';
+import { api, getApiBaseUrlLazy } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,7 +41,6 @@ function normalizeImageUrl(imagePath: string): string {
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) return imagePath;
   
   // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-  const { getApiBaseUrlLazy } = require("@/lib/api");
   const base = getApiBaseUrlLazy();
   
   // Priorizar URLs de la BD: /api/media/{id}

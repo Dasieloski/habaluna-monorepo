@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
-import { api, type BackendBanner } from "@/lib/api"
+import { api, type BackendBanner, getApiBaseUrlLazy } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -51,7 +51,6 @@ function normalizeImageUrl(imagePath: string): string {
   if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) return imagePath
   
   // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-  const { getApiBaseUrlLazy } = require("@/lib/api")
   const base = getApiBaseUrlLazy()
   
   // Priorizar URLs de la BD: /api/media/{id}
