@@ -60,51 +60,57 @@ export function OptimizedImage({
       return
     }
     
+    // Si es una URL completa, retornarla tal cual (forzar HTTPS)
+    if (normalizedSrc.startsWith('http://') || normalizedSrc.startsWith('https://')) {
+      if (normalizedSrc.startsWith('http://')) {
+        normalizedSrc = normalizedSrc.replace('http://', 'https://')
+      }
+      setImgSrc(normalizedSrc)
+      return
+    }
+    
     // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
     const apiBase = getApiBaseUrlLazy()
     
-    // Si es una URL relativa que empieza con /:
-    // - /api/* y /uploads/* viven en el backend (prefijar con API base)
-    // - lo demás se asume que es asset local del frontend (public/)
-    if (normalizedSrc.startsWith('/')) {
-      // Priorizar URLs de la BD: /api/media/{id}
-      if (normalizedSrc.startsWith('/api/media/') || normalizedSrc.startsWith('/api/') || normalizedSrc.startsWith('/uploads/')) {
-        setImgSrc(`${apiBase}${normalizedSrc}`)
-        return
-      }
-      // Rutas locales del frontend (public/) - solo si no parece ser ID de BD
-      if (normalizedSrc.startsWith('/placeholder') || normalizedSrc.startsWith('/images') || normalizedSrc.endsWith('.svg')) {
-        setImgSrc(normalizedSrc)
-        return
-      }
-      // Si no es ruta local conocida, asumir que es ruta del backend
+    // Si ya es una ruta completa del backend con /api/media/, retornarla con base
+    if (normalizedSrc.startsWith('/api/media/')) {
       setImgSrc(`${apiBase}${normalizedSrc}`)
       return
     }
 
-    // Si no tiene protocolo ni /, puede ser UUID o ID de BD
-    if (!normalizedSrc.startsWith('http://') && !normalizedSrc.startsWith('https://')) {
-      // Si es un UUID o ID largo, convertir a /api/media/{id}
-      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-      if (uuidPattern.test(normalizedSrc) || (normalizedSrc.length > 20 && /^[a-zA-Z0-9\-_]+$/.test(normalizedSrc))) {
-        normalizedSrc = `${apiBase}/api/media/${normalizedSrc}`
-      } else if (
-        normalizedSrc.startsWith('api/') ||
-        normalizedSrc.startsWith('uploads/')
-      ) {
-        normalizedSrc = `${apiBase}/${normalizedSrc}`
-      } else {
-        // Por defecto, asumir que es ID de BD
-        normalizedSrc = `${apiBase}/api/media/${normalizedSrc}`
-      }
+    // Si empieza con /uploads, construir la URL completa del backend
+    if (normalizedSrc.startsWith('/uploads/')) {
+      setImgSrc(`${apiBase}${normalizedSrc}`)
+      return
     }
 
-    // Forzar HTTPS para compatibilidad iOS/Safari
-    if (normalizedSrc.startsWith('http://')) {
-      normalizedSrc = normalizedSrc.replace('http://', 'https://')
+    // Rutas locales del frontend (public/) - retornar tal cual
+    if (
+      normalizedSrc.startsWith('/placeholder') || 
+      normalizedSrc.startsWith('/images') || 
+      normalizedSrc.startsWith('/logo') ||
+      normalizedSrc.endsWith('.svg') ||
+      normalizedSrc.endsWith('.png') ||
+      normalizedSrc.endsWith('.jpg') ||
+      normalizedSrc.endsWith('.jpeg') ||
+      normalizedSrc.endsWith('.webp')
+    ) {
+      setImgSrc(normalizedSrc)
+      return
     }
 
-    setImgSrc(normalizedSrc)
+    // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
+    // Si empieza con /, quitar el / primero
+    const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
+    
+    // Si después de quitar el / está vacío, marcar error
+    if (!imageId) {
+      setHasError(true)
+      return
+    }
+    
+    // Convertir a /api/media/{id}
+    setImgSrc(`${apiBase}/api/media/${imageId}`)
   }, [src])
 
   const handleError = () => {
@@ -210,41 +216,57 @@ export function OptimizedImg({
       return
     }
     
+    // Si es una URL completa, retornarla tal cual (forzar HTTPS)
+    if (normalizedSrc.startsWith('http://') || normalizedSrc.startsWith('https://')) {
+      if (normalizedSrc.startsWith('http://')) {
+        normalizedSrc = normalizedSrc.replace('http://', 'https://')
+      }
+      setImgSrc(normalizedSrc)
+      return
+    }
+    
     // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
     const apiBase = getApiBaseUrlLazy()
     
-    // Si es relativa, ver si pertenece al backend (/api o /uploads)
-    if (normalizedSrc.startsWith('/')) {
-      // Priorizar URLs de la BD: /api/media/{id}
-      if (normalizedSrc.startsWith('/api/media/') || normalizedSrc.startsWith('/api/') || normalizedSrc.startsWith('/uploads/')) {
-        setImgSrc(`${apiBase}${normalizedSrc}`)
-        return
-      }
-      // Rutas locales del frontend (public/)
+    // Si ya es una ruta completa del backend con /api/media/, retornarla con base
+    if (normalizedSrc.startsWith('/api/media/')) {
+      setImgSrc(`${apiBase}${normalizedSrc}`)
+      return
+    }
+
+    // Si empieza con /uploads, construir la URL completa del backend
+    if (normalizedSrc.startsWith('/uploads/')) {
+      setImgSrc(`${apiBase}${normalizedSrc}`)
+      return
+    }
+
+    // Rutas locales del frontend (public/) - retornar tal cual
+    if (
+      normalizedSrc.startsWith('/placeholder') || 
+      normalizedSrc.startsWith('/images') || 
+      normalizedSrc.startsWith('/logo') ||
+      normalizedSrc.endsWith('.svg') ||
+      normalizedSrc.endsWith('.png') ||
+      normalizedSrc.endsWith('.jpg') ||
+      normalizedSrc.endsWith('.jpeg') ||
+      normalizedSrc.endsWith('.webp')
+    ) {
       setImgSrc(normalizedSrc)
       return
     }
 
-    // Si no tiene protocolo, construir URL completa
-    if (!normalizedSrc.startsWith('http://') && !normalizedSrc.startsWith('https://')) {
-      if (
-        normalizedSrc.startsWith('/api/') ||
-        normalizedSrc.startsWith('api/') ||
-        normalizedSrc.startsWith('/uploads/') ||
-        normalizedSrc.startsWith('uploads/')
-      ) {
-        normalizedSrc = `${apiBase}${normalizedSrc.startsWith('/') ? '' : '/'}${normalizedSrc}`
-      } else {
-        normalizedSrc = `${apiBase}/uploads/${normalizedSrc}`
-      }
+    // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
+    // Si empieza con /, quitar el / primero
+    const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
+    
+    // Si después de quitar el / está vacío, marcar error
+    if (!imageId) {
+      setHasError(true)
+      return
     }
-
-    // Forzar HTTPS
-    if (normalizedSrc.startsWith('http://')) {
-      normalizedSrc = normalizedSrc.replace('http://', 'https://')
-    }
-
-    setImgSrc(normalizedSrc)
+    
+    // Convertir a /api/media/{id}
+    setImgSrc(`${apiBase}/api/media/${imageId}`)
   }, [src])
 
   const handleError = () => {

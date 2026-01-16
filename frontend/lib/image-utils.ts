@@ -16,89 +16,58 @@ export function getFirstImage(images?: string | string[]): string | null {
 export function getImageUrl(image?: string): string | null {
   if (!image) return null
   
+  const trimmed = image.trim()
+  if (!trimmed) return null
+  
   // Eliminar referencias a Cloudinary - usar solo imágenes de la BD
-  if (image.includes('cloudinary.com') || image.includes('res.cloudinary')) {
+  if (trimmed.includes('cloudinary.com') || trimmed.includes('res.cloudinary')) {
     return null
   }
   
-  // Si es una URL completa que NO es Cloudinary, retornarla
-  if (image.startsWith("http://") || image.startsWith("https://")) {
-    return image
+  // Si es una URL completa que NO es Cloudinary, retornarla tal cual
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed
   }
   
   // Usar getApiBaseUrlLazy() para obtener la URL base correcta
   const base = getApiBaseUrlLazy()
 
-  // Priorizar URLs de la BD: /api/media/{id}
-  if (image.startsWith("/api/media/")) {
-    return `${base}${image}`
+  // Si ya es una ruta completa del backend con /api/media/, retornarla con base
+  if (trimmed.startsWith("/api/media/")) {
+    return `${base}${trimmed}`
   }
 
   // Si empieza con /uploads, construir la URL completa del backend
-  if (image.startsWith("/uploads/")) {
-    return `${base}${image}`
+  if (trimmed.startsWith("/uploads/")) {
+    return `${base}${trimmed}`
   }
 
-  // Si es un UUID (probablemente ID de imagen en BD), convertir a /api/media/{id}
-  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-  if (uuidPattern.test(image)) {
-    return `${base}/api/media/${image}`
-  }
-
-  // Si es un string que parece ID de BD (sin /, sin http, sin espacios, sin caracteres especiales)
-  // UUIDs pueden tener guiones, pero también aceptamos IDs sin guiones
-  const trimmed = image.trim()
-  if (trimmed && !trimmed.startsWith('/') && !trimmed.startsWith('http')) {
-    // Si tiene más de 10 caracteres y solo contiene letras, números, guiones y guiones bajos
-    // Es muy probable que sea un ID de la tabla Media
-    if (trimmed.length >= 10 && /^[a-zA-Z0-9\-_]+$/.test(trimmed)) {
-      return `${base}/api/media/${trimmed}`
-    }
-    
-    // Si tiene entre 8 y 36 caracteres (rango típico de UUIDs y hashes)
-    // y no contiene espacios ni caracteres especiales problemáticos
-    if (trimmed.length >= 8 && trimmed.length <= 36 && /^[a-zA-Z0-9\-_]+$/.test(trimmed)) {
-      return `${base}/api/media/${trimmed}`
-    }
-  }
-
-  // Rutas del backend (aunque empiecen por /) -> prefijar con el dominio del API
+  // Rutas locales del frontend (public/) - retornar tal cual
   if (
-    image.startsWith("/api/") ||
-    image.startsWith("/products/") ||
-    image.startsWith("/banners/")
+    trimmed.startsWith("/placeholder") || 
+    trimmed.startsWith("/images") || 
+    trimmed.startsWith("/logo") ||
+    trimmed.endsWith(".svg") ||
+    trimmed.endsWith(".png") ||
+    trimmed.endsWith(".jpg") ||
+    trimmed.endsWith(".jpeg") ||
+    trimmed.endsWith(".webp")
   ) {
-    return `${base}${image}`
+    return trimmed
   }
 
-  // Rutas locales de public (Next.js sirve public/ desde la raíz del frontend)
-  // Solo si NO parece ser una ruta de backend
-  if (image.startsWith("/") && !image.startsWith("/api") && !image.startsWith("/uploads")) {
-    // Verificar si es una ruta local conocida
-    if (
-      image.startsWith("/placeholder") || 
-      image.startsWith("/images") || 
-      image.endsWith(".svg") ||
-      image.endsWith(".png") ||
-      image.endsWith(".jpg") ||
-      image.endsWith(".jpeg")
-    ) {
-      return image
-    }
-    // Si no es una ruta local conocida, puede ser un ID que empieza con /
-    // Intentar como ID de BD
-    const withoutSlash = image.substring(1)
-    if (withoutSlash.length >= 8 && /^[a-zA-Z0-9\-_]+$/.test(withoutSlash)) {
-      return `${base}/api/media/${withoutSlash}`
-    }
-  }
-
-  // Fallback: si viene sin / y sin http, asumir que es ID de BD
-  // Solo si tiene al menos 8 caracteres (mínimo para ser un ID válido)
-  if (trimmed.length >= 8 && /^[a-zA-Z0-9\-_]+$/.test(trimmed)) {
-    return `${base}/api/media/${trimmed}`
-  }
-
-  // Si no cumple ningún patrón, retornar null para que se use placeholder
-  return null
+  // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
+  // Esto incluye:
+  // - UUIDs con guiones: "123e4567-e89b-12d3-a456-426614174000"
+  // - IDs sin guiones: "abc123def456"
+  // - Strings que empiezan con / pero no son rutas conocidas: "/abc123"
+  
+  // Si empieza con /, quitar el / primero
+  const imageId = trimmed.startsWith('/') ? trimmed.substring(1) : trimmed
+  
+  // Si después de quitar el / está vacío, retornar null
+  if (!imageId) return null
+  
+  // Convertir a /api/media/{id}
+  return `${base}/api/media/${imageId}`
 }
