@@ -80,16 +80,32 @@ export class EmailService {
     }
   }
 
-  async sendPasswordResetEmail(params: { to: string; resetUrl: string }) {
+  async sendPasswordResetEmail(params: { to: string; resetCode: string }) {
     const from = this.config.get<string>('EMAIL_FROM') ?? 'no-reply@habanaluna.local';
-    const subject = 'Recuperación de contraseña';
-    const text = `Has solicitado recuperar tu contraseña.\n\nUsa este enlace (válido por 1 hora):\n${params.resetUrl}\n\nSi no lo solicitaste, ignora este correo.`;
-    const html = `
-      <p>Has solicitado recuperar tu contraseña.</p>
-      <p><strong>Este enlace es válido por 1 hora:</strong></p>
-      <p><a href="${params.resetUrl}">Restablecer contraseña</a></p>
-      <p>Si no lo solicitaste, ignora este correo.</p>
-    `;
+    const subject = 'Código de recuperación de contraseña';
+    const frontendUrl = this.getFrontendUrl();
+    const codeUrl = `${frontendUrl}/auth/verify-code`;
+    
+    const text = `Has solicitado recuperar tu contraseña.\n\nTu código de verificación es: ${params.resetCode}\n\nEste código es válido por 15 minutos.\n\nIngresa este código en: ${codeUrl}\n\nSi no lo solicitaste, ignora este correo.`;
+    
+    const html = this.getEmailTemplate({
+      title: 'Código de Recuperación',
+      greeting: 'Hola,',
+      preheader: `Tu código de verificación es: ${params.resetCode}`,
+      content: `
+        <p style="margin:0 0 16px;">Has solicitado recuperar tu contraseña.</p>
+        <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); padding: 24px; border-radius: 12px; text-align: center; margin: 20px 0;">
+          <p style="margin:0 0 8px; font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 600;">Tu código de verificación es:</p>
+          <p style="margin:0; font-size: 36px; font-weight: 800; color: #ffffff; letter-spacing: 8px; font-family: 'Courier New', monospace;">${params.resetCode}</p>
+        </div>
+        <p style="margin:16px 0 8px; font-size: 14px; color: #64748b;">Este código es válido por <strong>15 minutos</strong>.</p>
+        <p style="margin:8px 0 0; font-size: 14px; color: #64748b;">Ingresa este código en la página de verificación para continuar.</p>
+        <p style="margin:16px 0 0; font-size: 13px; color: #94a3b8;">Si no solicitaste este código, puedes ignorar este correo de forma segura.</p>
+      `,
+      buttonText: 'Verificar Código',
+      buttonUrl: codeUrl,
+      toEmail: params.to,
+    });
 
     this.logger.log(`Intentando enviar email de recuperación a ${params.to}`);
     const result = await this.sendEmail({ from, to: params.to, subject, text, html });

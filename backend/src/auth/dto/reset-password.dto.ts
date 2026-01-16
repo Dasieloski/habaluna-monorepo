@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsStrongPassword } from '../../common/validators/is-strong-password.validator';
 
 export class ResetPasswordDto {
-  @ApiProperty({ description: 'Token recibido por email' })
+  @ApiProperty({ description: 'Código de 6 dígitos recibido por email' })
   @IsString()
   token: string;
 

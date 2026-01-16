@@ -307,7 +307,14 @@ export class AuthService {
   }
 
   /**
-   * Flujo: el usuario ingresa su email. Si existe una cuenta, generamos token (1h) y enviamos email.
+   * Genera un código de 6 dígitos aleatorio
+   */
+  private generateResetCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  /**
+   * Flujo: el usuario ingresa su email. Si existe una cuenta, generamos código de 6 dígitos (15 min) y enviamos email.
    * Nota: para evitar enumeración de usuarios, la respuesta es siempre genérica.
    */
   async forgotPassword(email: string) {
@@ -316,12 +323,13 @@ export class AuthService {
 
     if (user?.isActive) {
       try {
-        const rawToken = randomBytes(32).toString('hex');
-        const tokenHash = this.hashResetToken(rawToken);
+        // Generar código de 6 dígitos
+        const resetCode = this.generateResetCode();
+        const tokenHash = this.hashResetToken(resetCode);
 
-        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
-        // Invalidar tokens previos no usados (opcional pero recomendable)
+        // Invalidar códigos previos no usados
         await this.prisma.passwordResetToken.updateMany({
           where: { userId: user.id, used: false },
           data: { used: true },
@@ -336,16 +344,8 @@ export class AuthService {
           },
         });
 
-        // Codificar el token para la URL (por si tiene caracteres especiales)
-        const encodedToken = encodeURIComponent(rawToken);
-        const resetUrl = `${this.getFrontendBaseUrl()}/auth/reset-password/${encodedToken}`;
-        // #region agent log
-        const fs = require('fs');
-        const logPath = 'c:\\Dasieloski\\Habaluna\\HABANALUNA-monorepo\\HABANALUNA\\.cursor\\debug.log';
-        const logEntry = JSON.stringify({location:'auth.service.ts:341',message:'Reset URL generated',data:{rawTokenLength:rawToken.length,encodedTokenLength:encodedToken.length,resetUrl,frontendBaseUrl:this.getFrontendBaseUrl()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})+'\n';
-        fs.appendFileSync(logPath, logEntry, 'utf8');
-        // #endregion
-        const emailResult = await this.email.sendPasswordResetEmail({ to: user.email, resetUrl });
+        // Enviar email con el código (sin URL)
+        const emailResult = await this.email.sendPasswordResetEmail({ to: user.email, resetCode });
         
         if (!emailResult.sent) {
           this.logger.warn(
@@ -363,29 +363,56 @@ export class AuthService {
 
     return {
       message:
-        'Si el correo está registrado, enviaremos un enlace de recuperación válido por 1 hora.',
+        'Si el correo está registrado, enviaremos un código de 6 dígitos válido por 15 minutos.',
     };
   }
 
-  async resetPassword(token: string, newPassword: string) {
-    const rawToken = (token || '').trim();
-    if (!rawToken) {
-      throw new BadRequestException('Token requerido');
+  /**
+   * Valida el código de 6 dígitos y retorna el email del usuario si es válido
+   */
+  async validateResetCode(code: string): Promise<{ email: string }> {
+    const normalizedCode = (code || '').trim();
+    if (!normalizedCode || normalizedCode.length !== 6 || !/^\d{6}$/.test(normalizedCode)) {
+      throw new BadRequestException('Código inválido. Debe ser un número de 6 dígitos.');
     }
 
-    const tokenHash = this.hashResetToken(rawToken);
-    const record = await this.prisma.passwordResetToken.findUnique({
-      where: { token: tokenHash },
+    const tokenHash = this.hashResetToken(normalizedCode);
+    const record = await this.prisma.passwordResetToken.findFirst({
+      where: { 
+        token: tokenHash,
+        used: false,
+        expiresAt: { gt: new Date() },
+      },
       include: { user: true },
+      orderBy: { expiresAt: 'desc' }, // Obtener el más reciente
     });
 
-    if (
-      !record ||
-      record.used ||
-      record.expiresAt < new Date() ||
-      record.user?.isActive === false
-    ) {
-      throw new BadRequestException('Token inválido o expirado');
+    if (!record || record.user?.isActive === false) {
+      throw new BadRequestException('Código inválido o expirado');
+    }
+
+    return { email: record.user.email };
+  }
+
+  async resetPassword(code: string, newPassword: string) {
+    const normalizedCode = (code || '').trim();
+    if (!normalizedCode || normalizedCode.length !== 6 || !/^\d{6}$/.test(normalizedCode)) {
+      throw new BadRequestException('Código inválido. Debe ser un número de 6 dígitos.');
+    }
+
+    const tokenHash = this.hashResetToken(normalizedCode);
+    const record = await this.prisma.passwordResetToken.findFirst({
+      where: { 
+        token: tokenHash,
+        used: false,
+        expiresAt: { gt: new Date() },
+      },
+      include: { user: true },
+      orderBy: { expiresAt: 'desc' }, // Obtener el más reciente
+    });
+
+    if (!record || record.user?.isActive === false) {
+      throw new BadRequestException('Código inválido o expirado');
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);

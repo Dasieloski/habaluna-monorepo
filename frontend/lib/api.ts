@@ -1268,8 +1268,13 @@ export const api = {
     return response.data as { message: string }
   },
 
-  resetPassword: async (token: string, newPassword: string) => {
-    const response = await api.post("/auth/reset-password", { token, newPassword })
+  validateResetCode: async (code: string) => {
+    const response = await api.post("/auth/validate-reset-code", { code })
+    return response.data as { email: string }
+  },
+
+  resetPassword: async (code: string, newPassword: string) => {
+    const response = await api.post("/auth/reset-password", { token: code, newPassword })
     return response.data as { message: string }
   },
 

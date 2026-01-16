@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
       setError("")
       setMessage("")
       const res = await api.forgotPassword(data.email)
-      setMessage(res.message || "Si el correo está registrado, enviaremos un enlace de recuperación.")
+      setMessage(res.message || "Si el correo está registrado, enviaremos un código de 6 dígitos.")
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || "No se pudo procesar la solicitud."
       setError(msg)
@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
         <div className="max-w-lg mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Recuperar contraseña</h1>
-            <p className="text-muted-foreground">Te enviaremos un enlace válido por 1 hora.</p>
+            <p className="text-muted-foreground">Te enviaremos un código de 6 dígitos válido por 15 minutos.</p>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 shadow-sm">
@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
                 disabled={isSubmitting}
                 className="w-full py-3.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "Enviando..." : "Enviar enlace"}
+                {isSubmitting ? "Enviando..." : "Enviar código"}
               </button>
 
               <p className="text-center text-sm text-muted-foreground">
