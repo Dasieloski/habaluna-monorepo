@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "NEXT_PRIVATE_SKIP_TURBOPACK=1 next build",
-    "start": "sh start.sh",
-    "start:direct": "node .next/standalone/server.js",
+    "start": "node .next/standalone/server.js",
     "lint": "eslint ."
   },
   "dependencies": {
