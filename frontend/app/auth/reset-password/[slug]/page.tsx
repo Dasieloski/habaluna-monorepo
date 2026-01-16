@@ -8,10 +8,12 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { ResetPasswordClient } from "./reset-password-client"
 
-// Configuración similar a /products/[slug] que funciona correctamente
-// Ruta movida fuera del route group (main) para evitar problemas con standalone
-export const revalidate = 0
+// CRÍTICO: Forzar renderizado dinámico en cada request
+// Esto asegura que Next.js no intente pre-renderizar la ruta durante el build
+// y que siempre se renderice en el servidor en cada request
+export const dynamic = 'force-dynamic'
 export const dynamicParams = true
+export const revalidate = 0
 
 console.log('[ResetPassword] Configuraciones exportadas:', {
   dynamicParams,
@@ -23,13 +25,29 @@ type PageProps = {
 }
 
 // Función auxiliar para obtener la URL base de la API en el servidor
+// CRÍTICO: Esta función se ejecuta en cada request, no al cargar el módulo
+// Esto asegura que siempre use las variables de entorno actuales
 function getApiBaseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+  const raw = process.env.NEXT_PUBLIC_API_URL || ""
   let url = raw.trim()
-  if (!url) return "http://localhost:4000"
+  
+  // Si no hay URL configurada, usar fallback según el entorno
+  if (!url) {
+    // En producción (Railway), usar la URL conocida del backend
+    if (process.env.NODE_ENV === 'production') {
+      url = "https://habanaluna-backend-production.up.railway.app"
+    } else {
+      // Desarrollo local
+      url = "http://localhost:4000"
+    }
+  }
+  
+  // Normalizar URL
   if (!/^https?:\/\//i.test(url)) {
     url = `https://${url}`
   }
+  
+  // Remover /api del final si existe
   return url.replace(/\/api\/?$/, "")
 }
 

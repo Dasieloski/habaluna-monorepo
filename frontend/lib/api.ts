@@ -13,9 +13,11 @@ function normalizeApiBaseUrl(raw: string): string {
 }
 
 // Función para obtener la URL de la API de forma robusta
-// Intenta leer desde diferentes fuentes para funcionar en build y runtime
+// IMPORTANTE: Esta función se ejecuta en cada llamada, no solo al cargar el módulo
+// Esto asegura que siempre tenga acceso a las variables de entorno actuales
 function getApiBaseUrl(): string {
   // 1. Intentar desde process.env (build time y server-side)
+  // En Next.js, NEXT_PUBLIC_* se inyecta en build time pero está disponible en runtime
   let url = process.env.NEXT_PUBLIC_API_URL
   
   // 2. Si estamos en el cliente y no está disponible, intentar desde window (runtime)
@@ -24,31 +26,50 @@ function getApiBaseUrl(): string {
     url = window.__ENV__?.NEXT_PUBLIC_API_URL
   }
   
-  // 3. Si aún no hay URL, usar fallback
+  // 3. Si aún no hay URL, usar fallback inteligente
   if (!url) {
-    // En producción (Railway), si no hay variable configurada, usar la URL del backend conocida
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-      // Estamos en producción pero la variable no está configurada
-      // Intentar inferir desde el hostname o usar la URL conocida de Railway
-      url = "https://habanaluna-backend-production.up.railway.app"
+    // En producción (Railway), detectar por hostname
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname
+      // Si no es localhost, estamos en producción
+      if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+        url = "https://habanaluna-backend-production.up.railway.app"
+      } else {
+        url = "http://localhost:4000"
+      }
     } else {
-      // Desarrollo local
-      url = "http://localhost:4000"
+      // Server-side: verificar NODE_ENV
+      if (process.env.NODE_ENV === 'production') {
+        url = "https://habanaluna-backend-production.up.railway.app"
+      } else {
+        url = "http://localhost:4000"
+      }
     }
   }
   
   return normalizeApiBaseUrl(url)
 }
 
-// Asegurar que API_BASE_URL no termine con /api y que sea URL válida (con protocolo)
-let API_BASE_URL = getApiBaseUrl()
+// CRÍTICO: No inicializar API_BASE_URL aquí porque se ejecuta al cargar el módulo
+// En su lugar, crear una función que se llame cada vez que se necesite
+// Esto asegura que siempre use las variables de entorno actuales
+
+// Variable que se inicializa la primera vez que se usa (lazy initialization)
+let API_BASE_URL: string | null = null
+
+function getApiBaseUrlLazy(): string {
+  if (!API_BASE_URL) {
+    API_BASE_URL = getApiBaseUrl()
+  }
+  return API_BASE_URL
+}
 
 // Exponer la URL de la API en window para debugging (solo en desarrollo o para verificación)
 if (typeof window !== 'undefined') {
   // @ts-ignore
   window.__HABANALUNA_API_CONFIG = {
-    baseUrl: API_BASE_URL,
-    fullApiUrl: `${API_BASE_URL}/api`,
+    baseUrl: getApiBaseUrlLazy(),
+    fullApiUrl: `${getApiBaseUrlLazy()}/api`,
     envVar: process.env.NEXT_PUBLIC_API_URL || 'not set',
     hostname: window.location.hostname,
   }
@@ -108,7 +129,7 @@ async function buildApiError(response: Response, finalUrl: string): Promise<ApiE
 
 async function refreshAccessToken(): Promise<string | null> {
   try {
-    const url = `${API_BASE_URL}/api/auth/refresh`
+    const url = `${getApiBaseUrlLazy()}/api/auth/refresh`
     const res = await fetch(url, {
       method: "POST",
       credentials: "include",
@@ -432,8 +453,8 @@ export const api = {
       // Reconstruir endpoint limpio
       const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
       
-      // Construir URL final - API_BASE_URL no incluye /api, lo agregamos aquí
-      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+      // Construir URL final - getApiBaseUrlLazy() no incluye /api, lo agregamos aquí
+      const finalUrl = `${getApiBaseUrlLazy()}/api${finalPath}`
       
       // Retry logic para requests fallidos (solo en cliente)
       const fetchWithRetry = async (): Promise<Response> => {
@@ -952,7 +973,7 @@ export const api = {
     const formData = new FormData()
     formData.append('file', file)
     
-    const url = `${API_BASE_URL}/api/upload/single`
+    const url = `${getApiBaseUrlLazy()}/api/upload/single`
     const response = await fetchJsonWithAuth(url, {
       method: 'POST',
       body: formData,
@@ -986,7 +1007,7 @@ export const api = {
       }
       
       const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
-      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+      const finalUrl = `${getApiBaseUrlLazy()}/api${finalPath}`
       
       const token = getAuthToken()
       const headers: HeadersInit = {
@@ -1059,7 +1080,7 @@ export const api = {
       }
 
       const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
-      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+      const finalUrl = `${getApiBaseUrlLazy()}/api${finalPath}`
 
       const token = getAuthToken()
       const headers: HeadersInit = {
@@ -1131,7 +1152,7 @@ export const api = {
       }
       
       const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
-      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+      const finalUrl = `${getApiBaseUrlLazy()}/api${finalPath}`
       
       const token = getAuthToken()
       const headers: HeadersInit = {
@@ -1198,7 +1219,7 @@ export const api = {
       }
       
       const finalPath = queryPart ? `${cleanPath}?${queryPart}` : cleanPath
-      const finalUrl = `${API_BASE_URL}/api${finalPath}`
+      const finalUrl = `${getApiBaseUrlLazy()}/api${finalPath}`
       
       const token = getAuthToken()
       const headers: HeadersInit = {
@@ -1373,16 +1394,16 @@ function normalizeImageUrl(imagePath: string): string {
   
   // Si empieza con /uploads, construir la URL completa del backend
   if (imagePath.startsWith('/uploads/')) {
-    return `${API_BASE_URL}${imagePath}`
+    return `${getApiBaseUrlLazy()}${imagePath}`
   }
   
   // Si empieza con /, asumir que es una ruta relativa del backend
   if (imagePath.startsWith('/')) {
-    return `${API_BASE_URL}${imagePath}`
+    return `${getApiBaseUrlLazy()}${imagePath}`
   }
   
   // Si no tiene prefijo, asumir que es relativa a uploads
-  return `${API_BASE_URL}/uploads/${imagePath}`
+  return `${getApiBaseUrlLazy()}/uploads/${imagePath}`
 }
 
 // Función para mapear productos del backend al formato del frontend
