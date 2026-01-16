@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Asegurar que todas las rutas se sirvan correctamente
+  // CRÍTICO: Asegurar que las rutas dinámicas funcionen en producción
   trailingSlash: false,
-  // Asegurar que las rutas dinámicas se generen correctamente
+  // Forzar output: 'standalone' para Railway (Next.js 16 requiere esto para serverless)
+  output: 'standalone',
   experimental: {
-    // Asegurar que las rutas dinámicas funcionen en producción
     serverActions: {
       bodySizeLimit: '2mb',
     },
