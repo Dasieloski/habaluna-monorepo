@@ -25,6 +25,14 @@ RUN npm run build
 RUN ls -la /app/.next/standalone/server.js || (echo "❌ ERROR: standalone/server.js no se generó" && exit 1)
 
 # CRÍTICO: Verificar que la ruta catch-all se generó en el build
+# Buscar en routes-manifest.json o en la estructura de archivos
+RUN echo "🔍 Verificando rutas generadas..." && \
+    (cat /app/.next/routes-manifest.json 2>/dev/null | grep -i "reset-password" || echo "⚠️  Ruta no encontrada en routes-manifest") && \
+    (ls -la /app/.next/server/app/auth/reset-password 2>/dev/null || echo "⚠️  Directorio de ruta no encontrado en server") && \
+    (find /app/.next -name "*reset-password*" -type f 2>/dev/null | head -5 || echo "⚠️  No se encontraron archivos relacionados") && \
+    echo "✅ Verificación completada"
+
+# CRÍTICO: Verificar que la ruta catch-all se generó en el build
 # Buscar en los logs del build si la ruta aparece
 RUN echo "🔍 Verificando rutas generadas..." && \
     (grep -r "reset-password" /app/.next/routes-manifest.json 2>/dev/null || echo "⚠️  Ruta no encontrada en routes-manifest") && \
