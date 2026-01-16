@@ -107,7 +107,14 @@ export function Footer() {
                   { label: "Apple Pay", icon: "/payments/applepay.svg", w: 56, h: 16 },
                 ].map((m) => (
                   <div key={m.label} className="bg-muted px-3 py-2 rounded-lg flex items-center gap-2">
-                    <Image src={m.icon} alt={m.label} width={m.w} height={m.h} className="h-4 w-auto" />
+                    <Image 
+                      src={m.icon} 
+                      alt={m.label} 
+                      width={m.w} 
+                      height={m.h} 
+                      className="h-4 w-auto" 
+                      unoptimized={true}
+                    />
                     <span className="text-xs font-medium">{m.label}</span>
                   </div>
                 ))}

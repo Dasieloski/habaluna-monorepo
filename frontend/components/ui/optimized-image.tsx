@@ -144,8 +144,18 @@ export function OptimizedImage({
         }),
   }
 
-  // Deshabilitar optimización para imágenes externas que no podemos controlar
-  const shouldUnoptimize = imgSrc.startsWith('data:') || imgSrc.includes('unsplash.com') || imgSrc.includes('placeholder')
+  // Deshabilitar optimización para:
+  // - Imágenes externas que no podemos controlar
+  // - Imágenes del backend (pueden no existir o retornar null)
+  // - Data URLs
+  const shouldUnoptimize = 
+    imgSrc.startsWith('data:') || 
+    imgSrc.includes('unsplash.com') || 
+    imgSrc.includes('placeholder') ||
+    imgSrc.includes('/api/') ||
+    imgSrc.includes('/uploads/') ||
+    imgSrc.includes('habaluna-backend-production.up.railway.app') ||
+    imgSrc.includes('localhost:4000')
 
   return <Image {...imageProps} unoptimized={shouldUnoptimize} />
 }
