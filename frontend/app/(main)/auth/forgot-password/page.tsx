@@ -2,10 +2,18 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { api } from "@/lib/api"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 const schema = z.object({
   email: z.string().email("Email inválido"),
@@ -14,8 +22,13 @@ const schema = z.object({
 type Form = z.infer<typeof schema>
 
 export default function ForgotPasswordPage() {
+  const router = useRouter()
   const [message, setMessage] = useState<string>("")
   const [error, setError] = useState<string>("")
+  const [showCodeModal, setShowCodeModal] = useState(false)
+  const [code, setCode] = useState<string[]>(["", "", "", "", "", ""])
+  const [codeError, setCodeError] = useState<string>("")
+  const [isValidatingCode, setIsValidatingCode] = useState(false)
 
   const {
     register,
@@ -29,9 +42,79 @@ export default function ForgotPasswordPage() {
       setMessage("")
       const res = await api.forgotPassword(data.email)
       setMessage(res.message || "Si el correo está registrado, enviaremos un código de 6 dígitos.")
+      // Abrir el modal para ingresar el código
+      setShowCodeModal(true)
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || "No se pudo procesar la solicitud."
       setError(msg)
+    }
+  }
+
+  const handleCodeChange = (index: number, value: string) => {
+    if (value.length > 1) return // Solo un dígito por input
+    if (!/^\d*$/.test(value)) return // Solo números
+
+    const newCode = [...code]
+    newCode[index] = value
+    setCode(newCode)
+    setCodeError("")
+
+    // Auto-focus al siguiente input
+    if (value && index < 5) {
+      const nextInput = document.getElementById(`code-input-${index + 1}`)
+      nextInput?.focus()
+    }
+  }
+
+  const handleCodeKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !code[index] && index > 0) {
+      const prevInput = document.getElementById(`code-input-${index - 1}`)
+      prevInput?.focus()
+    }
+  }
+
+  const handleCodePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault()
+    const pastedData = e.clipboardData.getData("text").trim()
+    if (!/^\d{6}$/.test(pastedData)) {
+      setCodeError("El código debe ser de 6 dígitos")
+      return
+    }
+
+    const digits = pastedData.split("")
+    setCode(digits)
+    setCodeError("")
+    
+    // Focus en el último input
+    const lastInput = document.getElementById("code-input-5")
+    lastInput?.focus()
+  }
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const fullCode = code.join("")
+    
+    if (fullCode.length !== 6) {
+      setCodeError("Por favor ingresa el código completo de 6 dígitos")
+      return
+    }
+
+    setIsValidatingCode(true)
+    setCodeError("")
+
+    try {
+      await api.validateResetCode(fullCode)
+      // Si el código es válido, redirigir a la página de reset password con el código
+      router.push(`/auth/reset-password?code=${fullCode}`)
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || "Código inválido o expirado"
+      setCodeError(msg)
+      // Limpiar el código en caso de error
+      setCode(["", "", "", "", "", ""])
+      const firstInput = document.getElementById("code-input-0")
+      firstInput?.focus()
+    } finally {
+      setIsValidatingCode(false)
     }
   }
 
@@ -100,6 +183,75 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal para ingresar código de verificación */}
+      <Dialog open={showCodeModal} onOpenChange={setShowCodeModal}>
+        <DialogContent className="sm:max-w-md" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Ingresa el código de verificación</DialogTitle>
+            <DialogDescription>
+              Hemos enviado un código de 6 dígitos a tu correo electrónico. Ingresa el código para continuar.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleVerifyCode} className="space-y-4">
+            {codeError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                {codeError}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-foreground text-center">
+                Código de verificación
+              </label>
+              <div className="flex justify-center gap-3">
+                {code.map((digit, index) => (
+                  <input
+                    key={index}
+                    id={`code-input-${index}`}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleCodeChange(index, e.target.value)}
+                    onKeyDown={(e) => handleCodeKeyDown(index, e)}
+                    onPaste={index === 0 ? handleCodePaste : undefined}
+                    className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                    autoFocus={index === 0}
+                    disabled={isValidatingCode}
+                  />
+                ))}
+              </div>
+              <p className="text-center text-xs text-muted-foreground">
+                El código expira en 15 minutos
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCodeModal(false)
+                  setCode(["", "", "", "", "", ""])
+                  setCodeError("")
+                }}
+                className="flex-1 py-2.5 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={isValidatingCode}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={isValidatingCode || code.join("").length !== 6}
+                className="flex-1 py-2.5 px-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isValidatingCode ? "Verificando..." : "Verificar"}
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
