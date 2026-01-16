@@ -68,6 +68,20 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-# Ejecutar el servidor standalone (npm start ejecuta node .next/standalone/server.js)
-CMD ["npm", "start"]
+# CRÍTICO: Verificar que el servidor standalone puede encontrar las rutas
+# Agregar logs de inicio para debug
+RUN echo "#!/bin/sh" > /app/start-debug.sh && \
+    echo "echo '🚀 Iniciando servidor standalone...'" >> /app/start-debug.sh && \
+    echo "echo '📁 Verificando estructura de directorios:'" >> /app/start-debug.sh && \
+    echo "ls -la /app/.next/standalone/ 2>/dev/null | head -10 || echo '⚠️  No se encontró .next/standalone'" >> /app/start-debug.sh && \
+    echo "echo '📄 Verificando server.js:'" >> /app/start-debug.sh && \
+    echo "test -f /app/.next/standalone/server.js && echo '✅ server.js existe' || echo '❌ server.js NO existe'" >> /app/start-debug.sh && \
+    echo "echo '📂 Verificando ruta reset-password:'" >> /app/start-debug.sh && \
+    echo "find /app/.next/standalone -name '*reset-password*' -type f 2>/dev/null | head -5 || echo '⚠️  No se encontraron archivos de reset-password'" >> /app/start-debug.sh && \
+    echo "echo '🚀 Ejecutando servidor...'" >> /app/start-debug.sh && \
+    echo "exec npm start" >> /app/start-debug.sh && \
+    chmod +x /app/start-debug.sh
+
+# Ejecutar el servidor standalone con logs de debug
+CMD ["/app/start-debug.sh"]
 

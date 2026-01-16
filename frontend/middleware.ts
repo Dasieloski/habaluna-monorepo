@@ -140,6 +140,9 @@ export async function middleware(req: NextRequest) {
 export const config = {
   // CRÍTICO: El matcher debe excluir completamente /auth para que Next.js procese las rutas dinámicas
   // Si el matcher incluye /auth, el middleware se ejecuta y puede interferir
+  // #region agent log
+  // Log para verificar que el matcher está funcionando correctamente
+  // #endregion
   matcher: [
     /*
      * Match all request paths except for the ones starting with:

@@ -67,10 +67,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ResetPasswordPage({ params }: PageProps) {
   // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:66',message:'PAGE function entry',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  const fs = require('fs');
+  const logPath = process.cwd() + '/.cursor/debug.log';
+  const logEntry = JSON.stringify({location:'page.tsx:66',message:'PAGE function entry - SERVER RUNTIME',data:{timestamp:Date.now(),nodeEnv:process.env.NODE_ENV},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})+'\n';
+  try { fs.appendFileSync(logPath, logEntry, 'utf8'); } catch(e) {}
   // #endregion
   console.log('[ResetPassword] [PAGE] ========== INICIO RENDERIZADO ==========')
   console.log('[ResetPassword] [PAGE] Timestamp:', new Date().toISOString())
+  console.log('[ResetPassword] [PAGE] ⚠️⚠️⚠️ ESTA FUNCIÓN SE ESTÁ EJECUTANDO EN EL SERVIDOR ⚠️⚠️⚠️')
   
   try {
     // Paso 1: Resolver params
