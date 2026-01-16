@@ -1383,61 +1383,55 @@ export const api = {
 function normalizeImageUrl(imagePath: string): string {
   if (!imagePath) return '/placeholder.svg'
 
-  // DEBUG: Log para entender qué formato tienen las imágenes
-  console.log('[normalizeImageUrl] Input:', imagePath)
-
   // Si es una URL de Cloudinary, ignorarla y retornar placeholder
   if (imagePath.includes('cloudinary.com') || imagePath.includes('res.cloudinary')) {
-    console.warn('[normalizeImageUrl] URL de Cloudinary detectada, ignorando:', imagePath)
     return '/placeholder.svg'
   }
 
   // Si es una URL completa que NO es Cloudinary, retornarla tal cual
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    console.log('[normalizeImageUrl] URL externa permitida:', imagePath)
     return imagePath
   }
 
+  const base = getApiBaseUrlLazy()
+
   // Priorizar URLs de la BD: /api/media/{id}
   if (imagePath.startsWith('/api/media/')) {
-    const result = `${getApiBaseUrlLazy()}${imagePath}`
-    console.log('[normalizeImageUrl] URL de BD (/api/media):', result)
-    return result
+    return `${base}${imagePath}`
   }
 
   // Si empieza con /uploads, construir la URL completa del backend
   if (imagePath.startsWith('/uploads/')) {
-    const result = `${getApiBaseUrlLazy()}${imagePath}`
-    console.log('[normalizeImageUrl] URL de uploads:', result)
-    return result
+    return `${base}${imagePath}`
   }
 
   // Si es un UUID (probablemente ID de imagen en BD), convertir a /api/media/{id}
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
   if (uuidPattern.test(imagePath)) {
-    const result = `${getApiBaseUrlLazy()}/api/media/${imagePath}`
-    console.log('[normalizeImageUrl] UUID convertido a /api/media:', result)
-    return result
+    return `${base}/api/media/${imagePath}`
   }
 
-  // Si es un string largo que parece hash/ID, asumir que es ID de BD
-  if (imagePath.length > 20 && /^[a-zA-Z0-9\-_]+$/.test(imagePath)) {
-    const result = `${getApiBaseUrlLazy()}/api/media/${imagePath}`
-    console.log('[normalizeImageUrl] ID largo convertido a /api/media:', result)
-    return result
+  // Si es un string largo que parece hash/ID (sin /), asumir que es ID de BD
+  if (imagePath.length > 20 && /^[a-zA-Z0-9\-_]+$/.test(imagePath) && !imagePath.startsWith('/')) {
+    return `${base}/api/media/${imagePath}`
   }
 
-  // Si empieza con /, asumir que es una ruta relativa del backend
+  // Si empieza con /api/, construir la URL completa
+  if (imagePath.startsWith('/api/')) {
+    return `${base}${imagePath}`
+  }
+
+  // Si empieza con /, asumir que es una ruta relativa del backend (excepto rutas locales)
   if (imagePath.startsWith('/')) {
-    const result = `${getApiBaseUrlLazy()}${imagePath}`
-    console.log('[normalizeImageUrl] Ruta relativa:', result)
-    return result
+    // Rutas locales del frontend (public/) no deben tener prefijo
+    if (imagePath.startsWith('/placeholder') || imagePath.startsWith('/images') || imagePath.endsWith('.svg')) {
+      return imagePath
+    }
+    return `${base}${imagePath}`
   }
 
-  // Si no tiene prefijo, asumir que es relativa a uploads
-  const result = `${getApiBaseUrlLazy()}/uploads/${imagePath}`
-  console.log('[normalizeImageUrl] Ruta por defecto (/uploads):', result)
-  return result
+  // Si no tiene prefijo, asumir que es ID de BD
+  return `${base}/api/media/${imagePath}`
 }
 
 // Función para mapear productos del backend al formato del frontend

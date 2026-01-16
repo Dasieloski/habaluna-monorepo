@@ -1,3 +1,5 @@
+import { getApiBaseUrlLazy } from "./api"
+
 export function getFirstImage(images?: string | string[]): string | null {
   if (!images) return null
   if (typeof images === "string") {
@@ -16,12 +18,13 @@ export function getImageUrl(image?: string): string | null {
   
   // Eliminar referencias a Cloudinary - usar solo imágenes de la BD
   if (image.includes('cloudinary.com') || image.includes('res.cloudinary')) {
-    console.warn('[getImageUrl] URL de Cloudinary detectada, ignorando:', image)
     return null
   }
   
   // Si es una URL completa que NO es Cloudinary, retornarla
-  if (image.startsWith("http")) return image
+  if (image.startsWith("http://") || image.startsWith("https://")) {
+    return image
+  }
   
   // Usar getApiBaseUrlLazy() para obtener la URL base correcta
   const base = getApiBaseUrlLazy()
@@ -31,10 +34,25 @@ export function getImageUrl(image?: string): string | null {
     return `${base}${image}`
   }
 
+  // Si empieza con /uploads, construir la URL completa del backend
+  if (image.startsWith("/uploads/")) {
+    return `${base}${image}`
+  }
+
+  // Si es un UUID (probablemente ID de imagen en BD), convertir a /api/media/{id}
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (uuidPattern.test(image)) {
+    return `${base}/api/media/${image}`
+  }
+
+  // Si es un string largo que parece hash/ID (sin /), asumir que es ID de BD
+  if (image.length > 20 && /^[a-zA-Z0-9\-_]+$/.test(image) && !image.startsWith('/')) {
+    return `${base}/api/media/${image}`
+  }
+
   // Rutas del backend (aunque empiecen por /) -> prefijar con el dominio del API
   if (
     image.startsWith("/api/") ||
-    image.startsWith("/uploads/") ||
     image.startsWith("/products/") ||
     image.startsWith("/banners/")
   ) {
@@ -42,8 +60,11 @@ export function getImageUrl(image?: string): string | null {
   }
 
   // Rutas locales de public (Next.js sirve public/ desde la raíz del frontend)
-  if (image.startsWith("/")) return image
+  // Solo si NO parece ser una ruta de backend
+  if (image.startsWith("/") && !image.startsWith("/api") && !image.startsWith("/uploads")) {
+    return image
+  }
 
-  // Fallback: si viene sin / y sin http, asumir que es ruta de backend
-  return `${base}/${image}`
+  // Fallback: si viene sin / y sin http, asumir que es ID de BD
+  return `${base}/api/media/${image}`
 }

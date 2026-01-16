@@ -72,23 +72,30 @@ export function OptimizedImage({
         setImgSrc(`${apiBase}${normalizedSrc}`)
         return
       }
-      // Rutas locales del frontend (public/)
-      setImgSrc(normalizedSrc)
+      // Rutas locales del frontend (public/) - solo si no parece ser ID de BD
+      if (normalizedSrc.startsWith('/placeholder') || normalizedSrc.startsWith('/images') || normalizedSrc.endsWith('.svg')) {
+        setImgSrc(normalizedSrc)
+        return
+      }
+      // Si no es ruta local conocida, asumir que es ruta del backend
+      setImgSrc(`${apiBase}${normalizedSrc}`)
       return
     }
 
-    // Si no tiene protocolo, asumir que es ruta del backend
+    // Si no tiene protocolo ni /, puede ser UUID o ID de BD
     if (!normalizedSrc.startsWith('http://') && !normalizedSrc.startsWith('https://')) {
-      // Si parece ser una ruta de upload, construir URL completa
-      if (
-        normalizedSrc.startsWith('/api/') ||
+      // Si es un UUID o ID largo, convertir a /api/media/{id}
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if (uuidPattern.test(normalizedSrc) || (normalizedSrc.length > 20 && /^[a-zA-Z0-9\-_]+$/.test(normalizedSrc))) {
+        normalizedSrc = `${apiBase}/api/media/${normalizedSrc}`
+      } else if (
         normalizedSrc.startsWith('api/') ||
-        normalizedSrc.startsWith('/uploads/') ||
         normalizedSrc.startsWith('uploads/')
       ) {
-        normalizedSrc = `${apiBase}${normalizedSrc.startsWith('/') ? '' : '/'}${normalizedSrc}`
+        normalizedSrc = `${apiBase}/${normalizedSrc}`
       } else {
-        normalizedSrc = `${apiBase}/uploads/${normalizedSrc}`
+        // Por defecto, asumir que es ID de BD
+        normalizedSrc = `${apiBase}/api/media/${normalizedSrc}`
       }
     }
 

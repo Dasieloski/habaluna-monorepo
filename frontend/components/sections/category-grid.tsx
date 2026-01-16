@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useEffect, useState, useRef } from "react"
 import { OptimizedImage } from "@/components/ui/optimized-image"
+import { getImageUrl } from "@/lib/image-utils"
 
 interface Category {
   id: string
@@ -77,7 +78,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               >
                 <div className="w-16 h-16 md:w-28 md:h-28 rounded-full overflow-hidden bg-gradient-to-br from-sky-100 to-blue-100 mb-2 md:mb-4 ring-2 md:ring-4 ring-transparent group-hover:ring-sky-300 transition-all duration-300 group-hover:scale-110 shadow-lg relative">
                   <OptimizedImage
-                    src={category.image || DEFAULT_CIRCLE_IMAGES[index % DEFAULT_CIRCLE_IMAGES.length]}
+                    src={getImageUrl(category.image) || DEFAULT_CIRCLE_IMAGES[index % DEFAULT_CIRCLE_IMAGES.length]}
                     alt={category.name}
                     fill
                     className="transition-transform duration-500 group-hover:scale-110"
@@ -114,7 +115,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                 }}
               >
                 <OptimizedImage
-                  src={category.image || DEFAULT_CATEGORY_IMAGES[index % DEFAULT_CATEGORY_IMAGES.length]}
+                  src={getImageUrl(category.image) || DEFAULT_CATEGORY_IMAGES[index % DEFAULT_CATEGORY_IMAGES.length]}
                   alt={category.name}
                   fill
                   className="transition-transform duration-700 group-hover:scale-110"
@@ -150,7 +151,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               style={{ transitionDelay: `${index * 0.1}s` }}
             >
               <OptimizedImage
-                src={category.image || DEFAULT_CATEGORY_IMAGES[index % DEFAULT_CATEGORY_IMAGES.length]}
+                src={getImageUrl(category.image) || DEFAULT_CATEGORY_IMAGES[index % DEFAULT_CATEGORY_IMAGES.length]}
                 alt={category.name}
                 fill
                 className="transition-transform duration-700 group-hover:scale-110"
