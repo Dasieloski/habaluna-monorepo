@@ -12,6 +12,7 @@ import { useAuthStore } from "@/lib/store/auth-store"
 import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { OptimizedImage } from "@/components/ui/optimized-image"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { getImageUrl } from "@/lib/image-utils"
 
 interface ProductCardProps {
   product: {
@@ -38,8 +39,6 @@ interface ProductCardProps {
   badgeColor?: "coral" | "blue" | "mint"
 }
 
-const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop"
-
 export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const { toast } = useToast()
@@ -53,9 +52,11 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
   const comparePrice = toNumber(product.variants?.[0]?.comparePriceUSD ?? product.comparePriceUSD)
   const hasDiscount = comparePrice !== null && comparePrice > price
 
-  const firstImage = product.images?.[0] || DEFAULT_IMAGE
-  const secondImage = product.images?.[1] || firstImage
-  const currentImage = isHovered && product.images?.[1] ? secondImage : firstImage
+  // Normalizar imágenes usando la función centralizada
+  const normalizedImages = (product.images || []).map(img => getImageUrl(img)).filter(Boolean) as string[]
+  const firstImage = normalizedImages[0] || "/placeholder.svg"
+  const secondImage = normalizedImages[1] || firstImage
+  const currentImage = isHovered && normalizedImages[1] ? secondImage : firstImage
 
   const badgeColors = {
     coral: "bg-gradient-to-r from-orange-400 to-red-400 text-white",
