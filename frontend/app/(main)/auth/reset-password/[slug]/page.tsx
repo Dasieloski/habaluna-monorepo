@@ -21,7 +21,7 @@ console.log('[ResetPassword] Configuraciones exportadas:', {
 })
 
 type PageProps = {
-  params: Promise<{ token: string }>
+  params: Promise<{ slug: string }>
 }
 
 // Función auxiliar para obtener la URL base de la API en el servidor
@@ -40,8 +40,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   try {
     const resolvedParams = await params
     console.log('[ResetPassword] [generateMetadata] Params resueltos:', {
-      token: resolvedParams.token?.substring(0, 10) + '...',
-      tokenLength: resolvedParams.token?.length
+      slug: resolvedParams.slug?.substring(0, 10) + '...',
+      slugLength: resolvedParams.slug?.length
     })
     
     const metadata = {
@@ -69,16 +69,17 @@ export default async function ResetPasswordPage({ params }: PageProps) {
     const resolvedParams = await params
     const paramsTime = Date.now() - startParams
     console.log('[ResetPassword] [PAGE] Paso 1 COMPLETADO - Params resueltos en', paramsTime, 'ms:', {
-      token: resolvedParams.token?.substring(0, 20) + '...',
-      tokenLength: resolvedParams.token?.length,
-      tokenType: typeof resolvedParams.token
+      slug: resolvedParams.slug?.substring(0, 20) + '...',
+      slugLength: resolvedParams.slug?.length,
+      slugType: typeof resolvedParams.slug
     })
     
-    const { token } = resolvedParams
+    // El parámetro se llama 'slug' pero contiene el token
+    const token = resolvedParams.slug
 
     // Paso 2: Validar token (validación exhaustiva)
     console.log('[ResetPassword] [PAGE] Paso 2: Validando token...')
-    console.log('[ResetPassword] [PAGE] Token recibido:', {
+    console.log('[ResetPassword] [PAGE] Token recibido (desde slug):', {
       value: token,
       type: typeof token,
       length: token?.length,
