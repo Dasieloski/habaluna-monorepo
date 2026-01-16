@@ -50,8 +50,25 @@ type ProfileForm = z.infer<typeof profileSchema>;
 
 function normalizeImageUrl(imagePath: string): string {
   if (!imagePath) return "/placeholder.svg";
+  
+  // Eliminar referencias a Cloudinary - usar solo imágenes de la BD
+  if (imagePath.includes('cloudinary.com') || imagePath.includes('res.cloudinary')) {
+    console.warn('[normalizeImageUrl] URL de Cloudinary detectada, ignorando:', imagePath);
+    return "/placeholder.svg";
+  }
+  
+  // Si es una URL completa que NO es Cloudinary, retornarla
   if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) return imagePath;
-  const base = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(/\/api\/?$/, "");
+  
+  // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
+  const { getApiBaseUrlLazy } = require("@/lib/api");
+  const base = getApiBaseUrlLazy();
+  
+  // Priorizar URLs de la BD: /api/media/{id}
+  if (imagePath.startsWith("/api/media/")) {
+    return `${base}${imagePath}`;
+  }
+  
   if (imagePath.startsWith("/")) return `${base}${imagePath}`;
   return `${base}/uploads/${imagePath}`;
 }

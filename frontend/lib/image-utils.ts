@@ -13,9 +13,24 @@ export function getFirstImage(images?: string | string[]): string | null {
 
 export function getImageUrl(image?: string): string | null {
   if (!image) return null
+  
+  // Eliminar referencias a Cloudinary - usar solo imágenes de la BD
+  if (image.includes('cloudinary.com') || image.includes('res.cloudinary')) {
+    console.warn('[getImageUrl] URL de Cloudinary detectada, ignorando:', image)
+    return null
+  }
+  
+  // Si es una URL completa que NO es Cloudinary, retornarla
   if (image.startsWith("http")) return image
-  const raw = (process.env.NEXT_PUBLIC_API_URL || "").trim()
-  const base = (raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw).replace(/\/api\/?$/, "")
+  
+  // Usar getApiBaseUrlLazy() para obtener la URL base correcta
+  const { getApiBaseUrlLazy } = require("@/lib/api")
+  const base = getApiBaseUrlLazy()
+
+  // Priorizar URLs de la BD: /api/media/{id}
+  if (image.startsWith("/api/media/")) {
+    return `${base}${image}`
+  }
 
   // Rutas del backend (aunque empiecen por /) -> prefijar con el dominio del API
   if (
@@ -24,12 +39,12 @@ export function getImageUrl(image?: string): string | null {
     image.startsWith("/products/") ||
     image.startsWith("/banners/")
   ) {
-    return base ? `${base}${image}` : image
+    return `${base}${image}`
   }
 
   // Rutas locales de public (Next.js sirve public/ desde la raíz del frontend)
   if (image.startsWith("/")) return image
 
   // Fallback: si viene sin / y sin http, asumir que es ruta de backend
-  return base ? `${base}/${image}` : image
+  return `${base}/${image}`
 }

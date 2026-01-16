@@ -126,23 +126,36 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
       comparePriceRef.current.value = productToLoad.comparePriceUSD.toString()
     }
 
-    // Cargar imágenes - usar normalizeImageUrl si está disponible, sino normalizar manualmente
+    // Cargar imágenes - eliminar Cloudinary y usar solo imágenes de la BD
+    const { getApiBaseUrlLazy } = require("@/lib/api")
+    const apiBase = getApiBaseUrlLazy()
+    
     const normalizedImages = (productToLoad.images || []).map(img => {
       if (!img) return ''
-      // Si ya es una URL completa, retornarla
+      
+      // Eliminar referencias a Cloudinary
+      if (img.includes('cloudinary.com') || img.includes('res.cloudinary')) {
+        console.warn('[ProductEditDialog] URL de Cloudinary detectada, ignorando:', img)
+        return ''
+      }
+      
+      // Si ya es una URL completa que NO es Cloudinary, retornarla
       if (img.startsWith('http://') || img.startsWith('https://')) {
         return img
       }
-      // Si empieza con /uploads, construir la URL completa
-      if (img.startsWith('/uploads/')) {
-        return `http://localhost:4000${img}`
+      
+      // Priorizar URLs de la BD: /api/media/{id}
+      if (img.startsWith('/api/media/')) {
+        return `${apiBase}${img}`
       }
-      // Si empieza con /, construir la URL
+      
+      // Si empieza con /uploads o cualquier otra ruta, construir la URL completa
       if (img.startsWith('/')) {
-        return `http://localhost:4000${img}`
+        return `${apiBase}${img}`
       }
+      
       // Si no tiene /, agregarlo
-      return `http://localhost:4000/${img}`
+      return `${apiBase}/${img}`
     }).filter(img => img !== '')
     // Solo setear imágenes iniciales si el usuario aún no ha seleccionado nuevas (para no “pisar” previews)
     if (!hasUserTouchedImagesRef.current) {

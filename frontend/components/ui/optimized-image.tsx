@@ -52,28 +52,34 @@ export function OptimizedImage({
 
     let normalizedSrc = src.trim()
     
+    // CRÍTICO: Eliminar referencias a Cloudinary - usar solo imágenes de la BD
+    if (normalizedSrc.includes('cloudinary.com') || normalizedSrc.includes('res.cloudinary')) {
+      console.warn('[OptimizedImage] URL de Cloudinary detectada, ignorando:', normalizedSrc)
+      setHasError(true)
+      return
+    }
+    
+    // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
+    const { getApiBaseUrlLazy } = require("@/lib/api")
+    const apiBase = getApiBaseUrlLazy()
+    
     // Si es una URL relativa que empieza con /:
-    // - /api/* y /uploads/* viven en el backend (prefijar con NEXT_PUBLIC_API_URL)
+    // - /api/* y /uploads/* viven en el backend (prefijar con API base)
     // - lo demás se asume que es asset local del frontend (public/)
     if (normalizedSrc.startsWith('/')) {
-      const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000')
-        .replace(/\/api\/?$/, '')
-        .replace(/^http:/, 'https:')
-      if (normalizedSrc.startsWith('/api/') || normalizedSrc.startsWith('/uploads/')) {
+      // Priorizar URLs de la BD: /api/media/{id}
+      if (normalizedSrc.startsWith('/api/media/') || normalizedSrc.startsWith('/api/') || normalizedSrc.startsWith('/uploads/')) {
         setImgSrc(`${apiBase}${normalizedSrc}`)
         return
       }
+      // Rutas locales del frontend (public/)
       setImgSrc(normalizedSrc)
       return
     }
 
-    // Si no tiene protocolo, asumir HTTPS
+    // Si no tiene protocolo, asumir que es ruta del backend
     if (!normalizedSrc.startsWith('http://') && !normalizedSrc.startsWith('https://')) {
       // Si parece ser una ruta de upload, construir URL completa
-      const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'https://habaluna-backend-production.up.railway.app')
-        .replace(/\/api\/?$/, '')
-        .replace(/^http:/, 'https:') // Forzar HTTPS
-      
       if (
         normalizedSrc.startsWith('/api/') ||
         normalizedSrc.startsWith('api/') ||
@@ -190,25 +196,31 @@ export function OptimizedImg({
 
     let normalizedSrc = src.trim()
     
+    // CRÍTICO: Eliminar referencias a Cloudinary - usar solo imágenes de la BD
+    if (normalizedSrc.includes('cloudinary.com') || normalizedSrc.includes('res.cloudinary')) {
+      console.warn('[OptimizedImg] URL de Cloudinary detectada, ignorando:', normalizedSrc)
+      setHasError(true)
+      return
+    }
+    
+    // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
+    const { getApiBaseUrlLazy } = require("@/lib/api")
+    const apiBase = getApiBaseUrlLazy()
+    
     // Si es relativa, ver si pertenece al backend (/api o /uploads)
     if (normalizedSrc.startsWith('/')) {
-      const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000')
-        .replace(/\/api\/?$/, '')
-        .replace(/^http:/, 'https:')
-      if (normalizedSrc.startsWith('/api/') || normalizedSrc.startsWith('/uploads/')) {
+      // Priorizar URLs de la BD: /api/media/{id}
+      if (normalizedSrc.startsWith('/api/media/') || normalizedSrc.startsWith('/api/') || normalizedSrc.startsWith('/uploads/')) {
         setImgSrc(`${apiBase}${normalizedSrc}`)
         return
       }
+      // Rutas locales del frontend (public/)
       setImgSrc(normalizedSrc)
       return
     }
 
     // Si no tiene protocolo, construir URL completa
     if (!normalizedSrc.startsWith('http://') && !normalizedSrc.startsWith('https://')) {
-      const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'https://habaluna-backend-production.up.railway.app')
-        .replace(/\/api\/?$/, '')
-        .replace(/^http:/, 'https:')
-      
       if (
         normalizedSrc.startsWith('/api/') ||
         normalizedSrc.startsWith('api/') ||

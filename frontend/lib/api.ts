@@ -1359,10 +1359,27 @@ export const api = {
 }
 
 // Función para normalizar URLs de imágenes
+// CRÍTICO: Eliminar todas las referencias a Cloudinary y usar solo imágenes de la BD
 function normalizeImageUrl(imagePath: string): string {
-  // Si ya es una URL completa, retornarla tal cual
+  if (!imagePath) return '/placeholder.svg'
+  
+  // Si es una URL de Cloudinary, ignorarla y retornar placeholder
+  // Las imágenes deben estar en la BD, no en Cloudinary
+  if (imagePath.includes('cloudinary.com') || imagePath.includes('res.cloudinary')) {
+    console.warn('[normalizeImageUrl] URL de Cloudinary detectada, ignorando:', imagePath)
+    return '/placeholder.svg'
+  }
+  
+  // Si es una URL completa que NO es Cloudinary, retornarla tal cual
+  // (puede ser una URL externa válida, pero preferimos BD)
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    // Si no es Cloudinary, permitirla (pero preferir BD)
     return imagePath
+  }
+  
+  // Priorizar URLs de la BD: /api/media/{id}
+  if (imagePath.startsWith('/api/media/')) {
+    return `${getApiBaseUrlLazy()}${imagePath}`
   }
   
   // Si empieza con /uploads, construir la URL completa del backend
