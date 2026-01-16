@@ -1385,6 +1385,7 @@ export const api = {
 
 // Función para normalizar URLs de imágenes
 // CRÍTICO: Normalizar URLs de imágenes - eliminar Cloudinary y usar solo BD
+// Usa la misma lógica mejorada que getImageUrl de image-utils.ts
 function normalizeImageUrl(imagePath: string): string {
   if (!imagePath) return '/placeholder.svg'
 
@@ -1416,27 +1417,61 @@ function normalizeImageUrl(imagePath: string): string {
     return `${base}/api/media/${imagePath}`
   }
 
-  // Si es un string largo que parece hash/ID (sin /), asumir que es ID de BD
-  if (imagePath.length > 20 && /^[a-zA-Z0-9\-_]+$/.test(imagePath) && !imagePath.startsWith('/')) {
-    return `${base}/api/media/${imagePath}`
+  // Si es un string que parece ID de BD (sin /, sin http, sin espacios, sin caracteres especiales)
+  const trimmed = imagePath.trim()
+  if (trimmed && !trimmed.startsWith('/') && !trimmed.startsWith('http')) {
+    // Si tiene más de 10 caracteres y solo contiene letras, números, guiones y guiones bajos
+    // Es muy probable que sea un ID de la tabla Media
+    if (trimmed.length >= 10 && /^[a-zA-Z0-9\-_]+$/.test(trimmed)) {
+      return `${base}/api/media/${trimmed}`
+    }
+    
+    // Si tiene entre 8 y 36 caracteres (rango típico de UUIDs y hashes)
+    // y no contiene espacios ni caracteres especiales problemáticos
+    if (trimmed.length >= 8 && trimmed.length <= 36 && /^[a-zA-Z0-9\-_]+$/.test(trimmed)) {
+      return `${base}/api/media/${trimmed}`
+    }
   }
 
-  // Si empieza con /api/, construir la URL completa
-  if (imagePath.startsWith('/api/')) {
+  // Rutas del backend (aunque empiecen por /) -> prefijar con el dominio del API
+  if (
+    imagePath.startsWith('/api/') ||
+    imagePath.startsWith('/products/') ||
+    imagePath.startsWith('/banners/')
+  ) {
     return `${base}${imagePath}`
   }
 
-  // Si empieza con /, asumir que es una ruta relativa del backend (excepto rutas locales)
-  if (imagePath.startsWith('/')) {
-    // Rutas locales del frontend (public/) no deben tener prefijo
-    if (imagePath.startsWith('/placeholder') || imagePath.startsWith('/images') || imagePath.endsWith('.svg')) {
+  // Rutas locales de public (Next.js sirve public/ desde la raíz del frontend)
+  // Solo si NO parece ser una ruta de backend
+  if (imagePath.startsWith('/') && !imagePath.startsWith('/api') && !imagePath.startsWith('/uploads')) {
+    // Verificar si es una ruta local conocida
+    if (
+      imagePath.startsWith('/placeholder') || 
+      imagePath.startsWith('/images') || 
+      imagePath.endsWith('.svg') ||
+      imagePath.endsWith('.png') ||
+      imagePath.endsWith('.jpg') ||
+      imagePath.endsWith('.jpeg')
+    ) {
       return imagePath
     }
-    return `${base}${imagePath}`
+    // Si no es una ruta local conocida, puede ser un ID que empieza con /
+    // Intentar como ID de BD
+    const withoutSlash = imagePath.substring(1)
+    if (withoutSlash.length >= 8 && /^[a-zA-Z0-9\-_]+$/.test(withoutSlash)) {
+      return `${base}/api/media/${withoutSlash}`
+    }
   }
 
-  // Si no tiene prefijo, asumir que es ID de BD
-  return `${base}/api/media/${imagePath}`
+  // Fallback: si viene sin / y sin http, asumir que es ID de BD
+  // Solo si tiene al menos 8 caracteres (mínimo para ser un ID válido)
+  if (trimmed.length >= 8 && /^[a-zA-Z0-9\-_]+$/.test(trimmed)) {
+    return `${base}/api/media/${trimmed}`
+  }
+
+  // Si no cumple ningún patrón, retornar placeholder
+  return '/placeholder.svg'
 }
 
 // Función para mapear productos del backend al formato del frontend
