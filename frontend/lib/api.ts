@@ -141,18 +141,38 @@ async function fetchJsonWithAuth(
     credentials: "include", // enviar cookie HttpOnly de refresh token
   })
 
-  // 401 -> intentar refresh una vez y reintentar
+  // 401 -> intentar refresh una vez y reintentar, PERO evitar loop infinito
   if (response.status === 401 && init.retryOn401 !== false) {
-    const newToken = await refreshAccessToken()
-    if (newToken) {
-      const retryHeaders: Record<string, string> = { ...(headers || {}) }
-      retryHeaders.Authorization = `Bearer ${newToken}`
-      return fetch(finalUrl, {
-        ...init,
-        headers: retryHeaders,
-        credentials: "include",
-      })
+    // CRÍTICO: Evitar loop infinito - solo intentar refresh si NO estamos ya refrescando
+    if (typeof window !== 'undefined' && (window as any).__IS_REFRESHING) {
+      console.warn('[fetchJsonWithAuth] Evitando loop infinito - ya se está refrescando')
+      handleUnauthorized()
+      return response
     }
+
+    // Marcar que estamos refrescando
+    if (typeof window !== 'undefined') {
+      (window as any).__IS_REFRESHING = true
+    }
+
+    try {
+      const newToken = await refreshAccessToken()
+      if (newToken) {
+        const retryHeaders: Record<string, string> = { ...(headers || {}) }
+        retryHeaders.Authorization = `Bearer ${newToken}`
+        return fetch(finalUrl, {
+          ...init,
+          headers: retryHeaders,
+          credentials: "include",
+        })
+      }
+    } finally {
+      // Siempre limpiar el flag, incluso si hay error
+      if (typeof window !== 'undefined') {
+        (window as any).__IS_REFRESHING = false
+      }
+    }
+
     handleUnauthorized()
   }
 
@@ -1359,41 +1379,65 @@ export const api = {
 }
 
 // Función para normalizar URLs de imágenes
-// CRÍTICO: Eliminar todas las referencias a Cloudinary y usar solo imágenes de la BD
+// CRÍTICO: Normalizar URLs de imágenes - eliminar Cloudinary y usar solo BD
 function normalizeImageUrl(imagePath: string): string {
   if (!imagePath) return '/placeholder.svg'
-  
+
+  // DEBUG: Log para entender qué formato tienen las imágenes
+  console.log('[normalizeImageUrl] Input:', imagePath)
+
   // Si es una URL de Cloudinary, ignorarla y retornar placeholder
-  // Las imágenes deben estar en la BD, no en Cloudinary
   if (imagePath.includes('cloudinary.com') || imagePath.includes('res.cloudinary')) {
     console.warn('[normalizeImageUrl] URL de Cloudinary detectada, ignorando:', imagePath)
     return '/placeholder.svg'
   }
-  
+
   // Si es una URL completa que NO es Cloudinary, retornarla tal cual
-  // (puede ser una URL externa válida, pero preferimos BD)
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    // Si no es Cloudinary, permitirla (pero preferir BD)
+    console.log('[normalizeImageUrl] URL externa permitida:', imagePath)
     return imagePath
   }
-  
+
   // Priorizar URLs de la BD: /api/media/{id}
   if (imagePath.startsWith('/api/media/')) {
-    return `${getApiBaseUrlLazy()}${imagePath}`
+    const result = `${getApiBaseUrlLazy()}${imagePath}`
+    console.log('[normalizeImageUrl] URL de BD (/api/media):', result)
+    return result
   }
-  
+
   // Si empieza con /uploads, construir la URL completa del backend
   if (imagePath.startsWith('/uploads/')) {
-    return `${getApiBaseUrlLazy()}${imagePath}`
+    const result = `${getApiBaseUrlLazy()}${imagePath}`
+    console.log('[normalizeImageUrl] URL de uploads:', result)
+    return result
   }
-  
+
+  // Si es un UUID (probablemente ID de imagen en BD), convertir a /api/media/{id}
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (uuidPattern.test(imagePath)) {
+    const result = `${getApiBaseUrlLazy()}/api/media/${imagePath}`
+    console.log('[normalizeImageUrl] UUID convertido a /api/media:', result)
+    return result
+  }
+
+  // Si es un string largo que parece hash/ID, asumir que es ID de BD
+  if (imagePath.length > 20 && /^[a-zA-Z0-9\-_]+$/.test(imagePath)) {
+    const result = `${getApiBaseUrlLazy()}/api/media/${imagePath}`
+    console.log('[normalizeImageUrl] ID largo convertido a /api/media:', result)
+    return result
+  }
+
   // Si empieza con /, asumir que es una ruta relativa del backend
   if (imagePath.startsWith('/')) {
-    return `${getApiBaseUrlLazy()}${imagePath}`
+    const result = `${getApiBaseUrlLazy()}${imagePath}`
+    console.log('[normalizeImageUrl] Ruta relativa:', result)
+    return result
   }
-  
+
   // Si no tiene prefijo, asumir que es relativa a uploads
-  return `${getApiBaseUrlLazy()}/uploads/${imagePath}`
+  const result = `${getApiBaseUrlLazy()}/uploads/${imagePath}`
+  console.log('[normalizeImageUrl] Ruta por defecto (/uploads):', result)
+  return result
 }
 
 // Función para mapear productos del backend al formato del frontend

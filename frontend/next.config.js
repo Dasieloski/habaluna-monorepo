@@ -35,6 +35,11 @@ const nextConfig = {
         hostname: 'localhost',
         port: '4000',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '4000',
+      },
     ],
     // Optimización de imágenes
     formats: ['image/avif', 'image/webp'],

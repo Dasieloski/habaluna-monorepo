@@ -15,6 +15,11 @@ export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 export const revalidate = 0
 
+// DEBUG: Asegurar que Next.js reconozca esta ruta como catch-all
+export const generateStaticParams = () => {
+  return []
+}
+
 console.log('[ResetPassword] Configuraciones exportadas:', {
   dynamicParams,
   revalidate
