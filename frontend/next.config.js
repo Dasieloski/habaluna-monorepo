@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // CRÍTICO: Railway necesita output: 'standalone' para servir rutas dinámicas correctamente
-  output: 'standalone',
   // Asegurar que todas las rutas se sirvan correctamente
   trailingSlash: false,
   // Asegurar que las rutas dinámicas se generen correctamente
