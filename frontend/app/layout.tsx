@@ -61,8 +61,11 @@ export default function RootLayout({
   return (
     <html lang="es">
       <head>
+        {/* Preconnect para mejorar LCP */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://habaluna-backend-production.up.railway.app" />
+        {/* Fonts con display=swap para mejor rendimiento */}
         <link href="https://fonts.googleapis.com/css2?family=Londrina+Shadow&display=swap" rel="stylesheet" />
       </head>
       <body className={`${poppins.className} antialiased`}>

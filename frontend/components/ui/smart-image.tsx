@@ -261,6 +261,7 @@ export function SmartImage({
     placeholder: blurPlaceholder ? ('blur' as const) : ('empty' as const),
     blurDataURL: blurPlaceholder || undefined,
     unoptimized: shouldUnoptimize,
+    // Asegurar dimensiones para evitar CLS
     ...(fill
       ? { fill: true }
       : {
@@ -268,6 +269,8 @@ export function SmartImage({
           height: height || 400,
         }),
     ...(aspectRatio && !fill ? { style: { aspectRatio } } : {}),
+    // Fetch priority para imágenes críticas
+    fetchPriority: priority ? ('high' as const) : ('auto' as const),
   }
 
   return (

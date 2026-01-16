@@ -365,11 +365,13 @@ export function ProductClient({
             {/* Variants */}
             {variants.length > 0 && (
               <div className="mb-4 md:mb-6">
-                <label className="block text-sm font-medium text-foreground mb-2">Elige una opción</label>
+                <label htmlFor="product-variant-select" className="block text-sm font-medium text-foreground mb-2">Elige una opción</label>
                 <select
+                  id="product-variant-select"
                   value={selectedVariantId}
                   onChange={(e) => setSelectedVariantId(e.target.value)}
                   className="w-full md:w-auto px-4 py-3 border border-border rounded-xl text-sm focus:ring-2 focus:ring-sky-300 bg-background"
+                  aria-label="Seleccionar variante del producto"
                 >
                   {variants.map((v: any) => (
                     <option key={v.id} value={v.id}>
@@ -434,9 +436,10 @@ export function ProductClient({
                     )
                   }
                 }}
+                aria-label={`Añadir ${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} al carrito`}
                 className="flex-1 flex items-center justify-center gap-2 bg-foreground text-background py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-foreground/90 transition-all text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -448,6 +451,7 @@ export function ProductClient({
               </button>
               <button
                 onClick={() => setIsFavorite(!isFavorite)}
+                aria-label={isFavorite ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
                 className={`p-3.5 md:p-4 rounded-xl border transition-all ${
                   isFavorite ? "bg-red-50 border-red-200 text-red-500" : "border-border hover:bg-muted"
                 }`}
@@ -457,7 +461,7 @@ export function ProductClient({
               <button
                 onClick={shareProduct}
                 className="p-3.5 md:p-4 rounded-xl border border-border hover:bg-muted transition-all"
-                aria-label="Compartir"
+                aria-label={`Compartir ${product.name}`}
                 type="button"
               >
                 <ShareIcon className="w-5 h-5 md:w-6 md:h-6" />

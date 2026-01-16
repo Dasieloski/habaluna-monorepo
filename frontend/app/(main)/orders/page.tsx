@@ -293,10 +293,13 @@ export default function OrdersPage() {
               </div>
               <div className="relative md:w-64">
                 <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <label htmlFor="status-filter" className="sr-only">Filtrar por estado</label>
                 <select
+                  id="status-filter"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="w-full h-10 pl-10 pr-4 bg-secondary/50 border border-transparent rounded-lg focus:border-primary focus:outline-none text-sm"
+                  aria-label="Filtrar pedidos por estado"
                 >
                   {statusOptions.map((option) => (
                     <option key={option.value} value={option.value}>

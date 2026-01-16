@@ -59,6 +59,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               <Link
                 key={category.id}
                 href={`/products?categoryId=${category.id}`}
+                aria-label={`Ver productos de ${category.name}`}
                 className={`group flex flex-col items-center transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
                 style={{ transitionDelay: `${index * 0.1}s` }}
               >
@@ -94,6 +95,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               <Link
                 key={category.id}
                 href={`/products?categoryId=${category.id}`}
+                aria-label={`Ver productos de ${category.name}`}
                 className={`group relative aspect-[3/4] md:aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
                 style={{
                   backgroundColor: colors[index % colors.length],
@@ -133,6 +135,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
             <Link
               key={category.id}
               href={`/products?categoryId=${category.id}`}
+              aria-label={`Ver productos de ${category.name}`}
               className={`group relative aspect-[4/5] md:aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-br from-sky-100 to-blue-100 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{ transitionDelay: `${index * 0.1}s` }}
             >

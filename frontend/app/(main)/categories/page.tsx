@@ -45,11 +45,13 @@ export default async function CategoriesPage() {
                     <div className="aspect-video rounded-lg mb-4 overflow-hidden">
                       <SmartImage
                         src={getImageUrl(category.image)!}
-                        alt={category.name}
+                        alt={`Imagen de la categoría ${category.name}`}
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, 33vw"
                         aspectRatio="16/9"
+                        width={800}
+                        height={450}
                       />
                     </div>
                   )}

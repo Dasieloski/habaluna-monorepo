@@ -281,6 +281,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                 })
               })
             }}
+            aria-label={isInWishlist ? `Quitar ${product.name} de la wishlist` : `Agregar ${product.name} a la wishlist`}
             className={`absolute top-2 right-2 md:top-3 md:right-3 p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all duration-300 ${
               isInWishlist
                 ? "bg-red-500 text-white scale-110"
@@ -324,6 +325,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                 })
               }
             }}
+            aria-label={`Añadir ${product.name} al carrito`}
             className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-foreground text-background text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-foreground/90"
             type="button"
           >
@@ -392,6 +394,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                   })
                 }
               }}
+              aria-label={`Añadir ${product.name} al carrito`}
               className="w-full bg-foreground text-background text-xs font-semibold py-2.5 rounded-xl active:scale-[0.99] transition"
               type="button"
             >

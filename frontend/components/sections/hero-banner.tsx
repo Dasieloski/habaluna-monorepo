@@ -186,6 +186,8 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
+                aria-label={`Ir a slide ${index + 1}`}
+                aria-current={index === currentSlide ? "true" : "false"}
                 className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
                   index === currentSlide ? "bg-white w-6 md:w-8" : "bg-white/50 hover:bg-white/70"
                 }`}
