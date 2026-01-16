@@ -18,21 +18,7 @@ interface CategoryGridProps {
   title?: string
 }
 
-const DEFAULT_CATEGORY_IMAGES = [
-  "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=500&fit=crop",
-  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=500&fit=crop",
-  "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&h=500&fit=crop",
-  "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=500&fit=crop",
-]
-
-const DEFAULT_CIRCLE_IMAGES = [
-  "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=120&h=120&fit=crop",
-  "https://images.unsplash.com/photo-1576402187878-974f70c890a5?w=120&h=120&fit=crop",
-  "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=120&h=120&fit=crop",
-  "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=120&h=120&fit=crop",
-  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=120&h=120&fit=crop",
-  "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=120&h=120&fit=crop",
-]
+// Eliminadas imágenes estáticas - solo usar imágenes de la BD o placeholder
 
 export function CategoryGrid({ categories, variant = "cards", title }: CategoryGridProps) {
   const [isVisible, setIsVisible] = useState(false)
@@ -78,7 +64,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               >
                 <div className="w-16 h-16 md:w-28 md:h-28 rounded-full overflow-hidden bg-gradient-to-br from-sky-100 to-blue-100 mb-2 md:mb-4 ring-2 md:ring-4 ring-transparent group-hover:ring-sky-300 transition-all duration-300 group-hover:scale-110 shadow-lg relative">
                   <OptimizedImage
-                    src={getImageUrl(category.image) || DEFAULT_CIRCLE_IMAGES[index % DEFAULT_CIRCLE_IMAGES.length]}
+                    src={getImageUrl(category.image) || "/placeholder.svg"}
                     alt={category.name}
                     fill
                     className="transition-transform duration-500 group-hover:scale-110"
@@ -115,7 +101,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                 }}
               >
                 <OptimizedImage
-                  src={getImageUrl(category.image) || DEFAULT_CATEGORY_IMAGES[index % DEFAULT_CATEGORY_IMAGES.length]}
+                  src={getImageUrl(category.image) || "/placeholder.svg"}
                   alt={category.name}
                   fill
                   className="transition-transform duration-700 group-hover:scale-110"

@@ -26,12 +26,7 @@ interface ProductCarouselProps {
   autoSlide?: boolean
 }
 
-const DEFAULT_CAROUSEL_IMAGES = [
-  "https://images.unsplash.com/photo-1551462147-ff29053bfc14?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1563822249366-3efb23b8e0c9?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&h=400&fit=crop",
-]
+// Eliminadas imágenes estáticas - solo usar imágenes de la BD o placeholder
 
 export function ProductCarousel({ title, products, viewAllLink, badgeType, autoSlide = false }: ProductCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -90,10 +85,10 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
 
   if (!products || products.length === 0) return null
 
-  // Asegurar que cada producto tenga imagen
-  const productsWithImages = products.map((product, index) => ({
+  // Usar solo imágenes de la BD - si no hay, el ProductCard usará placeholder
+  const productsWithImages = products.map((product) => ({
     ...product,
-    images: product.images?.length ? product.images : [DEFAULT_CAROUSEL_IMAGES[index % DEFAULT_CAROUSEL_IMAGES.length]],
+    images: product.images?.length ? product.images : ['/placeholder.svg'],
   }))
 
   return (
