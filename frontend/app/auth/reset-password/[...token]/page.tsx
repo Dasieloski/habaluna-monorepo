@@ -6,19 +6,15 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { ResetPasswordClient } from "./reset-password-client"
 
-// CRÍTICO: Forzar renderizado dinámico en cada request
-// Esto asegura que Next.js no intente pre-renderizar la ruta durante el build
-// y que siempre se renderice en el servidor en cada request
-export const dynamic = 'force-dynamic'
+// CRÍTICO: Configuración para catch-all routes en standalone
+// Para catch-all routes, NO usar force-dynamic puede ayudar en standalone
+// En su lugar, usar dynamicParams = true y revalidate = 0
 export const dynamicParams = true
 export const revalidate = 0
 
-// CRÍTICO: Asegurar que Next.js reconozca esta ruta como catch-all en producción
-// Para catch-all routes, generateStaticParams debe retornar un array vacío
-// pero Next.js necesita saber explícitamente que es una ruta dinámica
+// CRÍTICO: generateStaticParams debe retornar array vacío para catch-all
+// Esto le dice a Next.js que esta ruta es completamente dinámica
 export async function generateStaticParams() {
-  // Retornar array vacío fuerza a Next.js a tratar esta ruta como completamente dinámica
-  // Esto es crítico para catch-all routes en modo standalone
   return []
 }
 
