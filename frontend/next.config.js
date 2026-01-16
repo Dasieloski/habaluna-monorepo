@@ -4,6 +4,9 @@ const nextConfig = {
   trailingSlash: false,
   // Forzar output: 'standalone' para Railway (Next.js 16 requiere esto para serverless)
   output: 'standalone',
+  // CRÍTICO: Asegurar que las rutas dinámicas se registren correctamente en standalone
+  // Sin esto, las rutas catch-all pueden no funcionar en producción
+  skipTrailingSlashRedirect: true,
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',

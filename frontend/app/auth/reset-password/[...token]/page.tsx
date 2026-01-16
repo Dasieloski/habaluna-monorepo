@@ -14,7 +14,11 @@ export const dynamicParams = true
 export const revalidate = 0
 
 // CRÍTICO: Asegurar que Next.js reconozca esta ruta como catch-all en producción
-export const generateStaticParams = () => {
+// Para catch-all routes, generateStaticParams debe retornar un array vacío
+// pero Next.js necesita saber explícitamente que es una ruta dinámica
+export async function generateStaticParams() {
+  // Retornar array vacío fuerza a Next.js a tratar esta ruta como completamente dinámica
+  // Esto es crítico para catch-all routes en modo standalone
   return []
 }
 
