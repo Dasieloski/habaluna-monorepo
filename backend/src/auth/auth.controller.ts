@@ -86,6 +86,12 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Password updated' })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   async resetPassword(@Body() dto: ResetPasswordDto) {
+    // #region agent log
+    const fs = require('fs');
+    const logPath = 'c:\\Dasieloski\\Habaluna\\HABANALUNA-monorepo\\HABANALUNA\\.cursor\\debug.log';
+    const logEntry = JSON.stringify({location:'auth.controller.ts:88',message:'reset-password endpoint called',data:{tokenLength:dto.token?.length,tokenPreview:dto.token?.substring(0,20),hasPassword:!!dto.newPassword},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})+'\n';
+    fs.appendFileSync(logPath, logEntry, 'utf8');
+    // #endregion
     return this.authService.resetPassword(dto.token, dto.newPassword);
   }
 }

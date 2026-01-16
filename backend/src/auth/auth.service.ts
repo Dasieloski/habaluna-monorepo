@@ -339,6 +339,12 @@ export class AuthService {
         // Codificar el token para la URL (por si tiene caracteres especiales)
         const encodedToken = encodeURIComponent(rawToken);
         const resetUrl = `${this.getFrontendBaseUrl()}/auth/reset-password/${encodedToken}`;
+        // #region agent log
+        const fs = require('fs');
+        const logPath = 'c:\\Dasieloski\\Habaluna\\HABANALUNA-monorepo\\HABANALUNA\\.cursor\\debug.log';
+        const logEntry = JSON.stringify({location:'auth.service.ts:341',message:'Reset URL generated',data:{rawTokenLength:rawToken.length,encodedTokenLength:encodedToken.length,resetUrl,frontendBaseUrl:this.getFrontendBaseUrl()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})+'\n';
+        fs.appendFileSync(logPath, logEntry, 'utf8');
+        // #endregion
         const emailResult = await this.email.sendPasswordResetEmail({ to: user.email, resetUrl });
         
         if (!emailResult.sent) {
