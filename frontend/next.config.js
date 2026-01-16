@@ -4,6 +4,15 @@ const nextConfig = {
   trailingSlash: false,
   // Forzar output: 'standalone' para Railway (Next.js 16 requiere esto para serverless)
   output: 'standalone',
+  // CRÍTICO: Asegurar que las rutas catch-all se registren correctamente
+  // Sin esto, Next.js standalone puede no servir correctamente las rutas catch-all
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+    // Asegurar que las rutas dinámicas se procesen correctamente
+    dynamicIO: true,
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
