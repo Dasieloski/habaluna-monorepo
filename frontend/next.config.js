@@ -86,7 +86,9 @@ const nextConfig = {
   },
   // Compresión y optimización
   compress: true,
-  // Reducir tamaño del bundle
+  // Configuración de Turbopack (Next.js 16 usa Turbopack por defecto)
+  turbopack: {},
+  // Reducir tamaño del bundle (solo para webpack, si se usa --webpack flag)
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // Tree shaking mejorado
