@@ -58,6 +58,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/standalone/.
 COPY --from=builder --chown=nextjs:nodejs /app/public ./.next/standalone/public
 # CRÍTICO: Copiar package.json para que npm start funcione
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+# CRÍTICO: Copiar node_modules del standalone (puede estar faltando)
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone/node_modules ./.next/standalone/node_modules
 
 # Verificar que server.js existe después de copiar (falla el build si no existe)
 RUN test -f /app/.next/standalone/server.js || (echo "❌ ERROR: server.js no existe después de copiar. Verifica que el build generó .next/standalone/server.js" && ls -la /app/.next/standalone/ 2>/dev/null || echo "Directorio .next/standalone no existe" && exit 1)
