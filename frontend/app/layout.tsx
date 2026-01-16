@@ -1,10 +1,14 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Poppins } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
 import { Providers } from "./providers"
 import "./globals.css"
+
+// Solo cargar Analytics si estamos en Vercel
+const Analytics = process.env.VERCEL
+  ? require("@vercel/analytics/next").Analytics
+  : () => null
 
 const poppins = Poppins({
   subsets: ["latin"],

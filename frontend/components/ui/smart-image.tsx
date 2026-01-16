@@ -94,9 +94,10 @@ export function SmartImage({
   blurDataURL,
   aspectRatio,
 }: SmartImageProps) {
-  const [imgSrc, setImgSrc] = useState<string>(src)
+  const [imgSrc, setImgSrc] = useState<string>('')
   const [hasError, setHasError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isUrlReady, setIsUrlReady] = useState(false)
   const [blurPlaceholder, setBlurPlaceholder] = useState<string>(blurDataURL || '')
 
   // Normalizar URL: asegurar HTTPS y formato correcto
@@ -104,8 +105,14 @@ export function SmartImage({
     if (!src) {
       setHasError(true)
       setIsLoading(false)
+      setIsUrlReady(false)
       return
     }
+
+    // Resetear estados al cambiar src
+    setHasError(false)
+    setIsLoading(true)
+    setIsUrlReady(false)
 
     let normalizedSrc = src.trim()
     
@@ -114,6 +121,7 @@ export function SmartImage({
       console.warn('[SmartImage] URL de Cloudinary detectada, ignorando:', normalizedSrc)
       setHasError(true)
       setIsLoading(false)
+      setIsUrlReady(false)
       return
     }
     
@@ -123,52 +131,78 @@ export function SmartImage({
         normalizedSrc = normalizedSrc.replace('http://', 'https://')
       }
       setImgSrc(normalizedSrc)
+      setIsUrlReady(true)
       return
     }
     
     // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-    const apiBase = getApiBaseUrlLazy()
-    
-    // Si ya es una ruta completa del backend con /api/media/, retornarla con base
-    if (normalizedSrc.startsWith('/api/media/')) {
-      setImgSrc(`${apiBase}${normalizedSrc}`)
-      return
-    }
+    // Esperar a que esté disponible (puede tardar en el cliente)
+    try {
+      const apiBase = getApiBaseUrlLazy()
+      
+      // Si ya es una ruta completa del backend con /api/media/, retornarla con base
+      if (normalizedSrc.startsWith('/api/media/')) {
+        setImgSrc(`${apiBase}${normalizedSrc}`)
+        setIsUrlReady(true)
+        return
+      }
 
-    // Si empieza con /uploads, construir la URL completa del backend
-    if (normalizedSrc.startsWith('/uploads/')) {
-      setImgSrc(`${apiBase}${normalizedSrc}`)
-      return
-    }
+      // Si empieza con /uploads, construir la URL completa del backend
+      if (normalizedSrc.startsWith('/uploads/')) {
+        setImgSrc(`${apiBase}${normalizedSrc}`)
+        setIsUrlReady(true)
+        return
+      }
 
-    // Rutas locales del frontend (public/) - retornar tal cual
-    if (
-      normalizedSrc.startsWith('/placeholder') || 
-      normalizedSrc.startsWith('/images') || 
-      normalizedSrc.startsWith('/logo') ||
-      normalizedSrc.endsWith('.svg') ||
-      normalizedSrc.endsWith('.png') ||
-      normalizedSrc.endsWith('.jpg') ||
-      normalizedSrc.endsWith('.jpeg') ||
-      normalizedSrc.endsWith('.webp')
-    ) {
-      setImgSrc(normalizedSrc)
-      return
-    }
+      // Rutas locales del frontend (public/) - retornar tal cual
+      if (
+        normalizedSrc.startsWith('/placeholder') || 
+        normalizedSrc.startsWith('/images') || 
+        normalizedSrc.startsWith('/logo') ||
+        normalizedSrc.endsWith('.svg') ||
+        normalizedSrc.endsWith('.png') ||
+        normalizedSrc.endsWith('.jpg') ||
+        normalizedSrc.endsWith('.jpeg') ||
+        normalizedSrc.endsWith('.webp')
+      ) {
+        setImgSrc(normalizedSrc)
+        setIsUrlReady(true)
+        return
+      }
 
-    // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
-    // Si empieza con /, quitar el / primero
-    const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
-    
-    // Si después de quitar el / está vacío, marcar error
-    if (!imageId) {
-      setHasError(true)
-      setIsLoading(false)
-      return
+      // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
+      // Si empieza con /, quitar el / primero
+      const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
+      
+      // Si después de quitar el / está vacío, marcar error
+      if (!imageId) {
+        setHasError(true)
+        setIsLoading(false)
+        setIsUrlReady(false)
+        return
+      }
+      
+      // Convertir a /api/media/{id}
+      setImgSrc(`${apiBase}/api/media/${imageId}`)
+      setIsUrlReady(true)
+    } catch (error) {
+      // Si hay error obteniendo la URL base, reintentar después de un delay
+      console.warn('[SmartImage] Error obteniendo API base URL, reintentando...', error)
+      setTimeout(() => {
+        try {
+          const apiBase = getApiBaseUrlLazy()
+          const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
+          if (imageId) {
+            setImgSrc(`${apiBase}/api/media/${imageId}`)
+            setIsUrlReady(true)
+          }
+        } catch (retryError) {
+          setHasError(true)
+          setIsLoading(false)
+          setIsUrlReady(false)
+        }
+      }, 100)
     }
-    
-    // Convertir a /api/media/{id}
-    setImgSrc(`${apiBase}/api/media/${imageId}`)
   }, [src])
 
   // Generar blur placeholder si no se proporciona
@@ -193,8 +227,8 @@ export function SmartImage({
     }
   }, [onLoadingComplete])
 
-  // Si hay error, mostrar placeholder de error
-  if (hasError || !imgSrc) {
+  // Si hay error o la URL no está lista, mostrar placeholder
+  if (hasError || !imgSrc || !isUrlReady) {
     return (
       <div 
         className={cn(
@@ -327,16 +361,23 @@ export function SmartImg({
   aspectRatio?: string
   [key: string]: any
 }) {
-  const [imgSrc, setImgSrc] = useState<string>(src)
+  const [imgSrc, setImgSrc] = useState<string>('')
   const [hasError, setHasError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isUrlReady, setIsUrlReady] = useState(false)
 
   useEffect(() => {
     if (!src) {
       setHasError(true)
       setIsLoading(false)
+      setIsUrlReady(false)
       return
     }
+
+    // Resetear estados al cambiar src
+    setHasError(false)
+    setIsLoading(true)
+    setIsUrlReady(false)
 
     let normalizedSrc = src.trim()
     
@@ -345,6 +386,7 @@ export function SmartImg({
       console.warn('[SmartImg] URL de Cloudinary detectada, ignorando:', normalizedSrc)
       setHasError(true)
       setIsLoading(false)
+      setIsUrlReady(false)
       return
     }
     
@@ -354,52 +396,78 @@ export function SmartImg({
         normalizedSrc = normalizedSrc.replace('http://', 'https://')
       }
       setImgSrc(normalizedSrc)
+      setIsUrlReady(true)
       return
     }
     
     // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-    const apiBase = getApiBaseUrlLazy()
-    
-    // Si ya es una ruta completa del backend con /api/media/, retornarla con base
-    if (normalizedSrc.startsWith('/api/media/')) {
-      setImgSrc(`${apiBase}${normalizedSrc}`)
-      return
-    }
+    // Esperar a que esté disponible (puede tardar en el cliente)
+    try {
+      const apiBase = getApiBaseUrlLazy()
+      
+      // Si ya es una ruta completa del backend con /api/media/, retornarla con base
+      if (normalizedSrc.startsWith('/api/media/')) {
+        setImgSrc(`${apiBase}${normalizedSrc}`)
+        setIsUrlReady(true)
+        return
+      }
 
-    // Si empieza con /uploads, construir la URL completa del backend
-    if (normalizedSrc.startsWith('/uploads/')) {
-      setImgSrc(`${apiBase}${normalizedSrc}`)
-      return
-    }
+      // Si empieza con /uploads, construir la URL completa del backend
+      if (normalizedSrc.startsWith('/uploads/')) {
+        setImgSrc(`${apiBase}${normalizedSrc}`)
+        setIsUrlReady(true)
+        return
+      }
 
-    // Rutas locales del frontend (public/) - retornar tal cual
-    if (
-      normalizedSrc.startsWith('/placeholder') || 
-      normalizedSrc.startsWith('/images') || 
-      normalizedSrc.startsWith('/logo') ||
-      normalizedSrc.endsWith('.svg') ||
-      normalizedSrc.endsWith('.png') ||
-      normalizedSrc.endsWith('.jpg') ||
-      normalizedSrc.endsWith('.jpeg') ||
-      normalizedSrc.endsWith('.webp')
-    ) {
-      setImgSrc(normalizedSrc)
-      return
-    }
+      // Rutas locales del frontend (public/) - retornar tal cual
+      if (
+        normalizedSrc.startsWith('/placeholder') || 
+        normalizedSrc.startsWith('/images') || 
+        normalizedSrc.startsWith('/logo') ||
+        normalizedSrc.endsWith('.svg') ||
+        normalizedSrc.endsWith('.png') ||
+        normalizedSrc.endsWith('.jpg') ||
+        normalizedSrc.endsWith('.jpeg') ||
+        normalizedSrc.endsWith('.webp')
+      ) {
+        setImgSrc(normalizedSrc)
+        setIsUrlReady(true)
+        return
+      }
 
-    // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
-    // Si empieza con /, quitar el / primero
-    const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
-    
-    // Si después de quitar el / está vacío, marcar error
-    if (!imageId) {
-      setHasError(true)
-      setIsLoading(false)
-      return
+      // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
+      // Si empieza con /, quitar el / primero
+      const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
+      
+      // Si después de quitar el / está vacío, marcar error
+      if (!imageId) {
+        setHasError(true)
+        setIsLoading(false)
+        setIsUrlReady(false)
+        return
+      }
+      
+      // Convertir a /api/media/{id}
+      setImgSrc(`${apiBase}/api/media/${imageId}`)
+      setIsUrlReady(true)
+    } catch (error) {
+      // Si hay error obteniendo la URL base, reintentar después de un delay
+      console.warn('[SmartImg] Error obteniendo API base URL, reintentando...', error)
+      setTimeout(() => {
+        try {
+          const apiBase = getApiBaseUrlLazy()
+          const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
+          if (imageId) {
+            setImgSrc(`${apiBase}/api/media/${imageId}`)
+            setIsUrlReady(true)
+          }
+        } catch (retryError) {
+          setHasError(true)
+          setIsLoading(false)
+          setIsUrlReady(false)
+        }
+      }, 100)
     }
-    
-    // Convertir a /api/media/{id}
-    setImgSrc(`${apiBase}/api/media/${imageId}`)
   }, [src])
 
   const handleError = useCallback(() => {
@@ -414,7 +482,7 @@ export function SmartImg({
     setIsLoading(false)
   }, [])
 
-  if (hasError || !imgSrc) {
+  if (hasError || !imgSrc || !isUrlReady) {
     return (
       <div 
         className={cn(
