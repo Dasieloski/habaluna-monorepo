@@ -2,13 +2,18 @@ FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++
 WORKDIR /app
 
-COPY package.json ./
-# En workspaces, puede no haber package-lock.json en el subdirectorio
-# Usar npm install en lugar de npm ci si no existe
-RUN npm install --production=false
+COPY package.json package-lock.json* ./
+# Usar npm ci si existe package-lock.json, sino npm install
+# --prefer-offline para usar cache si está disponible
+# --no-audit para acelerar instalación
+RUN if [ -f package-lock.json ]; then \
+      npm ci --prefer-offline --no-audit; \
+    else \
+      npm install --prefer-offline --no-audit --production=false; \
+    fi
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -19,6 +24,9 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Build the application (esto ejecuta build + postbuild automáticamente)
+# Agregar variables de entorno para optimizar build
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 RUN npm run build
 
 # Verificar que el standalone se generó correctamente

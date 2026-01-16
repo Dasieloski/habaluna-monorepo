@@ -84,12 +84,12 @@ export class EmailMarketingService {
   renderFullPreview(params: { subject: string; preheader?: string; html: string }): string {
     const firstName = 'Cliente';
     const email = 'cliente@email.com';
-    
+
     // Renderizar el contenido con variables
     let body = params.html;
     body = body.replace(/\{\{\s*firstName\s*\}\}/g, firstName);
     body = body.replace(/\{\{\s*email\s*\}\}/g, email);
-    
+
     // Envolver con el template de Habaluna
     const wrapped = this.email.wrapTemplate({
       title: params.subject,
@@ -443,4 +443,3 @@ export class EmailMarketingService {
     this.logger.log(`Campaign ${campaignId} done. sent=${sent} failed=${failed}`);
   }
 }
-

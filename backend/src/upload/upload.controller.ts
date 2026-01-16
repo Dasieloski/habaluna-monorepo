@@ -13,7 +13,10 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UploadService } from './upload.service';
-import { multerOptions, validateFileMagicBytes } from '../common/interceptors/file-upload.interceptor';
+import {
+  multerOptions,
+  validateFileMagicBytes,
+} from '../common/interceptors/file-upload.interceptor';
 
 @ApiTags('upload')
 @Controller('upload')

@@ -28,4 +28,3 @@ export class CreateCampaignDto {
   @IsString()
   text?: string;
 }
-

@@ -17,7 +17,9 @@ export class EmailService {
         this.resendClient = new Resend(resendApiKey);
         this.logger.log('Resend inicializado correctamente');
       } catch (error) {
-        this.logger.error(`Error inicializando Resend: ${error instanceof Error ? error.message : String(error)}`);
+        this.logger.error(
+          `Error inicializando Resend: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
   }
@@ -38,7 +40,9 @@ export class EmailService {
       return null;
     }
 
-    this.logger.log(`Configurando SMTP: host=${host}, port=${port}, secure=${secure}, user=${user}`);
+    this.logger.log(
+      `Configurando SMTP: host=${host}, port=${port}, secure=${secure}, user=${user}`,
+    );
 
     try {
       const transport = nodemailer.createTransport({
@@ -61,7 +65,9 @@ export class EmailService {
         if (error) {
           this.logger.error(`Error verificando conexión SMTP a ${host}:${port}: ${error.message}`);
           if ((error as any).code === 'ENOTFOUND') {
-            this.logger.error(`El hostname SMTP "${host}" no se puede resolver. Verifica que el hostname sea correcto.`);
+            this.logger.error(
+              `El hostname SMTP "${host}" no se puede resolver. Verifica que el hostname sea correcto.`,
+            );
           }
         } else {
           this.logger.log(`Conexión SMTP verificada correctamente a ${host}:${port}`);
@@ -85,9 +91,9 @@ export class EmailService {
     const subject = 'Código de recuperación de contraseña';
     const frontendUrl = this.getFrontendUrl();
     const codeUrl = `${frontendUrl}/auth/verify-code`;
-    
+
     const text = `Has solicitado recuperar tu contraseña.\n\nTu código de verificación es: ${params.resetCode}\n\nEste código es válido por 15 minutos.\n\nIngresa este código en: ${codeUrl}\n\nSi no lo solicitaste, ignora este correo.`;
-    
+
     const html = this.getEmailTemplate({
       title: 'Código de Recuperación',
       greeting: 'Hola,',
@@ -109,13 +115,15 @@ export class EmailService {
 
     this.logger.log(`Intentando enviar email de recuperación a ${params.to}`);
     const result = await this.sendEmail({ from, to: params.to, subject, text, html });
-    
+
     if (result.sent) {
       this.logger.log(`Email de recuperación enviado exitosamente a ${params.to}`);
     } else {
-      this.logger.warn(`No se pudo enviar email de recuperación a ${params.to}. Error: ${result.error || 'desconocido'}`);
+      this.logger.warn(
+        `No se pudo enviar email de recuperación a ${params.to}. Error: ${result.error || 'desconocido'}`,
+      );
     }
-    
+
     return result;
   }
 
@@ -250,7 +258,7 @@ export class EmailService {
       try {
         const fromAddress = this.config.get<string>('RESEND_FROM') || params.from;
         this.logger.log(`Enviando email vía Resend a ${params.to}`);
-        
+
         const result = await this.resendClient.emails.send({
           from: fromAddress,
           to: params.to,
@@ -298,7 +306,13 @@ export class EmailService {
    * API pública para enviar un email arbitrario.
    * Útil para campañas/newsletter desde el panel admin.
    */
-  async sendRaw(params: { to: string; subject: string; html: string; text?: string; from?: string }) {
+  async sendRaw(params: {
+    to: string;
+    subject: string;
+    html: string;
+    text?: string;
+    from?: string;
+  }) {
     const from = params.from || this.getFromAddress();
     return this.sendEmail({
       from,

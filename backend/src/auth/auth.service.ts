@@ -48,7 +48,9 @@ export class AuthService {
     const nodeEnv = String(this.config.get<string>('NODE_ENV') || '').toLowerCase();
     const frontendUrl = String(this.config.get<string>('FRONTEND_URL') || '').toLowerCase();
     const railwayEnv = String(this.config.get<string>('RAILWAY_ENVIRONMENT') || '').toLowerCase();
-    return nodeEnv === 'production' || railwayEnv === 'production' || frontendUrl.startsWith('https://');
+    return (
+      nodeEnv === 'production' || railwayEnv === 'production' || frontendUrl.startsWith('https://')
+    );
   }
 
   /**

@@ -492,9 +492,9 @@ export const allTemplates: EmailTemplate[] = [
 ];
 
 export function getTemplatesByCategory(category: EmailTemplate['category']): EmailTemplate[] {
-  return allTemplates.filter(t => t.category === category);
+  return allTemplates.filter((t) => t.category === category);
 }
 
 export function getTemplateById(id: string): EmailTemplate | undefined {
-  return allTemplates.find(t => t.id === id);
+  return allTemplates.find((t) => t.id === id);
 }

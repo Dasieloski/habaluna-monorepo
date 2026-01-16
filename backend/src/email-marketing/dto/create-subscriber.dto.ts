@@ -18,4 +18,3 @@ export class CreateSubscriberDto {
   @MaxLength(60)
   lastName?: string;
 }
-

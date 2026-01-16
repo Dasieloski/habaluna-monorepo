@@ -157,10 +157,7 @@ export class EmailMarketingController {
   @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Render template with variables (Admin)' })
-  async renderTemplate(
-    @Param('id') id: string,
-    @Body() variables: Record<string, string>,
-  ) {
+  async renderTemplate(@Param('id') id: string, @Body() variables: Record<string, string>) {
     return { html: this.svc.renderTemplate(id, variables) };
   }
 
@@ -173,4 +170,3 @@ export class EmailMarketingController {
     return { html: this.svc.renderFullPreview(dto) };
   }
 }
-

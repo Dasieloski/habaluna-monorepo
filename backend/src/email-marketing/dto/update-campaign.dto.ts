@@ -30,4 +30,3 @@ export class UpdateCampaignDto {
   @IsString()
   text?: string;
 }
-

@@ -13,7 +13,11 @@ export class MediaController {
   @ApiQuery({ name: 'w', required: false, description: 'Width in pixels' })
   @ApiQuery({ name: 'h', required: false, description: 'Height in pixels' })
   @ApiQuery({ name: 'q', required: false, description: 'Quality 1-100 (default: 80)' })
-  @ApiQuery({ name: 'format', required: false, description: 'Image format: webp, avif, or original' })
+  @ApiQuery({
+    name: 'format',
+    required: false,
+    description: 'Image format: webp, avif, or original',
+  })
   async getById(
     @Param('id') id: string,
     @Query('w') width?: string,
@@ -64,4 +68,3 @@ export class MediaController {
     return res.send(media.data);
   }
 }
-
