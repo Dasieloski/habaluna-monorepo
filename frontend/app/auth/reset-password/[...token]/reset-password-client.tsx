@@ -74,6 +74,9 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
   console.log('[ResetPasswordClient] ========== FIN RENDERIZADO CLIENTE ==========')
 
   const onSubmit = async (data: Form) => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'reset-password-client.tsx:76',message:'onSubmit called',data:{tokenLength:token?.length,hasPassword:!!data.newPassword},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+    // #endregion
     if (!token || token.trim() === "") {
       setError("Token inválido. Por favor, solicita un nuevo enlace de recuperación.")
       return
@@ -83,9 +86,15 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
       setError("")
       setMessage("")
       const res = await api.resetPassword(token, data.newPassword)
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'reset-password-client.tsx:87',message:'resetPassword API call success',data:{message:res.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
       setMessage(res.message || "Contraseña actualizada correctamente.")
       setTimeout(() => router.push("/auth/login"), 1200)
     } catch (err: any) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'reset-password-client.tsx:89',message:'resetPassword API call error',data:{errorMessage:err?.message,statusCode:err?.response?.status},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
       const msg =
         err.response?.data?.message ||
         err.message ||

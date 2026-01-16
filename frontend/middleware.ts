@@ -88,6 +88,12 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   const isResetPassword = pathname.startsWith("/auth/reset-password")
 
+  // #region agent log
+  if (isResetPassword) {
+    fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'middleware.ts:87',message:'Middleware executed for reset-password',data:{pathname,url:req.url,method:req.method},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+  }
+  // #endregion
+
   // DEBUG: Log para rutas de reset-password
   if (isResetPassword) {
     console.log('[Middleware] ========== PROCESANDO RESET-PASSWORD ==========')
@@ -101,6 +107,11 @@ export async function middleware(req: NextRequest) {
   // Esto debe ser lo PRIMERO que se ejecute, antes de cualquier otra lógica
   // Incluye todas las subrutas como /auth/reset-password/[token]
   if (pathname.startsWith("/auth")) {
+    // #region agent log
+    if (isResetPassword) {
+      fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'middleware.ts:103',message:'Middleware bypassing /auth route',data:{pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    }
+    // #endregion
     if (isResetPassword) {
       console.log('[Middleware] Ruta /auth detectada - Bypass inmediato (NO debería ejecutarse por matcher)')
       console.log('[Middleware] ========== BYPASS RESET-PASSWORD ==========')

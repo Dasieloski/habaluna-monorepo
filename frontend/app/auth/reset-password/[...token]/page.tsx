@@ -1,8 +1,6 @@
-// LOG CRÍTICO: Verificar que el módulo se carga
-console.log('[ResetPassword] ========== MÓDULO CARGADO ==========')
-console.log('[ResetPassword] Timestamp carga módulo:', new Date().toISOString())
-console.log('[ResetPassword] Entorno:', process.env.NODE_ENV)
-console.log('[ResetPassword] ====================================')
+// #region agent log
+fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:2',message:'Módulo cargado',data:{nodeEnv:process.env.NODE_ENV,hasApiUrl:!!process.env.NEXT_PUBLIC_API_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+// #endregion
 
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
@@ -64,6 +62,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ResetPasswordPage({ params }: PageProps) {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:66',message:'PAGE function entry',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   console.log('[ResetPassword] [PAGE] ========== INICIO RENDERIZADO ==========')
   console.log('[ResetPassword] [PAGE] Timestamp:', new Date().toISOString())
   
@@ -79,6 +80,9 @@ export default async function ResetPasswordPage({ params }: PageProps) {
       ? resolvedParams.token.join('/') 
       : resolvedParams.token || ''
     
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:78',message:'Params resolved',data:{tokenLength:token?.length,tokenPreview:token?.substring(0,20),isArray:Array.isArray(resolvedParams.token),tokenArrayLength:Array.isArray(resolvedParams.token)?resolvedParams.token.length:0,paramsTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     console.log('[ResetPassword] [PAGE] Paso 1 COMPLETADO - Params resueltos en', paramsTime, 'ms:', {
       token: token?.substring(0, 20) + '...',
       tokenLength: token?.length,
@@ -100,16 +104,25 @@ export default async function ResetPasswordPage({ params }: PageProps) {
     
     // Validación exhaustiva del token
     if (!token) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:102',message:'Token validation failed - null/undefined',data:{token},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
       console.error('[ResetPassword] [PAGE] Paso 2 ERROR - Token es null/undefined')
       notFound()
     }
     
     if (typeof token !== "string") {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:107',message:'Token validation failed - not string',data:{tokenType:typeof token,token},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
       console.error('[ResetPassword] [PAGE] Paso 2 ERROR - Token no es string:', typeof token)
       notFound()
     }
     
     if (token.trim() === "") {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:112',message:'Token validation failed - empty after trim',data:{token},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
       console.error('[ResetPassword] [PAGE] Paso 2 ERROR - Token está vacío después de trim')
       notFound()
     }
@@ -186,11 +199,17 @@ export default async function ResetPasswordPage({ params }: PageProps) {
     })
     
     const component = <ResetPasswordClient token={decodedToken} />
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:188',message:'Component rendered successfully',data:{decodedTokenLength:decodedToken?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     console.log('[ResetPassword] [PAGE] Paso 6 COMPLETADO - Componente creado')
     console.log('[ResetPassword] [PAGE] ========== FIN RENDERIZADO EXITOSO ==========')
     
     return component
   } catch (error: any) {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/fbde7859-a93a-4806-9ce5-38d24ca3ebd9',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page.tsx:193',message:'PAGE function error',data:{errorMessage:error?.message,errorName:error?.name,errorStack:error?.stack?.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
     console.error('[ResetPassword] [PAGE] ========== ERROR CRÍTICO ==========')
     console.error('[ResetPassword] [PAGE] Error:', {
       message: error?.message,
