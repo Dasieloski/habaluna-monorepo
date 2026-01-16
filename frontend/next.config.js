@@ -78,8 +78,7 @@ const nextConfig = {
     // Tamaños de imagen para responsive (optimizados para mejor LCP)
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Calidad de compresión optimizada (75-85 para balance calidad/tamaño)
-    quality: 80,
+    // Cache TTL para mejor rendimiento
     minimumCacheTTL: 31536000, // 1 año para mejor caching
     // Deshabilitar optimización solo para imágenes específicas (data URLs, etc)
     dangerouslyAllowSVG: true,
@@ -87,8 +86,6 @@ const nextConfig = {
   },
   // Compresión y optimización
   compress: true,
-  // Optimización de producción
-  swcMinify: true,
   // Reducir tamaño del bundle
   webpack: (config, { isServer }) => {
     if (!isServer) {
