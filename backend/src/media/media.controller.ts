@@ -20,11 +20,11 @@ export class MediaController {
   })
   async getById(
     @Param('id') id: string,
+    @Res() res: Response,
     @Query('w') width?: string,
     @Query('h') height?: string,
     @Query('q') quality?: string,
     @Query('format') format?: string,
-    @Res() res: Response,
   ) {
     const media = await this.mediaService.getById(id);
     if (!media) {
