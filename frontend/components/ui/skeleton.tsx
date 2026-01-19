@@ -5,8 +5,9 @@ import * as React from 'react';
 
 interface SkeletonProps extends React.ComponentProps<'div'> {
   /**
-   * Si es true, activa una animación (pulso suave)
-   * Por defecto: false (más fino y discreto)
+   * Si es true, activa animación de pulso en el skeleton.
+   * Por defecto: true (feedback visual durante carga).
+   * Para desactivar: <Skeleton enableShimmer={false} />
    */
   enableShimmer?: boolean;
 }
@@ -24,12 +25,11 @@ interface SkeletonProps extends React.ComponentProps<'div'> {
  * 
  * Para desactivar shimmer: <Skeleton enableShimmer={false} />
  */
-function Skeleton({ className, enableShimmer = false, ...props }: SkeletonProps) {
+function Skeleton({ className, enableShimmer = true, ...props }: SkeletonProps) {
   return (
     <div
       data-slot="skeleton"
       className={cn(
-        // Estilo más sutil y consistente en todo el sitio
         'rounded-md bg-muted/60',
         enableShimmer && 'animate-pulse',
         className,

@@ -5,9 +5,9 @@ import Image from "next/image"
 
 export function Footer() {
   return (
-    <footer className="bg-background border-t border-border">
+    <footer className="bg-muted/30 border-t border-border">
       {/* Main footer */}
-      <div className="py-12">
+      <div className="pt-12 pb-10">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             {/* Logo and language */}
@@ -107,7 +107,7 @@ export function Footer() {
                   { label: "PayPal", icon: "/payments/paypal.svg", w: 52, h: 16 },
                   { label: "Apple Pay", icon: "/payments/applepay.svg", w: 56, h: 16 },
                 ].map((m) => (
-                  <div key={m.label} className="bg-muted px-3 py-2 rounded-lg flex items-center gap-2">
+                  <div key={m.label} className="bg-white border border-border px-3 py-2 rounded-lg flex items-center gap-2 transition-colors hover:border-sky-200 hover:bg-sky-50/50">
                     <Image 
                       src={m.icon} 
                       alt={m.label} 
@@ -127,7 +127,7 @@ export function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-border py-5">
+      <div className="border-t border-border pt-6 pb-5">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
             <div className="flex flex-wrap items-center justify-center gap-5">

@@ -127,12 +127,8 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
           {displayBanners.map((banner, index) => (
             <div
               key={banner.id}
-              className={`absolute inset-0 transition-all duration-500 ease-out ${
-                index === currentSlide
-                  ? "opacity-100 translate-x-0"
-                  : index < currentSlide
-                    ? "opacity-0 -translate-x-full"
-                    : "opacity-0 translate-x-full"
+              className={`absolute inset-0 transition-opacity duration-300 ease-out ${
+                index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
               }`}
             >
               <div className="relative h-full min-h-[450px] md:min-h-[550px]">
@@ -148,13 +144,13 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                   />
                 )}
                 {/* Overlay sutil */}
-                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
 
                 <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12">
                   <div className="max-w-xl">
                     <h1
                       className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-4 tracking-tight leading-tight drop-shadow-lg"
-                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                      style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
                     >
                       {banner.title}
                     </h1>
@@ -190,7 +186,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                 aria-label={`Ir a slide ${index + 1}`}
                 aria-current={index === currentSlide ? "true" : "false"}
                 className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide ? "bg-white w-6 md:w-8" : "bg-white/50 hover:bg-white/70"
+                  index === currentSlide ? "bg-white w-6 md:w-8 scale-110" : "bg-white/50 hover:bg-white/70"
                 }`}
               />
             ))}

@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { motion, type HTMLMotionProps } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
@@ -12,8 +13,9 @@ const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
-      variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        variant: {
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80',
+        cta: 'bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 shadow-md hover:shadow-lg',
         destructive:
           'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
         outline:
@@ -47,6 +49,12 @@ interface ButtonProps extends React.ComponentProps<'button'>, VariantProps<typeo
    * Por defecto: true
    */
   enableAnimations?: boolean;
+  /**
+   * Muestra spinner y deshabilita el botón. No se aplica cuando asChild.
+   */
+  loading?: boolean;
+  /** Texto junto al spinner cuando loading (ej. "Añadiendo…"). Si no se pasa, solo se muestra el spinner. */
+  loadingText?: string;
 }
 
 /**
@@ -65,36 +73,65 @@ function Button({
   size,
   asChild = false,
   enableAnimations = true,
+  loading = false,
+  loadingText,
+  children,
+  disabled,
   ...props
 }: ButtonProps) {
-  const Comp = asChild ? Slot : 'button';
   const prefersReducedMotion = useReducedMotion();
+  const isDisabled = disabled || loading;
+  const content = loading
+    ? (
+        <>
+          <Loader2 className="size-4 animate-spin" aria-hidden />
+          {loadingText != null ? <span>{loadingText}</span> : null}
+        </>
+      )
+    : children;
 
-  // Si no hay animaciones, es asChild, o el usuario prefiere movimiento reducido
-  if (!enableAnimations || asChild || prefersReducedMotion) {
+  // asChild: Slot no soporta loading; pasamos children tal cual
+  if (asChild) {
     return (
-      <Comp
+      <Slot
         data-slot="button"
         className={cn(buttonVariants({ variant, size, className }))}
         {...props}
-      />
+      >
+        {children}
+      </Slot>
     );
   }
 
-  // Microinteracciones: hover y click sutil
-  const buttonMotionProps: HTMLMotionProps<'button'> = {
-    whileHover: { scale: 1.02 },
-    whileTap: { scale: 0.98 },
-    transition: { duration: 0.15, ease: 'easeOut' },
-  };
+  // Sin animaciones o movimiento reducido: button estático
+  if (!enableAnimations || prefersReducedMotion) {
+    return (
+      <button
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        disabled={isDisabled}
+        {...props}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  // Con animaciones: motion.button (hover/tap); no aplicar cuando loading
+  const buttonMotionProps: HTMLMotionProps<'button'> = loading
+    ? {}
+    : { whileHover: { scale: 1.02 }, whileTap: { scale: 0.98 }, transition: { duration: 0.15, ease: 'easeOut' } };
 
   return (
     <motion.button
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={isDisabled}
       {...buttonMotionProps}
       {...(props as any)}
-    />
+    >
+      {content}
+    </motion.button>
   );
 }
 

@@ -80,7 +80,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         data-slot="input"
         className={baseClasses}
         initial={false}
-        whileFocus={{ scale: 1.01 }}
+        whileFocus={{ scale: 1.005 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
         {...(props as any)}
       />

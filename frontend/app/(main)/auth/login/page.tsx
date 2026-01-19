@@ -8,8 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { api } from "@/lib/api"
 import { useAuthStore } from "@/lib/store/auth-store"
-import { Eye, EyeOff } from "lucide-react"
+import { AlertCircle, Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
 
 const loginSchema = z.object({
   email: z.string().email("Ese correo no parece válido 📧"),
@@ -69,7 +70,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 to-white">
       {/* Breadcrumbs */}
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -91,12 +92,15 @@ export default function LoginPage() {
           </div>
 
           {/* Form Card */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 shadow-sm">
-            <h2 className="text-lg font-semibold text-foreground mb-6">Acceder</h2>
+          <div className="bg-white border border-sky-100 rounded-xl p-6 md:p-8 shadow-lg">
+            <h2 className="text-xl font-semibold text-foreground mb-6">Acceder</h2>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{error}</div>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
               )}
 
               {/* Email */}
@@ -157,13 +161,15 @@ export default function LoginPage() {
               </div>
 
               {/* Submit Button */}
-              <button
+              <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                loading={isSubmitting}
+                loadingText="Iniciando sesión…"
+                className="w-full py-3.5 h-12 bg-black text-white font-medium rounded-lg hover:bg-gray-800"
               >
-                {isSubmitting ? "Iniciando sesión..." : "Continuar"}
-              </button>
+                Continuar
+              </Button>
 
               {/* Register link */}
               <p className="text-center text-sm text-muted-foreground pt-2">

@@ -27,6 +27,8 @@ interface EmptyStateProps {
    * Por defecto: true
    */
   enableAnimations?: boolean;
+  /** Variante visual: cart (sky-400), search (muted), orders, default. */
+  variant?: 'cart' | 'search' | 'orders' | 'default';
   className?: string;
 }
 
@@ -48,21 +50,25 @@ interface EmptyStateProps {
  * 
  * Para desactivar animaciones: <EmptyState enableAnimations={false} />
  */
+const iconColorMap = { cart: 'text-sky-400', search: 'text-muted-foreground/60', orders: 'text-sky-400', default: 'text-gray-300' } as const
+
 export function EmptyState({
   icon,
   title,
   description,
   action,
   enableAnimations = true,
+  variant = 'default',
   className,
 }: EmptyStateProps) {
   const prefersReducedMotion = useReducedMotion();
   const shouldAnimate = enableAnimations && !prefersReducedMotion;
+  const iconColor = iconColorMap[variant]
 
   if (!shouldAnimate) {
     return (
       <div className={cn('flex flex-col items-center justify-center px-4 py-12 text-center', className)}>
-        {icon && <div className="mb-6 text-gray-300">{icon}</div>}
+        {icon && <div className={cn('mb-6', iconColor)}>{icon}</div>}
         <h2 className={cn('text-2xl font-semibold text-gray-800 mb-2')}>{title}</h2>
         {description && <p className="text-gray-500 mb-6 max-w-md">{description}</p>}
         {action && <div>{action}</div>}
@@ -82,7 +88,7 @@ export function EmptyState({
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.1, type: 'spring', stiffness: 200 }}
-          className="mb-6 text-gray-300"
+          className={cn('mb-6', iconColor)}
         >
           {icon}
         </motion.div>

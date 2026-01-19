@@ -203,7 +203,7 @@ export function Header() {
           isHidden ? "-translate-y-full" : "translate-y-0"
         }`}
       >
-      <div className="bg-linear-to-r from-sky-100 to-blue-100 text-foreground text-xs md:text-sm py-2.5 text-center">
+      <div className="bg-sky-100 border-b border-sky-200 text-foreground text-xs md:text-sm py-2.5 text-center">
         <p className="animate-fade-in">{ui.announcement}</p>
       </div>
 
@@ -258,7 +258,7 @@ export function Header() {
                   <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-border/50 overflow-hidden animate-fade-in-up z-50">
                     {authed && user ? (
                       <>
-                        <div className="p-4 bg-linear-to-r from-sky-50 to-blue-50 border-b border-border/30">
+                        <div className="p-4 bg-gradient-to-r from-sky-50 to-blue-50 border-b border-border/30">
                           <p className="text-sm font-medium text-foreground">
                             {user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.email}
                           </p>
@@ -351,7 +351,7 @@ export function Header() {
                       </>
                     ) : (
                       <>
-                        <div className="p-4 bg-linear-to-r from-sky-50 to-blue-50 border-b border-border/30">
+                        <div className="p-4 bg-gradient-to-r from-sky-50 to-blue-50 border-b border-border/30">
                           <p className="text-sm font-medium text-foreground">Mi cuenta</p>
                           <p className="text-xs text-muted-foreground mt-0.5">Accede o crea tu cuenta</p>
                         </div>
@@ -441,30 +441,35 @@ export function Header() {
         <nav className="hidden md:block border-t border-border/30">
           <div className="container mx-auto px-4">
             <ul className="flex items-center justify-center gap-1">
-              {navItems.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="flex items-center gap-1.5 px-5 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 hover:bg-secondary"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
+              {navItems.map((item) => {
+                const itemCategoryId = (item.href.match(/categoryId=([^&]+)/) || [])[1]
+                const currentCategoryId = searchParams?.get("categoryId") ?? null
+                const isActive = pathname === "/products" && currentCategoryId != null && itemCategoryId === currentCategoryId
+                return (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className={`flex items-center gap-1.5 px-5 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 hover:bg-secondary ${isActive ? "font-semibold text-sky-600 bg-sky-100" : ""}`}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </div>
         </nav>
       </div>
 
-      <div className="relative z-10 bg-linear-to-r from-sky-50 via-blue-50 to-sky-50 py-2.5 md:py-3 border-b border-sky-100">
+      <div className="relative z-10 bg-gradient-to-r from-sky-50 via-blue-50 to-sky-50 py-2.5 md:py-3 border-b border-sky-100">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-start md:justify-center gap-4 md:gap-12 text-[11px] md:text-sm overflow-x-auto scrollbar-hide">
             <div
               className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap text-sky-700 animate-fade-in shrink-0"
               style={{ animationDelay: "0.1s" }}
             >
-              <TruckIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-              <span className="font-medium">{ui.highlights[0]}</span>
+              <TruckIcon className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
+              <span className="font-semibold">{ui.highlights[0]}</span>
             </div>
             <div
               className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap text-sky-700 animate-fade-in shrink-0"

@@ -62,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" className={poppins.variable}>
       <head>
         {/* Preconnect para mejorar LCP */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -25,7 +25,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-sky-50 to-white">
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -55,9 +55,9 @@ export default function Error({
             <RefreshCw className="mr-2 h-4 w-4" />
             Intentar de nuevo
           </Button>
-          <Button onClick={() => window.location.href = '/'} className="w-full sm:w-auto">
+          <Button onClick={() => window.location.href = '/'} variant="cta" className="w-full sm:w-auto">
             <Home className="mr-2 h-4 w-4" />
-            Ir al inicio
+            Volver al inicio
           </Button>
         </CardFooter>
       </Card>

@@ -65,7 +65,7 @@ export function OptimizedImage({
   // Si hay error, mostrar placeholder
   if (hasError || !imgSrc) {
     return (
-      <div className={`flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200 ${className}`}>
+      <div className={`flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 ${className}`}>
         <div className="text-center p-4">
           <svg
             className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 text-gray-400"
@@ -160,7 +160,7 @@ export function OptimizedImg({
 
   if (!imgSrc || hasError) {
     return (
-      <div className={`flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200 ${className}`}>
+      <div className={`flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 ${className}`}>
         <div className="text-center p-4">
           <svg
             className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 text-gray-400"

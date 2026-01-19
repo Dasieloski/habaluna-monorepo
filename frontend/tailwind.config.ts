@@ -13,6 +13,7 @@ const config = {
     container: {
       center: true,
       padding: '2rem',
+      maxWidth: '80rem',
       screens: {
         '2xl': '1400px',
       },
@@ -58,6 +59,11 @@ const config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        'habaluna-coral': 'var(--habaluna-coral)',
+        'habaluna-yellow': 'var(--habaluna-yellow)',
+        'habaluna-mint': 'var(--habaluna-mint)',
+        'habaluna-blue': 'var(--habaluna-blue)',
+        'habaluna-blue-dark': 'var(--habaluna-blue-dark)',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -79,8 +85,8 @@ const config = {
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-poppins)', 'Poppins', 'system-ui', 'sans-serif'],
+        display: ["'Londrina Shadow'", 'cursive'],
       },
     },
   },

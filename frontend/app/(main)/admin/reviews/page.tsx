@@ -200,7 +200,7 @@ export default function AdminReviewsPage() {
           <p className="text-muted-foreground mt-1">Aprueba, edita o elimina reseñas de productos</p>
         </div>
         <Button
-          className="bg-linear-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg"
+          className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg"
           onClick={() => setCreateOpen(true)}
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -245,7 +245,7 @@ export default function AdminReviewsPage() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-primary to-habaluna-blue-dark rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-habaluna-blue-dark rounded-xl flex items-center justify-center">
                 <MessageSquare className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -259,7 +259,7 @@ export default function AdminReviewsPage() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
                 <CheckCircle2 className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -273,7 +273,7 @@ export default function AdminReviewsPage() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center">
                 <Clock className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -287,7 +287,7 @@ export default function AdminReviewsPage() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-habaluna-coral to-orange-400 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-habaluna-coral to-orange-400 rounded-xl flex items-center justify-center">
                 <Star className="w-5 h-5 text-white" />
               </div>
               <div>

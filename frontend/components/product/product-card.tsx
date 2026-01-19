@@ -60,9 +60,9 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
   const currentImage = isHovered && normalizedImages[1] ? secondImage : firstImage
 
   const badgeColors = {
-    coral: "bg-gradient-to-r from-orange-400 to-red-400 text-white",
+    coral: "bg-gradient-to-r from-habaluna-coral to-orange-400 text-white",
     blue: "bg-gradient-to-r from-sky-400 to-blue-500 text-white",
-    mint: "bg-gradient-to-r from-teal-400 to-cyan-400 text-white",
+    mint: "bg-gradient-to-r from-habaluna-mint to-cyan-400 text-white",
   }
 
   if (prefersReducedMotion) {
@@ -74,8 +74,8 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border/50 bg-linear-to-b from-gray-50 via-white to-white transition-shadow duration-300 hover:shadow-xl">
-            <div className="aspect-square relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100">
+          <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border/50 bg-gradient-to-b from-gray-50 via-white to-white shadow-sm transition-shadow duration-300 hover:shadow-xl">
+            <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
               <SmartImage
                 src={currentImage}
                 alt={product.name}
@@ -252,8 +252,8 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border/50 bg-linear-to-b from-gray-50 via-white to-white transition-shadow duration-300 hover:shadow-xl">
-        <div className="aspect-square relative overflow-hidden bg-linear-to-br from-gray-50 to-gray-100">
+        <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border/50 bg-gradient-to-b from-gray-50 via-white to-white shadow-sm transition-shadow duration-300 hover:shadow-xl">
+        <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
           <SmartImage
             src={currentImage}
             alt={product.name}
@@ -275,7 +275,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             onClick={(e) => {
               e.preventDefault()
               if (!isAuthenticated()) {
-                toast({ title: "Inicia sesión", description: "Para guardar productos en tu wishlist.", variant: "destructive" })
+                toast({ title: "¡Entra primero! 🔐", description: "Inicia sesión para guardar en tu wishlist.", variant: "destructive" })
                 return
               }
               toggleWishlist(product.id).catch((err: any) => {
@@ -358,9 +358,9 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             </div>
           )}
           <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
-            <span className="text-sm md:text-lg font-bold text-foreground">${price.toFixed(2)}</span>
+            <span className="text-base md:text-lg font-bold text-sky-600">${price.toFixed(2)}</span>
             {hasDiscount && (
-              <span className="text-[10px] md:text-sm text-muted-foreground line-through">
+              <span className="text-sm text-muted-foreground line-through">
                 ${comparePrice!.toFixed(2)}
               </span>
             )}

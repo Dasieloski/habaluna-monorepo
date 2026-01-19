@@ -106,13 +106,14 @@ export default async function Home() {
         viewAllLink="/products?filter=offers"
         badgeType="sale"
         autoSlide={true}
+        className="pt-12 md:pt-16"
       />
 
       {/* Category Cards */}
       <CategoryGrid categories={displayCategories} variant="cards" />
 
       {/* Top Sales */}
-      <TopSales products={allProducts.slice(0, 5)} />
+      <TopSales products={allProducts.slice(0, 5)} className="pb-16 md:pb-24" />
 
       {/* More Products */}
       <ProductCarousel
@@ -120,6 +121,7 @@ export default async function Home() {
         products={(featuredProducts.length > 0 ? featuredProducts : allProducts).slice(0, 8)}
         viewAllLink="/products?filter=top"
         badgeType="personalized"
+        className="pt-16 md:pt-20"
       />
 
       {/* Circle Categories */}

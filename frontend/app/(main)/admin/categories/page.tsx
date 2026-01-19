@@ -329,7 +329,7 @@ function CategoriesContent() {
                 e.preventDefault()
                 confirmDelete("move_products_to_uncategorized")
               }}
-              className="w-full sm:flex-1 sm:min-w-64 whitespace-normal text-center leading-snug bg-linear-to-r from-primary to-habaluna-blue-dark text-primary-foreground"
+              className="w-full sm:flex-1 sm:min-w-64 whitespace-normal text-center leading-snug bg-gradient-to-r from-primary to-habaluna-blue-dark text-primary-foreground"
               disabled={!deleteTarget || !!isDeletingId}
             >
               {isDeletingId ? "Procesando..." : "Eliminar y mover a “Sin categoría”"}
@@ -339,7 +339,7 @@ function CategoriesContent() {
                 e.preventDefault()
                 confirmDelete("delete_with_products")
               }}
-              className="w-full sm:flex-1 sm:min-w-64 whitespace-normal text-center leading-snug bg-linear-to-r from-destructive to-habaluna-coral text-destructive-foreground"
+              className="w-full sm:flex-1 sm:min-w-64 whitespace-normal text-center leading-snug bg-gradient-to-r from-destructive to-habaluna-coral text-destructive-foreground"
               disabled={!deleteTarget || !!isDeletingId}
             >
               {isDeletingId ? "Procesando..." : "Eliminar categoría y productos"}
@@ -358,7 +358,7 @@ function CategoriesContent() {
           <DialogTrigger asChild>
             <Button
               onClick={openNewDialog}
-              className="bg-linear-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg"
+              className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg"
             >
               <Plus className="w-4 h-4 mr-2" />
               Nueva categoría
@@ -547,7 +547,7 @@ function CategoriesContent() {
                       type="button"
                       onClick={assignSelectedProducts}
                       disabled={isAssigning || selectedProductIds.length === 0}
-                      className="bg-linear-to-r from-primary to-habaluna-blue-dark text-primary-foreground"
+                      className="bg-gradient-to-r from-primary to-habaluna-blue-dark text-primary-foreground"
                     >
                       {isAssigning ? "Asociando..." : "Asociar seleccionados"}
                     </Button>
@@ -617,7 +617,7 @@ function CategoriesContent() {
                       type="button"
                       onClick={removeSelectedProducts}
                       disabled={isRemoving || removeSelectedProductIds.length === 0}
-                      className="bg-linear-to-r from-destructive to-habaluna-coral text-destructive-foreground"
+                      className="bg-gradient-to-r from-destructive to-habaluna-coral text-destructive-foreground"
                     >
                       {isRemoving ? "Quitando..." : "Quitar seleccionados"}
                     </Button>
@@ -632,7 +632,7 @@ function CategoriesContent() {
               <Button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="bg-linear-to-r from-primary to-habaluna-blue-dark text-primary-foreground"
+                className="bg-gradient-to-r from-primary to-habaluna-blue-dark text-primary-foreground"
               >
                 {isSaving ? "Guardando..." : editingCategory ? "Guardar cambios" : "Crear categoría"}
               </Button>
@@ -646,7 +646,7 @@ function CategoriesContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-primary to-habaluna-blue-dark rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-habaluna-blue-dark rounded-xl flex items-center justify-center">
                 <FolderTree className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -659,7 +659,7 @@ function CategoriesContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-habaluna-mint to-teal-400 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-habaluna-mint to-teal-400 rounded-xl flex items-center justify-center">
                 <Package className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -674,7 +674,7 @@ function CategoriesContent() {
         <Card className="border-0 shadow-md col-span-2 lg:col-span-1">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-linear-to-br from-habaluna-yellow to-amber-400 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-habaluna-yellow to-amber-400 rounded-xl flex items-center justify-center">
                 <Package className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -728,7 +728,7 @@ function CategoriesContent() {
           >
             <CardContent className="p-5">
               <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 bg-linear-to-br from-primary/20 to-habaluna-blue-dark/20 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-habaluna-blue-dark/20 rounded-xl flex items-center justify-center">
                   <FolderTree className="w-6 h-6 text-primary" />
                 </div>
                 <div className="flex gap-1">

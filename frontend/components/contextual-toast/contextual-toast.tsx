@@ -163,8 +163,8 @@ function SimpleToast({
       <motion.div
         className={`rounded-xl border px-4 py-3 shadow-lg ${
           isError
-            ? 'border-red-200 bg-red-50 text-red-900'
-            : 'border-sky-200 bg-white text-foreground'
+            ? 'border-l-4 border-l-red-400 border-red-200 bg-red-50 text-red-900'
+            : 'border-l-4 border-l-sky-400 border-sky-200 bg-white text-foreground'
         }`}
         animate={isError ? { x: [0, -6, 6, -4, 4, 0] } : {}}
         transition={isError ? { duration: 0.4 } : {}}

@@ -26,9 +26,11 @@ interface Product {
 
 interface TopSalesProps {
   products: Product[]
+  /** Para ritmo vertical (ej. pb-16 md:pb-24). */
+  className?: string
 }
 
-export function TopSales({ products }: TopSalesProps) {
+export function TopSales({ products, className }: TopSalesProps) {
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
@@ -102,13 +104,13 @@ export function TopSales({ products }: TopSalesProps) {
   const getComparePrice = (product: Product) => toNumber(product.variants?.[0]?.comparePriceUSD ?? product.comparePriceUSD)
 
   return (
-    <section ref={sectionRef} className="py-10 md:py-16 bg-linear-to-br from-sky-50 via-blue-50 to-cyan-50">
+    <section ref={sectionRef} className={`py-10 md:py-16 bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50 ${className ?? ""}`}>
       <div className="container mx-auto px-4">
         {/* Header */}
         <div
           className={`flex items-center justify-between mb-6 md:mb-8 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
         >
-          <h2 className="text-xl md:text-3xl font-bold text-foreground">Top Ventas</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-foreground">Top Ventas</h2>
           <Link
             href="/products?filter=top"
             className="px-4 md:px-5 py-2 md:py-2.5 bg-sky-500 text-white text-xs md:text-sm font-semibold rounded-xl hover:bg-sky-600 transition-all duration-300 hover:scale-105 shadow-lg shadow-sky-200"

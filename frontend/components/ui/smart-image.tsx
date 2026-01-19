@@ -33,7 +33,7 @@ function ImageSkeleton({
   return (
     <div
       className={cn(
-        "relative overflow-hidden bg-linear-to-br from-gray-100 via-gray-50 to-gray-100",
+        "relative overflow-hidden bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100",
         "animate-pulse",
         className
       )}
@@ -91,7 +91,7 @@ function PlaceholderError({ className, fill, aspectRatio, width, height }: {
   return (
     <div
       className={cn(
-        "flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200",
+        "flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200",
         className
       )}
       style={

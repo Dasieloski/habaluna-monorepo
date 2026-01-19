@@ -24,6 +24,8 @@ interface ProductCarouselProps {
   viewAllLink?: string
   badgeType?: "bestseller" | "new" | "sale" | "personalized"
   autoSlide?: boolean
+  /** Para ritmo vertical (ej. pt-12 md:pt-16 o pt-16 md:pt-20). */
+  className?: string
 }
 
 // Eliminadas imágenes estáticas - solo usar imágenes de la BD o placeholder
@@ -57,7 +59,8 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
           if (scrollLeft + clientWidth >= scrollWidth - 10) {
             scrollRef.current.scrollTo({ left: 0, behavior: "smooth" })
           } else {
-            scrollRef.current.scrollBy({ left: 200, behavior: "smooth" })
+            const amount = clientWidth >= 768 ? 250 : 170
+            scrollRef.current.scrollBy({ left: amount, behavior: "smooth" })
           }
         }
       }, 4000)
@@ -93,16 +96,16 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
 
   return (
     <section
-      className={`py-8 md:py-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+      className={`py-8 md:py-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${className ?? ""}`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6 md:mb-8">
-          <h2 className="text-xl md:text-3xl font-bold text-foreground">{title}</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-foreground">{title}</h2>
           {viewAllLink && (
             <Link
               href={viewAllLink}
               aria-label={`Ver todos los productos de ${title}`}
-              className="text-xs md:text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors flex items-center gap-1 group"
+              className="text-xs md:text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors flex items-center gap-1 group relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left"
             >
               Ver todo
               <ChevronRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -137,7 +140,7 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
                   key={product.id}
                   className="flex-shrink-0 w-[160px] md:w-[240px] transition-all duration-500"
                   style={{
-                    animationDelay: `${index * 0.1}s`,
+                    transitionDelay: `${index < 5 ? index * 0.08 : 0.35 + (index - 5) * 0.02}s`,
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? "translateY(0)" : "translateY(20px)",
                   }}

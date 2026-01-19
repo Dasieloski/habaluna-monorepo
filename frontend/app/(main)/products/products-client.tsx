@@ -188,9 +188,10 @@ export default function ProductsClient() {
           </AnimatedList>
         ) : pagedProducts.length === 0 ? (
           <EmptyState
+            variant="search"
             icon={
               <svg
-                className="w-16 h-16 text-gray-300"
+                className="w-16 h-16"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

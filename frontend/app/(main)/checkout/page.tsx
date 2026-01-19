@@ -456,7 +456,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="lg:col-span-1">
-          <Card className="sticky top-24">
+          <Card className="sticky top-24 bg-sky-50/50 border-sky-100">
             <CardHeader>
               <CardTitle>Resumen del Pedido</CardTitle>
             </CardHeader>

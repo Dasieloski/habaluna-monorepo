@@ -223,8 +223,8 @@ export default function AdminTransportPage() {
           </CardContent>
         </Card>
 
-        <Button type="submit" disabled={saving}>
-          {saving ? "Guardando..." : "Guardar"}
+        <Button type="submit" disabled={saving} loading={saving} loadingText="Guardando…">
+          Guardar
         </Button>
       </form>
     </div>

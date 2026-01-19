@@ -49,7 +49,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
         <div className="container mx-auto px-4">
           {title && (
             <h2
-              className={`text-xl md:text-3xl font-bold text-foreground text-center mb-8 md:mb-10 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+              className={`text-2xl md:text-3xl font-semibold text-foreground text-center mb-8 md:mb-10 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
             >
               {title}
             </h2>
@@ -99,7 +99,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                 className={`group relative aspect-[3/4] md:aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
                 style={{
                   backgroundColor: colors[index % colors.length],
-                  transitionDelay: `${index * 0.1}s`,
+                  transitionDelay: `${index < 5 ? index * 0.08 : 0.35 + (index - 5) * 0.02}s`,
                 }}
               >
                 <SmartImage
@@ -137,7 +137,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               href={`/products?categoryId=${category.id}`}
               aria-label={`Ver productos de ${category.name}`}
               className={`group relative aspect-[4/5] md:aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-br from-sky-100 to-blue-100 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-              style={{ transitionDelay: `${index * 0.1}s` }}
+              style={{ transitionDelay: `${index < 5 ? index * 0.08 : 0.35 + (index - 5) * 0.02}s` }}
             >
               <SmartImage
                 src={getImageUrl(category.image) || "/placeholder.svg"}

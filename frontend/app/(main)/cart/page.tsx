@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react"
 import type { MouseEvent } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Minus, Plus, Trash2, ChevronDown, ChevronUp, Truck, Gift, ShoppingBag, AlertTriangle } from "lucide-react"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useAuthStore } from "@/lib/store/auth-store"
@@ -168,6 +167,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <EmptyState
+        variant="cart"
         icon={<ShoppingBag className="h-24 w-24" strokeWidth={1} />}
         title="Tu carrito está vacío"
         description="Añade algunos productos para empezar"
@@ -224,7 +224,7 @@ export default function CartPage() {
         )}
 
         {/* Bloque de transporte */}
-        <div className="bg-white rounded-xl p-4 mb-6 flex items-center gap-4">
+        <div className="bg-white rounded-xl p-4 mb-6 flex items-center gap-4 border-l-4 border-sky-400">
           <div className="flex-1">
             {transportEstimate?.appliedRule ? (
               <p className="text-sm md:text-base text-gray-700">
@@ -242,7 +242,7 @@ export default function CartPage() {
             )}
           </div>
           <div className="flex-shrink-0 text-sky-500">
-            <Truck className="h-8 w-8" />
+            <Truck className="h-10 w-10" />
           </div>
         </div>
 
@@ -252,18 +252,18 @@ export default function CartPage() {
             {items.map((item) => {
               const price = Number(item.productVariant?.priceUSD ?? item.product.priceUSD ?? 0)
               const option = item.productVariant?.name || "Producto"
-              const image = item.product.images?.[0] || "/placeholder.svg"
+              const imageSrc = item.product.images?.[0] || "/placeholder.svg"
               return (
               <div key={item.id} className="bg-white rounded-xl p-4 md:p-6">
                 <div className="flex gap-4">
-                  {/* Imagen */}
-                  <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                    <Image
-                      src={image}
+                  {/* Imagen: SmartImage resuelve IDs de Media a /api/media/{id} */}
+                  <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 relative">
+                    <SmartImage
+                      src={imageSrc}
                       alt={item.product.name}
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="96px"
+                      objectFit="cover"
                     />
                   </div>
 
@@ -418,7 +418,7 @@ export default function CartPage() {
 
           {/* Panel Resumen */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl p-4 md:p-6 sticky top-24">
+            <div className="bg-sky-50/50 rounded-xl p-4 md:p-6 sticky top-24 border border-sky-100">
               <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Resumen</h2>
 
               <div className="space-y-3 mb-4">
