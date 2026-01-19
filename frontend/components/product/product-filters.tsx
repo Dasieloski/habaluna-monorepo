@@ -110,7 +110,8 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
     searchParams.get('maxPrice') ||
     searchParams.get('inStock') === 'true' ||
     searchParams.get('isFeatured') === 'true' ||
-    searchParams.get('sortBy');
+    searchParams.get('sortBy') ||
+    searchParams.get('filter') === 'combos';
 
   return (
     <div className="mb-6">
@@ -319,6 +320,17 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
               Destacados
               <button
                 onClick={() => updateFilter('isFeatured', null)}
+                className="hover:text-sky-900"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          )}
+          {searchParams.get('filter') === 'combos' && (
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm">
+              Combos
+              <button
+                onClick={() => updateFilter('filter', null)}
                 className="hover:text-sky-900"
               >
                 <X className="w-3 h-3" />

@@ -64,6 +64,7 @@ export default function ProductsClient() {
       if (searchParams.get('inStock') === 'true') filters.inStock = true;
       if (searchParams.get('isFeatured') === 'true') filters.isFeatured = true;
       if (searchParams.get('sortBy')) filters.sortBy = searchParams.get('sortBy');
+      if (searchParams.get('filter') === 'combos') filters.isCombo = true;
 
       const response = await api.getProducts(filters);
       const mapped = response.data.map(mapBackendProductToFrontend) as any[];
@@ -107,6 +108,7 @@ export default function ProductsClient() {
     searchParams.get('inStock'),
     searchParams.get('isFeatured'),
     searchParams.get('sortBy'),
+    searchParams.get('filter'),
   ]);
 
   // Cargar productos cuando cambian los filtros o la página
@@ -145,7 +147,9 @@ export default function ProductsClient() {
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-gray-400">Productos</span>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-foreground font-medium">Todos los productos</span>
+            <span className="text-foreground font-medium">
+              {searchParams.get('filter') === 'combos' ? 'Combos' : 'Todos los productos'}
+            </span>
           </nav>
         </div>
       </div>
@@ -153,7 +157,7 @@ export default function ProductsClient() {
       <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Title */}
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 md:mb-8">
-          Productos
+          {searchParams.get('filter') === 'combos' ? 'Combos' : 'Productos'}
         </h1>
 
         {/* Filtros */}
