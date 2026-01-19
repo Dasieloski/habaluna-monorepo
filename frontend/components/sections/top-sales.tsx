@@ -104,16 +104,16 @@ export function TopSales({ products, className }: TopSalesProps) {
   const getComparePrice = (product: Product) => toNumber(product.variants?.[0]?.comparePriceUSD ?? product.comparePriceUSD)
 
   return (
-    <section ref={sectionRef} className={`py-10 md:py-16 bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50 ${className ?? ""}`}>
+    <section ref={sectionRef} className={`py-10 md:py-16 bg-gradient-to-br from-[var(--habaluna-blue)] via-secondary to-[var(--habaluna-mint)] ${className ?? ""}`}>
       <div className="container mx-auto px-4">
         {/* Header */}
         <div
           className={`flex items-center justify-between mb-6 md:mb-8 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
         >
-          <h2 className="text-2xl md:text-3xl font-semibold text-foreground">Top Ventas</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-foreground leading-tight">Top Ventas</h2>
           <Link
             href="/products?filter=top"
-            className="px-4 md:px-5 py-2 md:py-2.5 bg-sky-500 text-white text-xs md:text-sm font-semibold rounded-xl hover:bg-sky-600 transition-all duration-300 hover:scale-105 shadow-lg shadow-sky-200"
+            className="px-4 md:px-5 py-2 md:py-2.5 bg-primary text-primary-foreground text-xs md:text-sm font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-primary/20"
           >
             Ver todo
           </Link>
@@ -160,7 +160,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                 </span>
               </div>
               <div className="p-4 md:p-5">
-                <h3 className="text-sm md:text-xl font-semibold text-foreground line-clamp-2 group-hover:text-sky-600 transition-colors">
+                <h3 className="text-sm md:text-xl font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                   {featuredProduct.name}
                 </h3>
                 <p className="text-base md:text-2xl font-bold text-foreground mt-2 md:mt-3">
@@ -209,7 +209,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                   </button>
                 </div>
                 <div className="p-3 md:p-4">
-                  <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 group-hover:text-sky-600 transition-colors">
+                  <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-1 md:gap-2 mt-1.5 md:mt-2">

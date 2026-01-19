@@ -104,7 +104,7 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 to-white">
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-sky-500 transition-colors">
@@ -118,11 +118,11 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
       <div className="container mx-auto px-4 py-8 md:py-16">
         <div className="max-w-lg mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Restablecer contraseña</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 leading-tight">Restablecer contraseña</h1>
             <p className="text-muted-foreground">El enlace es válido por 1 hora.</p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 shadow-sm">
+          <div className="bg-white border border-sky-100 rounded-xl p-6 md:p-8 shadow-lg">
             {isLoading ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">Cargando...</p>

@@ -80,10 +80,10 @@ export function BenefitsBar() {
                 className={`text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
                 style={{ transitionDelay: `${index * 0.15}s` }}
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 mb-5 text-sky-500 bg-sky-50 rounded-2xl transition-all duration-300 hover:scale-110 hover:bg-sky-100">
+                <div className="inline-flex items-center justify-center w-16 h-16 mb-5 text-primary bg-primary/10 rounded-2xl transition-all duration-300 hover:scale-110 hover:bg-primary/20">
                   <IconComponent className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground tracking-wider mb-3">{benefit.title}</h3>
+                <h3 className="text-xl font-semibold text-foreground tracking-wider mb-3 leading-tight">{benefit.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">{benefit.description}</p>
               </div>
             )

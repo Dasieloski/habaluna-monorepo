@@ -244,7 +244,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8 text-center">Finalizar compra</h1>
+      <h1 className="text-4xl font-bold mb-8 text-center leading-tight">Finalizar compra</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <div className="lg:col-span-2">
@@ -456,7 +456,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="lg:col-span-1">
-          <Card className="sticky top-24 bg-sky-50/50 border-sky-100">
+          <Card className="sticky top-24 bg-[var(--habaluna-blue)]/50 border-border">
             <CardHeader>
               <CardTitle>Resumen del Pedido</CardTitle>
             </CardHeader>

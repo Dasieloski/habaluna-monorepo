@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Bell, Search, User, LogOut, Settings, Menu, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 interface AdminHeaderProps {
   onMenuToggle?: () => void
@@ -63,6 +64,7 @@ export function AdminHeader({ onMenuToggle, isMenuOpen }: AdminHeaderProps) {
 
       {/* Right section */}
       <div className="flex items-center gap-2">
+        <ThemeToggle className="shrink-0" />
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="w-5 h-5 text-muted-foreground" />

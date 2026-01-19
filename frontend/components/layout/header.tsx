@@ -21,6 +21,8 @@ import {
   ShieldIcon,
   StarIcon,
 } from "@/components/icons/streamline-icons"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
+import Image from "next/image"
 
 export function Header() {
   const router = useRouter()
@@ -45,6 +47,7 @@ export function Header() {
 
   const [ui, setUi] = useState<{
     announcement: string
+    announcementVariant?: "default" | "promo"
     highlights: [string, string, string, string]
   }>({
     announcement: "Envíos a toda la Habana - Entrega rápida",
@@ -99,6 +102,7 @@ export function Header() {
         const highlights = Array.isArray((res as any)?.headerHighlights) ? (res as any).headerHighlights : []
         setUi({
           announcement: (res as any)?.headerAnnouncement || ui.announcement,
+          announcementVariant: (res as any)?.headerAnnouncementVariant === "promo" ? "promo" : "default",
           highlights: [
             String(highlights[0] || ui.highlights[0]),
             String(highlights[1] || ui.highlights[1]),
@@ -203,7 +207,13 @@ export function Header() {
           isHidden ? "-translate-y-full" : "translate-y-0"
         }`}
       >
-      <div className="bg-sky-100 border-b border-sky-200 text-foreground text-xs md:text-sm py-2.5 text-center">
+      <div
+        className={`border-b text-foreground text-xs md:text-sm py-2.5 text-center ${
+          ui.announcementVariant === "promo"
+            ? "bg-gradient-to-r from-amber-50/80 to-[var(--habaluna-blue)] dark:from-amber-950/30 dark:to-[var(--habaluna-blue)] border-amber-200 dark:border-amber-800"
+            : "bg-secondary border-border"
+        }`}
+      >
         <p className="animate-fade-in">{ui.announcement}</p>
       </div>
 
@@ -220,12 +230,14 @@ export function Header() {
             </button>
 
             <Link href="/" className="flex items-center group">
-              <span
-                className="text-3xl md:text-5xl tracking-wide text-sky-600 transition-transform duration-300 group-hover:scale-105"
-                style={{ fontFamily: "'Londrina Shadow', cursive" }}
-              >
-                Habaluna
-              </span>
+              <Image
+                src="/logo.svg"
+                alt="Habaluna"
+                width={160}
+                height={52}
+                className="h-9 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+                priority
+              />
             </Link>
 
             {/* Desktop Search */}
@@ -241,6 +253,7 @@ export function Header() {
 
             {/* Right icons */}
             <div className="flex items-center gap-1 md:gap-3">
+              <ThemeToggle className="shrink-0" />
               <button
                 className="md:hidden p-2.5 hover:bg-secondary rounded-xl transition-colors duration-300"
                 onClick={() => setSearchOpen(!searchOpen)}
@@ -258,7 +271,7 @@ export function Header() {
                   <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-border/50 overflow-hidden animate-fade-in-up z-50">
                     {authed && user ? (
                       <>
-                        <div className="p-4 bg-gradient-to-r from-sky-50 to-blue-50 border-b border-border/30">
+                        <div className="p-4 bg-gradient-to-r from-[var(--habaluna-blue)] to-secondary border-b border-border/30">
                           <p className="text-sm font-medium text-foreground">
                             {user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.email}
                           </p>
@@ -312,7 +325,7 @@ export function Header() {
                               onClick={() => setUserMenuOpen(false)}
                             >
                               <svg
-                                className="w-5 h-5 text-sky-600"
+                                className="w-5 h-5 text-primary"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -351,7 +364,7 @@ export function Header() {
                       </>
                     ) : (
                       <>
-                        <div className="p-4 bg-gradient-to-r from-sky-50 to-blue-50 border-b border-border/30">
+                        <div className="p-4 bg-gradient-to-r from-[var(--habaluna-blue)] to-secondary border-b border-border/30">
                           <p className="text-sm font-medium text-foreground">Mi cuenta</p>
                           <p className="text-xs text-muted-foreground mt-0.5">Accede o crea tu cuenta</p>
                         </div>
@@ -415,7 +428,7 @@ export function Header() {
               >
                 <CartIcon className="w-5 h-5" />
                 {mounted && cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 bg-sky-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 bg-accent text-accent-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
                     {cartCount > 99 ? "99+" : cartCount}
                 </span>
                 )}
@@ -449,7 +462,7 @@ export function Header() {
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-1.5 px-5 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 hover:bg-secondary ${isActive ? "font-semibold text-sky-600 bg-sky-100" : ""}`}
+                      className={`flex items-center gap-1.5 px-5 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 hover:bg-secondary ${isActive ? "font-semibold text-primary bg-primary/15" : ""}`}
                     >
                       {item.name}
                     </Link>
@@ -461,32 +474,32 @@ export function Header() {
         </nav>
       </div>
 
-      <div className="relative z-10 bg-gradient-to-r from-sky-50 via-blue-50 to-sky-50 py-2.5 md:py-3 border-b border-sky-100">
+      <div className="relative z-10 bg-gradient-to-r from-[var(--habaluna-blue)] via-secondary to-[var(--habaluna-blue)] py-2.5 md:py-3 border-b border-border">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-start md:justify-center gap-4 md:gap-12 text-[11px] md:text-sm overflow-x-auto scrollbar-hide">
+          <div className="flex items-center justify-start md:justify-center gap-4 md:gap-12 text-[11px] md:text-sm overflow-x-auto scrollbar-hide text-primary">
             <div
-              className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap text-sky-700 animate-fade-in shrink-0"
+              className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
               style={{ animationDelay: "0.1s" }}
             >
               <TruckIcon className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
               <span className="font-semibold">{ui.highlights[0]}</span>
             </div>
             <div
-              className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap text-sky-700 animate-fade-in shrink-0"
+              className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
               style={{ animationDelay: "0.2s" }}
             >
               <ReturnIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
               <span className="font-medium">{ui.highlights[1]}</span>
             </div>
             <div
-              className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap text-sky-700 animate-fade-in shrink-0"
+              className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
               style={{ animationDelay: "0.3s" }}
             >
               <ShieldIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
               <span className="font-medium">{ui.highlights[2]}</span>
             </div>
             <div
-              className="hidden lg:flex items-center gap-2 whitespace-nowrap text-sky-700 animate-fade-in shrink-0"
+              className="hidden lg:flex items-center gap-2 whitespace-nowrap animate-fade-in shrink-0"
               style={{ animationDelay: "0.4s" }}
             >
               <StarIcon className="w-5 h-5 shrink-0" />

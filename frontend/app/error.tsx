@@ -25,7 +25,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-sky-50 to-white">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-[var(--habaluna-blue)] to-background">
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center gap-2">

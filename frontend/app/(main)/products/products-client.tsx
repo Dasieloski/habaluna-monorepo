@@ -139,7 +139,7 @@ export default function ProductsClient() {
           <nav className="flex items-center gap-2 text-sm text-gray-500">
             <Link
               href="/"
-              className="hover:text-sky-600 transition-colors flex items-center gap-1"
+              className="hover:text-primary transition-colors flex items-center gap-1"
             >
               <Home className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Página de inicio</span>
@@ -156,7 +156,7 @@ export default function ProductsClient() {
 
       <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Title */}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 md:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 md:mb-8 leading-tight">
           {searchParams.get('filter') === 'combos' ? 'Combos' : 'Productos'}
         </h1>
 

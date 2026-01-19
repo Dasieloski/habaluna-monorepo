@@ -61,7 +61,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
 
   const badgeColors = {
     coral: "bg-gradient-to-r from-habaluna-coral to-orange-400 text-white",
-    blue: "bg-gradient-to-r from-sky-400 to-blue-500 text-white",
+    blue: "bg-gradient-to-r from-primary to-[var(--habaluna-blue-dark)] text-primary-foreground",
     mint: "bg-gradient-to-r from-habaluna-mint to-cyan-400 text-white",
   }
 
@@ -165,7 +165,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             </div>
 
             <div className="p-3 md:p-4">
-              <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 group-hover:text-sky-600 transition-colors">
+              <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 leading-relaxed group-hover:text-primary transition-colors">
                 {product.name}
               </h3>
               {product.averageRating && product.reviewCount && product.reviewCount > 0 && (
@@ -341,7 +341,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
         </div>
 
         <div className="p-3 md:p-4">
-          <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 group-hover:text-sky-600 transition-colors">
+          <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 leading-relaxed group-hover:text-primary transition-colors">
             {product.name}
           </h3>
           {product.averageRating && product.reviewCount && product.reviewCount > 0 && (
@@ -358,7 +358,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             </div>
           )}
           <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
-            <span className="text-base md:text-lg font-bold text-sky-600">${price.toFixed(2)}</span>
+            <span className="text-base md:text-lg font-bold text-primary">${price.toFixed(2)}</span>
             {hasDiscount && (
               <span className="text-sm text-muted-foreground line-through">
                 ${comparePrice!.toFixed(2)}

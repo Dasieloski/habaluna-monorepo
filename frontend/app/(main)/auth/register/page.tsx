@@ -81,7 +81,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 to-white">
       {/* Breadcrumbs */}
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -98,11 +98,11 @@ export default function RegisterPage() {
         <div className="max-w-xl mx-auto">
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Crear una cuenta cliente</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">Crear una cuenta cliente</h1>
           </div>
 
           {/* Form Card */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8 shadow-sm">
+          <div className="bg-white border border-sky-100 rounded-xl p-6 md:p-8 shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{error}</div>

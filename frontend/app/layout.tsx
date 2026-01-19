@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
-      // Fallback (some browsers still prefer PNG for tab icons)
+      { url: "/logo.svg", type: "image/svg+xml" },
       { url: "/uploads/logo.png", type: "image/png" },
     ],
     shortcut: "/icon.svg",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#e0f2fe",
+  themeColor: "#2D4581",
   width: "device-width",
   initialScale: 1,
 }

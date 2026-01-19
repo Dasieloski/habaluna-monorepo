@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { ProductCard } from "@/components/product/product-card"
 import Link from "next/link"
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons/streamline-icons"
@@ -95,17 +96,20 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
   }))
 
   return (
-    <section
-      className={`py-8 md:py-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${className ?? ""}`}
+    <motion.section
+      initial={{ opacity: 0, y: 28 }}
+      animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
+      transition={{ type: "spring", stiffness: 80, damping: 20 }}
+      className={`py-8 md:py-16 ${className ?? ""}`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6 md:mb-8">
-          <h2 className="text-2xl md:text-3xl font-semibold text-foreground">{title}</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-foreground leading-tight">{title}</h2>
           {viewAllLink && (
             <Link
               href={viewAllLink}
               aria-label={`Ver todos los productos de ${title}`}
-              className="text-xs md:text-sm font-semibold text-sky-600 hover:text-sky-700 transition-colors flex items-center gap-1 group relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left"
+              className="text-xs md:text-sm font-semibold text-primary hover:text-primary/90 transition-colors flex items-center gap-1 group relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left"
             >
               Ver todo
               <ChevronRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -152,6 +156,6 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   )
 }

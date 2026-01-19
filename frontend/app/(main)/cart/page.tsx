@@ -186,7 +186,7 @@ export default function CartPage() {
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         {/* Breadcrumbs */}
         <nav className="text-sm text-gray-500 mb-4 md:mb-6">
-          <Link href="/" className="hover:text-sky-600">
+          <Link href="/" className="hover:text-primary">
             Home
           </Link>
           <span className="mx-2">{">"}</span>
@@ -194,7 +194,7 @@ export default function CartPage() {
         </nav>
 
         {/* Título */}
-        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 md:mb-6">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
           Tu carrito de la compra
         </h1>
 
@@ -224,7 +224,7 @@ export default function CartPage() {
         )}
 
         {/* Bloque de transporte */}
-        <div className="bg-white rounded-xl p-4 mb-6 flex items-center gap-4 border-l-4 border-sky-400">
+        <div className="bg-card rounded-xl p-4 mb-6 flex items-center gap-4 border-l-4 border-primary">
           <div className="flex-1">
             {transportEstimate?.appliedRule ? (
               <p className="text-sm md:text-base text-gray-700">
@@ -272,7 +272,7 @@ export default function CartPage() {
                     <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-1 truncate">{item.product.name}</h3>
                     <p className="text-xs md:text-sm text-gray-500 mb-2">Opción: {option}</p>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="font-bold text-sky-600">${price.toFixed(2)}</span>
+                      <span className="font-bold text-primary">${price.toFixed(2)}</span>
                     </div>
                     
                     {/* Alerta de stock para este item */}
@@ -325,7 +325,7 @@ export default function CartPage() {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                            className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:border-sky-500 hover:text-sky-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:border-primary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Reducir cantidad"
                             disabled={item.quantity <= 1}
                           >
@@ -338,7 +338,7 @@ export default function CartPage() {
                               const maxQuantity = availableStock !== null ? availableStock : item.quantity + 1
                               updateItemQuantity(item.id, Math.min(item.quantity + 1, maxQuantity))
                             }}
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Aumentar cantidad"
                             disabled={(() => {
                               const availableStock = getItemAvailableStock(item.id)
@@ -393,7 +393,7 @@ export default function CartPage() {
                             </div>
                           </Link>
                           <Link href={`/products/${product.slug}`}>
-                            <h4 className="text-xs md:text-sm text-gray-700 mb-1 line-clamp-2 hover:text-sky-600 transition-colors">
+                            <h4 className="text-xs md:text-sm text-gray-700 mb-1 line-clamp-2 hover:text-primary transition-colors">
                               {product.name}
                             </h4>
                           </Link>
@@ -418,7 +418,7 @@ export default function CartPage() {
 
           {/* Panel Resumen */}
           <div className="lg:col-span-1">
-            <div className="bg-sky-50/50 rounded-xl p-4 md:p-6 sticky top-24 border border-sky-100">
+            <div className="bg-[var(--habaluna-blue)]/50 rounded-xl p-4 md:p-6 sticky top-24 border border-border">
               <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Resumen</h2>
 
               <div className="space-y-3 mb-4">
@@ -456,7 +456,7 @@ export default function CartPage() {
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     placeholder="Código de descuento"
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                   <button 
                     aria-label="Aplicar código de descuento"
@@ -501,15 +501,15 @@ export default function CartPage() {
             <div>
               <ul className="space-y-3 text-sm md:text-base text-gray-700">
                 <li className="flex items-start gap-2">
-                  <span className="text-sky-500 mt-1">•</span>
+                  <span className="text-primary mt-1">•</span>
                   Dispones de 100 días para devolver los productos sin coste
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-sky-500 mt-1">•</span>
+                  <span className="text-primary mt-1">•</span>
                   Devolución del dinero garantizada
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-sky-500 mt-1">•</span>
+                  <span className="text-primary mt-1">•</span>
                   Pago seguro SSL
                 </li>
               </ul>

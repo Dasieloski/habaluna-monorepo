@@ -9,10 +9,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
  */
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-sky-50 to-white">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-[var(--habaluna-blue)] to-background">
       <Card className="w-full max-w-md text-center">
         <CardHeader>
-          <div className="text-6xl font-bold text-sky-200 mb-4">404</div>
+          <div className="text-6xl font-bold text-primary/40 mb-4">404</div>
           <CardTitle className="text-2xl">Página no encontrada</CardTitle>
           <CardDescription>
             Lo sentimos, la página que buscas no existe o ha sido movida.

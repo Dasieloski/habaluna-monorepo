@@ -87,7 +87,7 @@ export default function LoginPage() {
         <div className="max-w-lg mx-auto">
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Acceso del cliente</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 leading-tight">Acceso del cliente</h1>
             <p className="text-sky-500">¡Bienvenido de nuevo!</p>
           </div>
 

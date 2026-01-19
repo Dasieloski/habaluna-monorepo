@@ -96,7 +96,7 @@ export default function AdminTransportPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="p-2.5 rounded-xl bg-sky-100 text-sky-600">
+        <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
           <Truck className="w-6 h-6" />
         </div>
         <div>

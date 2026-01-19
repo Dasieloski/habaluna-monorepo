@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useState, useRef } from "react"
+import { motion } from "framer-motion"
 import { SmartImage } from "@/components/ui/smart-image"
 import { getImageUrl } from "@/lib/image-utils"
 
@@ -45,25 +46,28 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
 
   if (variant === "circles") {
     return (
-      <section ref={sectionRef} className="py-10 md:py-16 bg-gradient-to-b from-white to-sky-50/30">
+      <motion.section
+        ref={sectionRef}
+        initial={{ opacity: 0, y: 28 }}
+        animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
+        transition={{ type: "spring", stiffness: 80, damping: 20 }}
+        className="py-10 md:py-16 bg-gradient-to-b from-white to-[var(--habaluna-blue)]/30"
+      >
         <div className="container mx-auto px-4">
           {title && (
-            <h2
-              className={`text-2xl md:text-3xl font-semibold text-foreground text-center mb-8 md:mb-10 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-            >
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground text-center mb-8 md:mb-10 leading-tight">
               {title}
             </h2>
           )}
           <div className="grid grid-cols-3 md:flex md:flex-wrap md:justify-center gap-4 md:gap-12">
-            {categories.slice(0, 6).map((category, index) => (
+            {categories.slice(0, 6).map((category) => (
               <Link
                 key={category.id}
                 href={`/products?categoryId=${category.id}`}
                 aria-label={`Ver productos de ${category.name}`}
-                className={`group flex flex-col items-center transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-                style={{ transitionDelay: `${index * 0.1}s` }}
+                className="group flex flex-col items-center"
               >
-                <div className="w-16 h-16 md:w-28 md:h-28 rounded-full overflow-hidden bg-gradient-to-br from-sky-100 to-blue-100 mb-2 md:mb-4 ring-2 md:ring-4 ring-transparent group-hover:ring-sky-300 transition-all duration-300 group-hover:scale-110 shadow-lg relative">
+                <div className="w-16 h-16 md:w-28 md:h-28 rounded-full overflow-hidden bg-gradient-to-br from-[var(--habaluna-blue)] to-primary/20 mb-2 md:mb-4 ring-2 md:ring-4 ring-transparent group-hover:ring-primary/50 transition-all duration-300 group-hover:scale-110 shadow-lg relative">
                   <SmartImage
                     src={getImageUrl(category.image) || "/placeholder.svg"}
                     alt={category.name}
@@ -74,14 +78,14 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                     loading="lazy"
                   />
                 </div>
-                <span className="text-xs md:text-sm font-semibold text-foreground text-center group-hover:text-sky-600 transition-colors line-clamp-1">
+                <span className="text-xs md:text-sm font-semibold text-foreground text-center group-hover:text-primary transition-colors line-clamp-1">
                   {category.name}
                 </span>
               </Link>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
     )
   }
 
@@ -136,7 +140,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               key={category.id}
               href={`/products?categoryId=${category.id}`}
               aria-label={`Ver productos de ${category.name}`}
-              className={`group relative aspect-[4/5] md:aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-br from-sky-100 to-blue-100 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+              className={`group relative aspect-[4/5] md:aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-br from-[var(--habaluna-blue)] to-primary/20 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{ transitionDelay: `${index < 5 ? index * 0.08 : 0.35 + (index - 5) * 0.02}s` }}
             >
               <SmartImage

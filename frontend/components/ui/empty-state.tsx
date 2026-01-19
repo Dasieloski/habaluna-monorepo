@@ -50,7 +50,7 @@ interface EmptyStateProps {
  * 
  * Para desactivar animaciones: <EmptyState enableAnimations={false} />
  */
-const iconColorMap = { cart: 'text-sky-400', search: 'text-muted-foreground/60', orders: 'text-sky-400', default: 'text-gray-300' } as const
+const iconColorMap = { cart: 'text-primary', search: 'text-muted-foreground/60', orders: 'text-primary', default: 'text-muted-foreground/40' } as const
 
 export function EmptyState({
   icon,
@@ -69,8 +69,8 @@ export function EmptyState({
     return (
       <div className={cn('flex flex-col items-center justify-center px-4 py-12 text-center', className)}>
         {icon && <div className={cn('mb-6', iconColor)}>{icon}</div>}
-        <h2 className={cn('text-2xl font-semibold text-gray-800 mb-2')}>{title}</h2>
-        {description && <p className="text-gray-500 mb-6 max-w-md">{description}</p>}
+        <h2 className={cn('text-2xl font-semibold text-gray-800 mb-2 leading-tight')}>{title}</h2>
+        {description && <p className="text-gray-500 mb-6 max-w-md leading-relaxed">{description}</p>}
         {action && <div>{action}</div>}
       </div>
     );
@@ -97,7 +97,7 @@ export function EmptyState({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
-        className={cn('text-2xl font-semibold text-gray-800 mb-2')}
+        className={cn('text-2xl font-semibold text-gray-800 mb-2 leading-tight')}
       >
         {title}
       </motion.h2>
@@ -106,7 +106,7 @@ export function EmptyState({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
-          className="text-gray-500 mb-6 max-w-md"
+          className="text-gray-500 mb-6 max-w-md leading-relaxed"
         >
           {description}
         </motion.p>
