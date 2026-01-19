@@ -51,7 +51,7 @@ export class TransportConfigService {
         id: existing.id,
         baseCost: existing.baseCost,
         discountsEnabled: existing.discountsEnabled,
-        rules: (existing.rules as TransportRule[]) ?? [],
+        rules: (existing.rules as unknown as TransportRule[]) ?? [],
         noDiscountMessage: existing.noDiscountMessage,
       };
     }
@@ -68,7 +68,7 @@ export class TransportConfigService {
       id: created.id,
       baseCost: created.baseCost,
       discountsEnabled: created.discountsEnabled,
-      rules: (created.rules as TransportRule[]) ?? [],
+      rules: (created.rules as unknown as TransportRule[]) ?? [],
       noDiscountMessage: created.noDiscountMessage,
     };
   }
