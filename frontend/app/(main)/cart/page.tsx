@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import type { MouseEvent } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Minus, Plus, Trash2, ChevronDown, ChevronUp, Truck, Gift, ShoppingBag, AlertTriangle } from "lucide-react"
@@ -9,6 +10,7 @@ import { useAuthStore } from "@/lib/store/auth-store"
 import { useCartValidation } from "@/hooks/use-cart-validation"
 import { api, mapBackendProductToFrontend } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
+import { getTriggerRect } from "@/lib/contextual-toast-utils"
 import { SmartImage } from "@/components/ui/smart-image"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Button } from "@/components/ui/button"
@@ -24,7 +26,7 @@ export default function CartPage() {
   const isBootstrapped = useAuthStore((s) => s.isBootstrapped)
   const { items, subtotal, fetchCart, updateItemQuantity, removeItem, addToCart } = useCartStore()
   const { validation, getItemErrorMessage, hasItemIssue, getItemAvailableStock } = useCartValidation()
-  const { toast } = useToast()
+  const { toast, showAddToCart } = useToast()
 
   useEffect(() => {
     const loadCart = async () => {
@@ -93,7 +95,8 @@ export default function CartPage() {
     }
   }, [items])
 
-  const handleAddSuggestedProduct = async (product: any) => {
+  const handleAddSuggestedProduct = async (product: any, e: MouseEvent<HTMLElement>) => {
+    const rect = getTriggerRect(e.currentTarget)
     try {
       await addToCart({
         product: {
@@ -114,10 +117,8 @@ export default function CartPage() {
           : null,
         quantity: 1,
       })
-      toast({
-        title: "Producto añadido",
-        description: `${product.name} se añadió al carrito`,
-      })
+      if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
+      else toast({ title: "Producto añadido", description: `${product.name} se añadió al carrito` })
     } catch (error: any) {
       toast({
         title: "Error",
@@ -383,7 +384,7 @@ export default function CartPage() {
                             ${price.toFixed(2)}
                           </p>
                           <button
-                            onClick={() => handleAddSuggestedProduct(product)}
+                            onClick={(e) => handleAddSuggestedProduct(product, e)}
                             aria-label={`Añadir ${product.name} al carrito`}
                             className="w-full bg-sky-500 hover:bg-sky-600 text-white text-xs py-2 px-3 rounded-full transition-colors"
                           >

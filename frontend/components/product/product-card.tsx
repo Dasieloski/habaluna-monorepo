@@ -8,6 +8,7 @@ import { Star } from "lucide-react"
 import { toNumber } from "@/lib/money"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useToast } from "@/hooks/use-toast"
+import { getTriggerRect } from "@/lib/contextual-toast-utils"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { SmartImage } from "@/components/ui/smart-image"
@@ -41,7 +42,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const { toast } = useToast()
+  const { toast, showAddToCart } = useToast()
   const addToCart = useCartStore((s) => s.addToCart)
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const toggleWishlist = useWishlistStore((s) => s.toggle)
@@ -125,6 +126,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                 onClick={async (e) => {
                   e.preventDefault()
                   e.stopPropagation()
+                  const rect = getTriggerRect(e.currentTarget)
                   try {
                     await addToCart({
                       product: {
@@ -145,7 +147,8 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                         : null,
                       quantity: 1,
                     })
-                    toast({ title: "Añadido al carrito" })
+                    if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
+                    else toast({ title: "Añadido al carrito" })
                   } catch (err: any) {
                     toast({
                       title: "No se pudo añadir",
@@ -191,6 +194,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                   onClick={async (e) => {
                     e.preventDefault()
                     e.stopPropagation()
+                    const rect = getTriggerRect(e.currentTarget)
                     try {
                       await addToCart({
                         product: {
@@ -211,7 +215,8 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                           : null,
                         quantity: 1,
                       })
-                      toast({ title: "Añadido al carrito" })
+                      if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
+                      else toast({ title: "Añadido al carrito" })
                     } catch (err: any) {
                       toast({
                         title: "No se pudo añadir",
@@ -296,6 +301,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             onClick={async (e) => {
               e.preventDefault()
               e.stopPropagation()
+              const rect = getTriggerRect(e.currentTarget)
               try {
                 await addToCart({
                   product: {
@@ -316,7 +322,8 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                     : null,
                   quantity: 1,
                 })
-                toast({ title: "Añadido al carrito" })
+                if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
+                else toast({ title: "Añadido al carrito" })
               } catch (err: any) {
                 toast({
                   title: "No se pudo añadir",
@@ -365,6 +372,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
               onClick={async (e) => {
                 e.preventDefault()
                 e.stopPropagation()
+                const rect = getTriggerRect(e.currentTarget)
                 try {
                   await addToCart({
                     product: {
@@ -385,7 +393,8 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                       : null,
                     quantity: 1,
                   })
-                  toast({ title: "Añadido al carrito" })
+                  if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
+                  else toast({ title: "Añadido al carrito" })
                 } catch (err: any) {
                   toast({
                     title: "No se pudo añadir",

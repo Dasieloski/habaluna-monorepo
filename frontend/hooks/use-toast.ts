@@ -1,2 +1,6 @@
-// Re-export from components/ui/use-toast for backward compatibility
-export { useToast, toast, showSuccess, showError, showInfo, showWarning } from '@/components/ui/use-toast'
+/**
+ * Re-export del sistema Contextual Toast.
+ * useToast mantiene compatibilidad con la API anterior (toast, showSuccess, showError, etc.)
+ * y añade showAddToCart para el flujo de añadir al carrito.
+ */
+export { useContextualToast as useToast, useContextualToast } from '@/components/contextual-toast'

@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
 import { Poppins } from "next/font/google"
-import { Toaster } from "@/components/ui/toaster"
 import { Providers } from "./providers"
 import "./globals.css"
 
@@ -74,7 +73,6 @@ export default function RootLayout({
       </head>
       <body className={`${poppins.className} antialiased`}>
         <Providers>{children}</Providers>
-        <Toaster />
         <Analytics />
       </body>
     </html>

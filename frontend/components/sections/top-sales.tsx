@@ -9,6 +9,7 @@ import { SmartImage } from "@/components/ui/smart-image"
 import { ShoppingCart } from "lucide-react"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useToast } from "@/hooks/use-toast"
+import { getTriggerRect } from "@/lib/contextual-toast-utils"
 
 interface Product {
   id: string
@@ -67,6 +68,7 @@ export function TopSales({ products }: TopSalesProps) {
   const handleAddToCart = async (product: Product, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    const rect = getTriggerRect(e.currentTarget)
     try {
       await addToCart({
         product: {
@@ -80,7 +82,8 @@ export function TopSales({ products }: TopSalesProps) {
         productVariant: null,
         quantity: 1,
       })
-      toast({ title: "Añadido al carrito" })
+      if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
+      else toast({ title: "Añadido al carrito" })
     } catch (err: any) {
       toast({
         title: "No se pudo añadir",

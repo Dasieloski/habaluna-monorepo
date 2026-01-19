@@ -9,7 +9,7 @@ import * as z from "zod"
 import { api } from "@/lib/api"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { Eye, EyeOff } from "lucide-react"
-import { showSuccess, showError } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -24,6 +24,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const { setAuth } = useAuthStore()
+  const { showSuccess, showError } = useToast()
 
   const {
     register,

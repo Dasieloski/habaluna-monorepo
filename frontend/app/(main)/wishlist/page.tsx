@@ -9,6 +9,7 @@ import { useAuthStore } from "@/lib/store/auth-store"
 import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useToast } from "@/hooks/use-toast"
+import { getTriggerRect } from "@/lib/contextual-toast-utils"
 import { api, type BackendProduct, getApiBaseUrlLazy } from "@/lib/api"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Button } from "@/components/ui/button"
@@ -215,7 +216,8 @@ export default function WishlistPage() {
 
                 {/* Add to cart button */}
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    const rect = getTriggerRect(e.currentTarget)
                     addToCart({
                       product: {
                         id: p.id,
@@ -227,7 +229,10 @@ export default function WishlistPage() {
                       },
                       productVariant: null,
                       quantity: 1,
-                    }).then(() => toast({ title: "Añadido al carrito" }))
+                    }).then(() => {
+                      if (rect) showAddToCart({ productName: p.name, triggerRect: rect })
+                      else toast({ title: "Añadido al carrito" })
+                    })
                       .catch((err: any) =>
                         toast({
                           title: "No se pudo añadir",

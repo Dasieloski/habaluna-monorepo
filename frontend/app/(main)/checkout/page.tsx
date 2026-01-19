@@ -24,7 +24,7 @@ import { SupernovaWidget } from '@/components/payment/supernova-widget';
 import { isCatalogMode } from '@/lib/catalog-mode';
 import { useCartValidation } from '@/hooks/use-cart-validation';
 import { AlertTriangle, Tag, X } from 'lucide-react';
-import { showSuccess, showError } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { FormError } from '@/components/ui/form-error';
 import { COUNTRIES, getMunicipalitiesByCountry } from '@/lib/geo/countries';
 
@@ -56,6 +56,7 @@ export default function CheckoutPage() {
   const isBootstrapped = useAuthStore((s) => s.isBootstrapped)
   const { items, subtotal, clearCart, fetchCart } = useCartStore();
   const { validation, validateCart, isValid, hasIssues, loading: validationLoading } = useCartValidation();
+  const { showSuccess, showError } = useToast();
 
   const {
     register,

@@ -41,6 +41,7 @@ export function Header() {
   const [isHidden, setIsHidden] = useState(false)
   const lastYRef = useRef(0)
   const tickingRef = useRef(false)
+  const [cartBounce, setCartBounce] = useState(false)
 
   const [ui, setUi] = useState<{
     announcement: string
@@ -79,6 +80,12 @@ export function Header() {
   useEffect(() => {
     // Evitar hydration mismatch (persist rehidrata antes del primer paint)
     setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    const h = () => { setCartBounce(true); setTimeout(() => setCartBounce(false), 600) }
+    window.addEventListener('contextual-toast-cart-bounce', h)
+    return () => window.removeEventListener('contextual-toast-cart-bounce', h)
   }, [])
 
   useEffect(() => {
@@ -403,7 +410,8 @@ export function Header() {
               </Link>
               <Link
                 href="/cart"
-                className="p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 relative"
+                data-contextual-toast-cart
+                className={`p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 relative ${cartBounce ? 'animate-bounce' : ''}`}
               >
                 <CartIcon className="w-5 h-5" />
                 {mounted && cartCount > 0 && (

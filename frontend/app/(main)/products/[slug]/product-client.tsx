@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/product/product-card"
 import { ProductPrice } from "@/components/product/product-price"
 import { toNumber } from "@/lib/money"
 import { useToast } from "@/hooks/use-toast"
-import { showSuccess, showError } from "@/components/ui/use-toast"
+import { getTriggerRect } from "@/lib/contextual-toast-utils"
 import { api, getApiBaseUrlLazy } from "@/lib/api"
 import { useCartStore } from "@/lib/store/cart-store"
 import {
@@ -65,7 +65,7 @@ export function ProductClient({
   initialReviews = [],
   initialReviewsMeta,
 }: ProductClientProps) {
-  const { toast } = useToast()
+  const { toast, showSuccess, showError, showAddToCart } = useToast()
   const addToCart = useCartStore((s) => s.addToCart)
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
@@ -403,7 +403,8 @@ export function ProductClient({
             <div className="flex items-center gap-3 mb-4 md:mb-6">
               <button
                 disabled={stock <= 0}
-                onClick={async () => {
+                onClick={async (e) => {
+                  const rect = getTriggerRect(e.currentTarget)
                   try {
                     await addToCart({
                       product: {
@@ -424,16 +425,11 @@ export function ProductClient({
                         : null,
                       quantity,
                     })
-                    showSuccess(
-                      "Producto agregado",
-                      `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} se agregó al carrito`
-                    )
+                    if (rect) showAddToCart({ productName: `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''}`, triggerRect: rect })
+                    else showSuccess("Producto agregado", `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} se agregó al carrito`)
                   } catch (err: any) {
                     const errorMessage = err.response?.data?.message || err.message || "No se pudo añadir al carrito"
-                    showError(
-                      "Error al agregar",
-                      errorMessage
-                    )
+                    showError("Error al agregar", errorMessage)
                   }
                 }}
                 aria-label={`Añadir ${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} al carrito`}
