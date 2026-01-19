@@ -100,8 +100,8 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
       // Si falla, usar el producto que tenemos
       loadProductData(product)
       toast({
-        title: "Advertencia",
-        description: "No se pudieron cargar todos los datos del producto. Usando datos disponibles.",
+        title: "Cuidado… ⚠️",
+        description: "Algunos datos no cargaron. Trabajamos con lo que hay.",
         variant: "destructive",
       })
     } finally {
@@ -247,8 +247,8 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
       await api.updateProduct(productToUpdate.id, productData)
 
       toast({
-        title: "Éxito",
-        description: "Producto actualizado correctamente",
+        title: "¡Producto actualizado! ✅",
+        description: "Los cambios se guardaron bien.",
       })
 
       onSuccess()
@@ -258,7 +258,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
       const errorMessage = err.message || "Error al actualizar el producto. Por favor, intenta de nuevo."
       setError(errorMessage)
       toast({
-        title: "Error",
+        title: "Ups… no se pudo guardar 😅",
         description: errorMessage,
         variant: "destructive",
       })

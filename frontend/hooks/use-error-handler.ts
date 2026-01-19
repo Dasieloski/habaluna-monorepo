@@ -11,31 +11,36 @@ export function useErrorHandler() {
   const { showError } = useToast();
 
   const handleError = useCallback((error: unknown, customMessage?: string) => {
-    let message = customMessage || 'Ha ocurrido un error. Por favor, intenta nuevamente.';
+    let message = customMessage || 'Algo se torció. Intenta de nuevo 😅';
+    let title = 'Ups… algo falló';
 
     if (error instanceof Error) {
-      // Errores de API
       if ('status' in error) {
         const apiError = error as { status?: number; message?: string };
 
         switch (apiError.status) {
           case 401:
-            message = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
+            message = 'Tu sesión caducó. Vuelve a iniciar sesión.';
+            title = '¡Oye! Tu sesión se fue 😅';
             if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
               window.location.href = '/admin/login';
             }
             break;
           case 403:
-            message = 'No tienes permisos para realizar esta acción.';
+            message = 'No tienes permiso para esto.';
+            title = 'Eso no está en tus manos 👀';
             break;
           case 404:
-            message = 'El recurso que buscas no existe.';
+            message = 'Eso que buscas no está por aquí.';
+            title = 'No lo encontramos 😅';
             break;
           case 429:
-            message = 'Has realizado demasiadas solicitudes. Por favor, espera un momento.';
+            message = 'Demasiadas peticiones. Espera un ratito.';
+            title = '¡Tranquilo! Un momento 👋';
             break;
           case 500:
-            message = 'Error del servidor. Por favor, intenta más tarde.';
+            message = 'Nuestro servidor se despistó. Intenta más tarde.';
+            title = 'Ups… fallo nuestro 😅';
             break;
           default:
             message = apiError.message || message;
@@ -47,7 +52,7 @@ export function useErrorHandler() {
       message = error;
     }
 
-    showError('Error', message);
+    showError(title, message);
 
     if (process.env.NODE_ENV === 'development') {
       console.error('Error manejado:', error);

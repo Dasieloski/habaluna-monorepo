@@ -118,21 +118,37 @@ export default function CartPage() {
         quantity: 1,
       })
       if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-      else toast({ title: "Producto añadido", description: `${product.name} se añadió al carrito` })
+      else toast({ title: "¡Listo! 🛒", description: `${product.name} se añadió al carrito` })
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error?.response?.data?.message || error?.message || "No se pudo añadir el producto",
+        title: "Ups… no se pudo añadir 😅",
+        description: error?.response?.data?.message || error?.message || "Revisa e intenta de nuevo.",
         variant: "destructive",
       })
     }
   }
 
-  const shippingThreshold = 25.03
-  const shipping = subtotal >= 100 ? 0 : 11.99
+  const itemCount = items.reduce((s, i) => s + i.quantity, 0)
+  const [transportEstimate, setTransportEstimate] = useState<{
+    shipping: number
+    positiveMessage: string
+    appliedRule: { discountType: string; discountValue: number } | null
+  } | null>(null)
+
+  useEffect(() => {
+    if (items.length === 0) {
+      setTransportEstimate(null)
+      return
+    }
+    let cancelled = false
+    api.getTransportEstimate(itemCount).then((r) => {
+      if (!cancelled) setTransportEstimate({ shipping: r.shipping, positiveMessage: r.positiveMessage, appliedRule: r.appliedRule })
+    }).catch(() => { if (!cancelled) setTransportEstimate(null) })
+    return () => { cancelled = true }
+  }, [itemCount, items.length])
+
+  const shipping = transportEstimate?.shipping ?? 0
   const total = subtotal + shipping
-  const progressPercent = Math.min((subtotal / shippingThreshold) * 100, 100)
-  const isFreeShipping = subtotal >= shippingThreshold
 
   // Mostrar skeleton mientras carga el carrito
   if (isLoadingCart) {
@@ -207,22 +223,23 @@ export default function CartPage() {
           </div>
         )}
 
-        {/* Barra de progreso envío gratis */}
+        {/* Bloque de transporte */}
         <div className="bg-white rounded-xl p-4 mb-6 flex items-center gap-4">
           <div className="flex-1">
-            <p className="text-sm md:text-base text-gray-700 mb-2">
-              {isFreeShipping ? (
-                <span className="text-green-600 font-medium">¡El envío es gratis!</span>
-              ) : (
-                <>Desde ${shippingThreshold.toFixed(2)} de compras, el envío es gratis!</>
-              )}
-            </p>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-sky-400 to-sky-500 rounded-full transition-all duration-500"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
+            {transportEstimate?.appliedRule ? (
+              <p className="text-sm md:text-base text-gray-700">
+                <span className="text-emerald-600 font-medium">
+                  Descuento en transporte aplicado
+                  {transportEstimate.appliedRule.discountType === "percent"
+                    ? ` (${transportEstimate.appliedRule.discountValue}%)`
+                    : ` ($${Number(transportEstimate.appliedRule.discountValue).toFixed(2)})`}
+                </span>
+              </p>
+            ) : (
+              <p className="text-sm md:text-base text-gray-700">
+                {transportEstimate?.positiveMessage || "Transporte calculado al costo justo"}
+              </p>
+            )}
           </div>
           <div className="flex-shrink-0 text-sky-500">
             <Truck className="h-8 w-8" />

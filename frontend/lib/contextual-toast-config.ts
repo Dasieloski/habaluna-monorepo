@@ -1,8 +1,10 @@
 /**
  * Configuración del sistema Contextual Toast.
- * Umbral de ítems para envío gratis (ej: "3 de 5 para envío gratis").
+ * Los mensajes de transporte (con/sin descuento) se obtienen del backend /transport.
  */
-export const FREE_SHIPPING_ITEMS_THRESHOLD = 5
+
+/** Mensaje por defecto cuando no hay descuento y la config aún no cargó. */
+export const DEFAULT_POSITIVE_TRANSPORT_MESSAGE = '🚚 Transporte calculado al costo justo'
 
 /** Selector del ícono del carrito en el header (debe tener data-contextual-toast-cart). */
 export const CART_ICON_SELECTOR = '[data-contextual-toast-cart]'

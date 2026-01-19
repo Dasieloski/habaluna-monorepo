@@ -131,11 +131,11 @@ export default function AdminReviewsPage() {
       setReviews((prev) => prev.filter((x) => x.id !== deleteTarget.id))
       setConfirmOpen(false)
       setDeleteTarget(null)
-      toast({ title: "Reseña eliminada" })
+      toast({ title: "¡Reseña eliminada! 🗑️", description: "Se borró bien." })
     } catch (e: any) {
       toast({
-        title: "Error",
-        description: e?.response?.data?.message || e?.message || "No se pudo eliminar la reseña.",
+        title: "Ups… no se pudo eliminar 😅",
+        description: e?.response?.data?.message || e?.message || "Intenta de nuevo.",
         variant: "destructive",
       })
     } finally {
@@ -152,8 +152,8 @@ export default function AdminReviewsPage() {
       // Revertir
       setReviews((prev) => prev.map((x) => (x.id === r.id ? { ...x, isApproved: r.isApproved } : x)))
       toast({
-        title: "Error",
-        description: e?.response?.data?.message || e?.message || "No se pudo actualizar el estado.",
+        title: "Ups… no se actualizó el estado 😅",
+        description: e?.response?.data?.message || e?.message || "Intenta de nuevo.",
         variant: "destructive",
       })
     }
@@ -179,11 +179,11 @@ export default function AdminReviewsPage() {
       setReviews((prev) => prev.map((x) => (x.id === updated.id ? { ...(updated as any) } : x)))
       setEditOpen(false)
       setEditTarget(null)
-      toast({ title: "Reseña actualizada" })
+      toast({ title: "¡Reseña actualizada! ✅", description: "Cambios guardados." })
     } catch (e: any) {
       toast({
-        title: "Error",
-        description: e?.response?.data?.message || e?.message || "No se pudo guardar la reseña.",
+        title: "Ups… no se pudo guardar la reseña 😅",
+        description: e?.response?.data?.message || e?.message || "Intenta de nuevo.",
         variant: "destructive",
       })
     } finally {
@@ -225,12 +225,12 @@ export default function AdminReviewsPage() {
                 setAutoApproveReviews(checked)
                 try {
                   await api.updateAdminReviewSettings({ autoApproveReviews: checked })
-                  toast({ title: "Configuración actualizada" })
+                  toast({ title: "¡Config actualizada! ✅", description: "Se guardó bien." })
                 } catch (e: any) {
                   setAutoApproveReviews(!checked)
                   toast({
-                    title: "Error",
-                    description: e?.response?.data?.message || e?.message || "No se pudo guardar la configuración.",
+                    title: "Ups… no se guardó la config 😅",
+                    description: e?.response?.data?.message || e?.message || "Intenta de nuevo.",
                     variant: "destructive",
                   })
                 }
@@ -560,15 +560,15 @@ export default function AdminReviewsPage() {
             <Button
               onClick={async () => {
                 if (!createProductId.trim()) {
-                  toast({ title: "Falta el ID del producto", variant: "destructive" })
+                  toast({ title: "Falta algo 👀", description: "Pon el ID del producto.", variant: "destructive" })
                   return
                 }
                 if (!createAuthorName.trim()) {
-                  toast({ title: "Falta el autor", variant: "destructive" })
+                  toast({ title: "Falta algo 👀", description: "Pon el nombre del autor.", variant: "destructive" })
                   return
                 }
                 if (!createContent.trim()) {
-                  toast({ title: "Falta el contenido", variant: "destructive" })
+                  toast({ title: "Falta algo 👀", description: "Escribe el contenido de la reseña.", variant: "destructive" })
                   return
                 }
                 setCreateSaving(true)
@@ -591,11 +591,11 @@ export default function AdminReviewsPage() {
                   setCreateTitle("")
                   setCreateContent("")
                   setCreatePublishDirect(true)
-                  toast({ title: "Reseña creada" })
+                  toast({ title: "¡Reseña creada! 🎉", description: "Ya está publicada." })
                 } catch (e: any) {
                   toast({
-                    title: "Error",
-                    description: e?.response?.data?.message || e?.message || "No se pudo crear la reseña.",
+                    title: "Ups… no se pudo crear 😅",
+                    description: e?.response?.data?.message || e?.message || "Intenta de nuevo.",
                     variant: "destructive",
                   })
                 } finally {

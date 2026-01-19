@@ -246,12 +246,12 @@ export default function EditComboPage() {
         images: allImages.length ? allImages : undefined,
       } as any)
 
-      toast({ title: "Éxito", description: "Combo actualizado correctamente" })
+      toast({ title: "¡Combo actualizado! ✅", description: "Cambios guardados." })
       router.push("/admin/combos")
     } catch (err: any) {
       const msg = err?.message || "Error al guardar el combo."
       setError(msg)
-      toast({ title: "Error", description: msg, variant: "destructive" })
+      toast({ title: "Ups… no se pudo guardar el combo 😅", description: msg, variant: "destructive" })
     } finally {
       setUploadProgress(null)
       setIsLoading(false)

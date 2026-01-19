@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Store,
   X,
+  Truck,
 } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/admin/customers", label: "Clientes", icon: Users },
   { href: "/admin/offers", label: "Ofertas", icon: Percent },
   { href: "/admin/banners", label: "Carrusel", icon: Images },
+  { href: "/admin/transport", label: "Transporte", icon: Truck },
   { href: "/admin/reviews", label: "Reseñas", icon: MessageSquare },
   { href: "/admin/email-marketing", label: "Email Marketing", icon: Mail },
   { href: "/admin/settings", label: "Configuración", icon: Settings },

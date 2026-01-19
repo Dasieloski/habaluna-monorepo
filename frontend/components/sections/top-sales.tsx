@@ -33,7 +33,7 @@ export function TopSales({ products }: TopSalesProps) {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
   const addToCart = useCartStore((s) => s.addToCart)
-  const { toast } = useToast()
+  const { toast, showAddToCart } = useToast()
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -83,11 +83,11 @@ export function TopSales({ products }: TopSalesProps) {
         quantity: 1,
       })
       if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-      else toast({ title: "Añadido al carrito" })
+      else toast({ title: "¡Al carrito! 🛒" })
     } catch (err: any) {
       toast({
-        title: "No se pudo añadir",
-        description: err?.response?.data?.message || err?.message || "Intenta nuevamente.",
+        title: "Ups… no se pudo añadir 😅",
+        description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
         variant: "destructive",
       })
     }

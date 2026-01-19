@@ -237,6 +237,30 @@ export interface BackendUiSettings {
   updatedAt: string
 }
 
+export interface BackendTransportRule {
+  minProducts: number
+  discountType: "percent" | "fixed"
+  discountValue: number
+}
+
+export interface BackendTransportConfig {
+  id: string
+  baseCost: number
+  discountsEnabled: boolean
+  rules: BackendTransportRule[]
+  noDiscountMessage: string | null
+}
+
+export interface BackendTransportEstimate {
+  shipping: number
+  baseCost: number
+  appliedRule: BackendTransportRule | null
+  amountOff: number
+  messageKey: "discount" | "transparent" | "optimized" | "fair"
+  positiveMessage: string
+  config: BackendTransportConfig
+}
+
 export interface BackendReview {
   id: string
   productId: string
@@ -690,6 +714,32 @@ export const api = {
   ) => {
     const response = await api.patch("/ui-settings/admin", data)
     return response.data as BackendUiSettings
+  },
+
+  // Transporte (público + admin)
+  getTransportConfig: async (): Promise<BackendTransportConfig> => {
+    const response = await api.get("/transport")
+    return response.data as BackendTransportConfig
+  },
+
+  getTransportEstimate: async (itemCount: number): Promise<BackendTransportEstimate> => {
+    const response = await api.get(`/transport/estimate?itemCount=${itemCount}`)
+    return response.data as BackendTransportEstimate
+  },
+
+  getAdminTransportConfig: async (): Promise<BackendTransportConfig> => {
+    const response = await api.get("/transport/admin")
+    return response.data as BackendTransportConfig
+  },
+
+  updateAdminTransportConfig: async (data: {
+    baseCost?: number
+    discountsEnabled?: boolean
+    rules?: Array<{ minProducts: number; discountType: 'percent' | 'fixed'; discountValue: number }>
+    noDiscountMessage?: string | null
+  }): Promise<BackendTransportConfig> => {
+    const response = await api.patch("/transport/admin", data)
+    return response.data as BackendTransportConfig
   },
 
   // Clientes (Admin)

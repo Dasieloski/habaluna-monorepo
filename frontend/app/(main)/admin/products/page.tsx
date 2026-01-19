@@ -163,16 +163,16 @@ export default function ProductsPage() {
     try {
       await api.deleteProduct(productToDelete.id)
       toast({
-        title: "Éxito",
-        description: "Producto eliminado correctamente",
+        title: "¡Producto eliminado! 🗑️",
+        description: "Se borró del catálogo.",
       })
       // Recargar productos
       await loadProducts()
     } catch (err: any) {
       console.error("Error al eliminar producto:", err)
       toast({
-        title: "Error",
-        description: err.response?.data?.message || "Error al eliminar el producto",
+        title: "Ups… no se pudo eliminar 😅",
+        description: err.response?.data?.message || "Intenta de nuevo.",
         variant: "destructive",
       })
     } finally {

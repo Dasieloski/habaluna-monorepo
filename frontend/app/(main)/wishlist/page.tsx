@@ -183,8 +183,8 @@ export default function WishlistPage() {
                       e.preventDefault()
                       remove(p.id).catch((err: any) => {
                         toast({
-                          title: "Error",
-                          description: err?.response?.data?.message || err?.message || "No se pudo eliminar de la wishlist.",
+                          title: "Ups… no se pudo quitar 😅",
+                          description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
                           variant: "destructive",
                         })
                       })
@@ -231,12 +231,12 @@ export default function WishlistPage() {
                       quantity: 1,
                     }).then(() => {
                       if (rect) showAddToCart({ productName: p.name, triggerRect: rect })
-                      else toast({ title: "Añadido al carrito" })
+                      else toast({ title: "¡Al carrito! 🛒" })
                     })
                       .catch((err: any) =>
                         toast({
-                          title: "No se pudo añadir",
-                          description: err?.response?.data?.message || err?.message || "Intenta nuevamente.",
+                          title: "Ups… no se pudo añadir 😅",
+                          description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
                           variant: "destructive",
                         }),
                       )

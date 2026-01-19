@@ -4,9 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { SPRING, SPRING_SMOOTH } from '@/lib/contextual-toast-config'
-import { FREE_SHIPPING_ITEMS_THRESHOLD } from '@/lib/contextual-toast-config'
 import type { ContextualToastState } from './contextual-toast-provider'
-import { useCartStore } from '@/lib/store/cart-store'
 
 // ---------------------------------------------------------------------------
 // Tipos
@@ -15,6 +13,8 @@ import { useCartStore } from '@/lib/store/cart-store'
 interface ContextualToastProps {
   state: ContextualToastState
   progress: number
+  showProgressBar: boolean
+  statusLabel: string
   milestoneReached: boolean
   onIntegrateComplete?: () => void
 }
@@ -32,17 +32,10 @@ function getShowingPosition() {
 // ContextualToast
 // ---------------------------------------------------------------------------
 
-export function ContextualToast({ state, progress, milestoneReached, onIntegrateComplete }: ContextualToastProps) {
-  const getItemCount = useCartStore((s) => s.getItemCount)
+export function ContextualToast({ state, progress, showProgressBar, statusLabel, milestoneReached, onIntegrateComplete }: ContextualToastProps) {
   const [milestoneJustReached, setMilestoneJustReached] = useState(false)
 
-  const count = getItemCount()
-  const progressText =
-    milestoneReached
-      ? '🎉 Envío gratis desbloqueado'
-      : `${count} de ${FREE_SHIPPING_ITEMS_THRESHOLD} para envío gratis`
-
-  // Efecto: milestone recién alcanzado → glow + micro-vibración
+  // Efecto: descuento en transporte alcanzado → glow
   useEffect(() => {
     if (milestoneReached && state?.type === 'add-to-cart') {
       setMilestoneJustReached(true)
@@ -113,27 +106,27 @@ export function ContextualToast({ state, progress, milestoneReached, onIntegrate
             <Check className="h-4 w-4" strokeWidth={2.5} />
           </motion.span>
           <p className="truncate text-sm font-medium text-foreground" title={productName}>
-            {productName} añadido
+            ¡{productName} al carrito! 🛒
           </p>
         </div>
 
-        {/* Barra de progreso + texto */}
+        {/* Transporte: barra solo si hay descuentos; mensaje siempre */}
         <div className="mt-2.5">
-          <motion.div
-            className="h-1.5 w-full overflow-hidden rounded-full bg-sky-100"
-            initial={false}
-          >
+          {showProgressBar && (
             <motion.div
-              className="h-full rounded-full bg-sky-500"
+              className="h-1.5 w-full overflow-hidden rounded-full bg-sky-100 mb-1.5"
               initial={false}
-              animate={{ width: `${progress * 100}%` }}
-              transition={{ type: 'spring', ...SPRING }}
-            />
-          </motion.div>
-          <p
-            className={`mt-1.5 text-xs ${milestoneReached ? 'font-semibold text-emerald-600' : 'text-muted-foreground'}`}
-          >
-            {progressText}
+            >
+              <motion.div
+                className="h-full rounded-full bg-sky-500"
+                initial={false}
+                animate={{ width: `${progress * 100}%` }}
+                transition={{ type: 'spring', ...SPRING }}
+              />
+            </motion.div>
+          )}
+          <p className={`text-xs ${milestoneReached ? 'font-semibold text-emerald-600' : 'text-muted-foreground'}`}>
+            {statusLabel}
           </p>
         </div>
         </motion.div>

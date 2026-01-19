@@ -26,6 +26,7 @@ import { ReportsModule } from './reports/reports.module';
 import { CacheModule } from './common/cache/cache.module';
 import { MediaModule } from './media/media.module';
 import { EmailMarketingModule } from './email-marketing/email-marketing.module';
+import { TransportConfigModule } from './transport-config/transport-config.module';
 
 @Module({
   imports: [
@@ -98,6 +99,7 @@ import { EmailMarketingModule } from './email-marketing/email-marketing.module';
     CacheModule,
     MediaModule,
     EmailMarketingModule,
+    TransportConfigModule,
   ],
   providers: [
     HttpExceptionFilter,

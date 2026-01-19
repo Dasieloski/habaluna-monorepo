@@ -145,23 +145,23 @@ export function ProductClient({
       if (navigator.clipboard && url) {
         await navigator.clipboard.writeText(url)
         toast({
-          title: "Enlace copiado",
-          description: "Copiamos el enlace del producto al portapapeles.",
+          title: "¡Listo! 📋",
+          description: "Enlace copiado al portapapeles.",
         })
         return
       }
 
       toast({
-        title: "No se pudo compartir",
-        description: "Tu navegador no soporta compartir o copiar el enlace.",
+        title: "Ups… tu navegador no colabora 😅",
+        description: "No puede compartir ni copiar el enlace. Prueba en otro dispositivo.",
         variant: "destructive",
       })
     } catch (e: any) {
       // Si el usuario cancela el share, no es error real
       if (e?.name === "AbortError") return
       toast({
-        title: "No se pudo compartir",
-        description: "Ocurrió un error al intentar compartir este producto.",
+        title: "Ups… no se pudo compartir 😅",
+        description: "Algo falló al intentar. Prueba de nuevo.",
         variant: "destructive",
       })
     }
@@ -426,10 +426,10 @@ export function ProductClient({
                       quantity,
                     })
                     if (rect) showAddToCart({ productName: `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''}`, triggerRect: rect })
-                    else showSuccess("Producto agregado", `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} se agregó al carrito`)
+                    else showSuccess("¡Al carrito! 🛒", `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} se agregó.`)
                   } catch (err: any) {
-                    const errorMessage = err.response?.data?.message || err.message || "No se pudo añadir al carrito"
-                    showError("Error al agregar", errorMessage)
+                    const errorMessage = err.response?.data?.message || err.message || "No se pudo añadir"
+                    showError("Ups… no se pudo añadir 😅", errorMessage)
                   }
                 }}
                 aria-label={`Añadir ${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} al carrito`}

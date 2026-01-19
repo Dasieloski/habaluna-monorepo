@@ -4,9 +4,10 @@ import { OrdersController } from './orders.controller';
 import { CartModule } from '../cart/cart.module';
 import { EmailModule } from '../common/email/email.module';
 import { OffersModule } from '../offers/offers.module';
+import { TransportConfigModule } from '../transport-config/transport-config.module';
 
 @Module({
-  imports: [CartModule, OffersModule, EmailModule],
+  imports: [CartModule, OffersModule, EmailModule, TransportConfigModule],
   controllers: [OrdersController],
   providers: [OrdersService],
 })

@@ -1,15 +1,16 @@
 'use client'
 
-import React, { createContext, useCallback, useContext, useRef, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useCartStore } from '@/lib/store/cart-store'
 import {
-  FREE_SHIPPING_ITEMS_THRESHOLD,
+  DEFAULT_POSITIVE_TRANSPORT_MESSAGE,
   SIMPLE_TOAST_DURATION_MS,
   TOAST_SHOW_DURATION_MS,
 } from '@/lib/contextual-toast-config'
 import { getCartIconRect, type Rect } from '@/lib/contextual-toast-utils'
 import { ContextualToast } from './contextual-toast'
+import type { BackendTransportConfig } from '@/lib/api'
 
 // ---------------------------------------------------------------------------
 // Tipos
@@ -63,6 +64,15 @@ function genSimpleId() {
 export function ContextualToastProvider({ children }: { children: React.ReactNode }) {
   const getItemCount = useCartStore((s) => s.getItemCount)
   const [state, setState] = useState<ContextualToastState>(null)
+  const [transportConfig, setTransportConfig] = useState<BackendTransportConfig | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    import('@/lib/api').then(({ api }) => api.getTransportConfig()).then((c) => {
+      if (!cancelled) setTransportConfig(c)
+    }).catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   const showingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const simpleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -154,8 +164,26 @@ export function ContextualToastProvider({ children }: { children: React.ReactNod
   }
 
   const count = getItemCount()
-  const progress = Math.min(count / FREE_SHIPPING_ITEMS_THRESHOLD, 1)
-  const milestoneReached = count >= FREE_SHIPPING_ITEMS_THRESHOLD
+  const cfg = transportConfig
+  const hasDiscountRules = !!(cfg?.discountsEnabled && Array.isArray(cfg.rules) && cfg.rules.length > 0)
+  const appliedRule = hasDiscountRules && count > 0
+    ? (cfg!.rules as { minProducts: number; discountType: string; discountValue: number }[])
+        .filter((r) => count >= r.minProducts)
+        .sort((a, b) => b.minProducts - a.minProducts)[0] ?? null
+    : null
+  const nextRule = hasDiscountRules && !appliedRule
+    ? (cfg!.rules as { minProducts: number; discountType: string; discountValue: number }[])
+        .filter((r) => r.minProducts > count)
+        .sort((a, b) => a.minProducts - b.minProducts)[0] ?? null
+    : null
+  const showProgressBar = hasDiscountRules && (appliedRule != null || nextRule != null)
+  const progress = nextRule != null ? Math.min(count / nextRule.minProducts, 1) : appliedRule != null ? 1 : 0
+  const statusLabel = appliedRule != null
+    ? 'Descuento en transporte aplicado'
+    : nextRule != null
+      ? `${count} de ${nextRule.minProducts} para ${nextRule.discountType === 'percent' ? nextRule.discountValue + '%' : '$' + nextRule.discountValue} desc. en transporte`
+      : (cfg?.noDiscountMessage?.trim() || DEFAULT_POSITIVE_TRANSPORT_MESSAGE)
+  const milestoneReached = appliedRule != null
 
   const portal =
     state && typeof document !== 'undefined' ? (
@@ -163,6 +191,8 @@ export function ContextualToastProvider({ children }: { children: React.ReactNod
         <ContextualToast
           state={state}
           progress={state.type === 'add-to-cart' ? progress : 0}
+          showProgressBar={state.type === 'add-to-cart' ? showProgressBar : false}
+          statusLabel={state.type === 'add-to-cart' ? statusLabel : ''}
           milestoneReached={state.type === 'add-to-cart' ? milestoneReached : false}
           onIntegrateComplete={state.type === 'add-to-cart' ? onIntegrateComplete : undefined}
         />,

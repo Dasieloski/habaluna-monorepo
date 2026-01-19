@@ -12,8 +12,8 @@ import { Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 const loginSchema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  email: z.string().email("Ese correo no parece válido 📧"),
+  password: z.string().min(6, "Mínimo 6 caracteres, por favor 🔒"),
   rememberMe: z.boolean().optional(),
 })
 
@@ -50,15 +50,21 @@ export default function LoginPage() {
         // No bloquear el login si falla el fetch del perfil
       }
       showSuccess(
-        "¡Bienvenido!",
-        `Hola ${user.firstName || user.email}, has iniciado sesión correctamente.`
+        "¡Qué bien verte de nuevo! 🎉",
+        `Hola ${user.firstName || user.email}, ya estás dentro.`
       )
       router.push("/")
     } catch (err: any) {
       console.error("Error en login:", err)
-      const errorMessage = err.response?.data?.message || err.message || "Error al iniciar sesión. Verifica tus credenciales."
-      setError(errorMessage)
-      showError("Error al iniciar sesión", errorMessage)
+      const raw = (err.response?.data?.message || err.message || "").toLowerCase()
+      const isCredential = /invalid|credential|incorrect|unauthorized|incorrecto|credencial|no encontrado/.test(raw)
+      const msgAmigable = "Revisa tu correo y contraseña. Esa combinación no cuadra 🔑"
+      const msgParaUsuario = isCredential ? msgAmigable : (err.response?.data?.message || err.message || "Algo falló. Intenta de nuevo 😅")
+      setError(msgParaUsuario)
+      showError(
+        isCredential ? "¡Uy! Esa combinación no nos cuadra 😅" : "Ups… algo salió mal",
+        msgParaUsuario
+      )
     }
   }
 

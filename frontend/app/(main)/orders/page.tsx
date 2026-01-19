@@ -134,8 +134,8 @@ export default function OrdersPage() {
       } catch (error: any) {
         console.error('Error fetching orders:', error);
         toast({
-          title: 'Error',
-          description: error?.response?.data?.message || 'No se pudieron cargar los pedidos',
+          title: 'Ups… no cargaron los pedidos 😅',
+          description: error?.response?.data?.message || 'Intenta de nuevo en un momento.',
           variant: 'destructive',
         });
       } finally {

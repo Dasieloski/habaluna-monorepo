@@ -481,6 +481,20 @@ model UiSettings {
   @@map("ui_settings")
 }
 
+/// Configuración de transporte: costo base y descuentos por cantidad de productos.
+/// Reglas en JSON: [{ minProducts, discountType: "percent"|"fixed", discountValue }]
+model TransportConfig {
+  id                String   @id @default(uuid())
+  baseCost          Decimal  @db.Decimal(10, 2)
+  discountsEnabled  Boolean  @default(false)
+  rules             Json?    // [{ minProducts: number, discountType: "percent"|"fixed", discountValue: number }]
+  noDiscountMessage String?  @db.Text // Mensaje cuando no hay descuento: ej. "Transporte al costo justo"
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("transport_config")
+}
+
 /// Media binario almacenado en BD (Postgres bytea) para servir imágenes sin Cloudinary.
 model Media {
   id        String   @id @default(uuid())

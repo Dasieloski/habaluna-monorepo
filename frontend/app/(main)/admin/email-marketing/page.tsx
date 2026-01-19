@@ -72,7 +72,7 @@ export default function AdminEmailMarketingPage() {
       const res = await api.getEmailSubscribers({ search: subSearch || undefined, page: 1, limit: 50 })
       setSubs(res)
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo cargar suscriptores.", variant: "destructive" })
+      toast({ title: "Ups… no cargaron los suscriptores 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     } finally {
       setSubLoading(false)
     }
@@ -87,7 +87,7 @@ export default function AdminEmailMarketingPage() {
         setSelectedCampaignId(res.data[0].id)
       }
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo cargar campañas.", variant: "destructive" })
+      toast({ title: "Ups… no cargaron las campañas 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     } finally {
       setCampLoading(false)
     }
@@ -99,7 +99,7 @@ export default function AdminEmailMarketingPage() {
       const res = await api.getEmailTemplates(category)
       setTemplates(res)
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudieron cargar plantillas.", variant: "destructive" })
+      toast({ title: "Ups… no cargaron las plantillas 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     } finally {
       setTemplatesLoading(false)
     }
@@ -107,7 +107,7 @@ export default function AdminEmailMarketingPage() {
 
   const loadFullPreview = async () => {
     if (!campSubject.trim() || !campHtml.trim()) {
-      toast({ title: "Error", description: "Necesitas un asunto y contenido HTML para previsualizar.", variant: "destructive" })
+      toast({ title: "Falta algo 👀", description: "Pon asunto y contenido HTML para previsualizar.", variant: "destructive" })
       return
     }
 
@@ -141,7 +141,7 @@ export default function AdminEmailMarketingPage() {
       })
       setTemplatePreviewHtml(rendered.html)
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo previsualizar la plantilla.", variant: "destructive" })
+      toast({ title: "Ups… no se pudo previsualizar 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     }
   }
 
@@ -152,7 +152,7 @@ export default function AdminEmailMarketingPage() {
       setSelectedTemplateId(templateId)
       toast({ title: "Éxito", description: `Plantilla "${template.name}" cargada. Puedes editarla antes de guardar.` })
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo cargar la plantilla.", variant: "destructive" })
+      toast({ title: "Ups… no cargó la plantilla 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     }
   }
 
@@ -186,13 +186,13 @@ export default function AdminEmailMarketingPage() {
         firstName: newFirstName.trim() || undefined,
         lastName: newLastName.trim() || undefined,
       })
-      toast({ title: "Éxito", description: "Suscriptor guardado." })
+      toast({ title: "¡Suscriptor guardado! ✅", description: "Quedó en la lista." })
       setNewEmail("")
       setNewFirstName("")
       setNewLastName("")
       await loadSubscribers()
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo guardar.", variant: "destructive" })
+      toast({ title: "Ups… no se pudo guardar 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     } finally {
       setSubSaving(false)
     }
@@ -204,7 +204,7 @@ export default function AdminEmailMarketingPage() {
       await api.updateEmailSubscriber(s.id, { status: next })
       await loadSubscribers()
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo actualizar.", variant: "destructive" })
+      toast({ title: "Ups… no se pudo actualizar 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     }
   }
 
@@ -218,11 +218,11 @@ export default function AdminEmailMarketingPage() {
         html: campHtml,
         text: campText.trim() || undefined,
       })
-      toast({ title: "Éxito", description: "Campaña creada." })
+      toast({ title: "¡Campaña creada! 🎉", description: "Ya está en la lista." })
       await loadCampaigns()
       setSelectedCampaignId(c.id)
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo crear campaña.", variant: "destructive" })
+      toast({ title: "Ups… no se pudo crear la campaña 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     } finally {
       setCampSaving(false)
     }
@@ -239,10 +239,10 @@ export default function AdminEmailMarketingPage() {
         html: campHtml,
         text: campText,
       })
-      toast({ title: "Éxito", description: "Campaña guardada." })
+      toast({ title: "¡Campaña guardada! ✅", description: "Cambios aplicados." })
       await loadCampaigns()
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo guardar campaña.", variant: "destructive" })
+      toast({ title: "Ups… no se pudo guardar la campaña 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     } finally {
       setCampSaving(false)
     }
@@ -259,7 +259,7 @@ export default function AdminEmailMarketingPage() {
       await api.sendTestEmailCampaign(selectedCampaignId, testTo.trim())
       toast({ title: "Éxito", description: "Correo de prueba enviado." })
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo enviar prueba.", variant: "destructive" })
+      toast({ title: "Ups… no se envió la prueba 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     } finally {
       setSendingTest(false)
     }
@@ -270,10 +270,10 @@ export default function AdminEmailMarketingPage() {
     setSendingCampaign(true)
     try {
       await api.sendEmailCampaign(selectedCampaignId)
-      toast({ title: "Listo", description: "Envío iniciado en background. Revisa el estado en unos minutos." })
+      toast({ title: "¡Envío en marcha! 🚀", description: "En unos minutos revisa el estado." })
       await loadCampaigns()
     } catch (e: any) {
-      toast({ title: "Error", description: e?.response?.data?.message || e?.message || "No se pudo iniciar envío.", variant: "destructive" })
+      toast({ title: "Ups… no arrancó el envío 😅", description: e?.response?.data?.message || e?.message || "Intenta de nuevo.", variant: "destructive" })
     } finally {
       setSendingCampaign(false)
     }

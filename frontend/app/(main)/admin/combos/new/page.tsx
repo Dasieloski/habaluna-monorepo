@@ -245,12 +245,12 @@ export default function NewComboPage() {
         images: uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined,
       } as any)
 
-      toast({ title: "Éxito", description: "Combo creado correctamente" })
+      toast({ title: "¡Combo creado! 🎉", description: "Todo listo." })
       router.push("/admin/combos")
     } catch (err: any) {
       const msg = err?.message || "Error al crear el combo."
       setError(msg)
-      toast({ title: "Error", description: msg, variant: "destructive" })
+      toast({ title: "Ups… no se pudo crear el combo 😅", description: msg, variant: "destructive" })
     } finally {
       setUploadProgress(null)
       setIsLoading(false)

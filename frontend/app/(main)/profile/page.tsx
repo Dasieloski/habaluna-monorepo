@@ -119,8 +119,8 @@ export default function ProfilePage() {
       } catch (error: any) {
         console.error('Error fetching data:', error);
         toast({
-          title: 'Error',
-          description: error?.response?.data?.message || 'No se pudieron cargar los datos del perfil',
+          title: 'Ups… no cargó tu perfil 😅',
+          description: error?.response?.data?.message || 'Intenta recargar la página.',
           variant: 'destructive',
         });
       } finally {
@@ -142,14 +142,14 @@ export default function ProfilePage() {
         setAuth({ ...(user || {}), ...profileResponse.data }, accessToken);
       }
       toast({
-        title: 'Éxito',
-        description: 'Perfil actualizado correctamente',
+        title: '¡Perfil actualizado! ✅',
+        description: 'Tus datos se guardaron bien.',
       });
     } catch (error: any) {
       console.error('Error updating profile:', error);
       toast({
-        title: 'Error',
-        description: error?.response?.data?.message || 'No se pudo actualizar el perfil',
+        title: 'Ups… no se pudo guardar 😅',
+        description: error?.response?.data?.message || 'Revisa e intenta de nuevo.',
         variant: 'destructive',
       });
     } finally {

@@ -57,8 +57,8 @@ export default function NewProductPage() {
     } catch (err) {
       console.error("Error al cargar categorías:", err)
       toast({
-        title: "Error",
-        description: "No se pudieron cargar las categorías",
+        title: "Ups… no cargaron las categorías 😅",
+        description: "Intenta recargar la página.",
         variant: "destructive",
       })
     } finally {
@@ -130,8 +130,8 @@ export default function NewProductPage() {
       await api.createProduct(productData)
 
       toast({
-        title: "Éxito",
-        description: "Producto creado correctamente",
+        title: "¡Producto creado! 🎉",
+        description: "Ya está en tu catálogo.",
       })
 
       router.push("/admin/products")
@@ -140,7 +140,7 @@ export default function NewProductPage() {
       const errorMessage = err.message || "Error al crear el producto. Por favor, intenta de nuevo."
       setError(errorMessage)
       toast({
-        title: "Error",
+        title: "Ups… no se pudo crear 😅",
         description: errorMessage,
         variant: "destructive",
       })

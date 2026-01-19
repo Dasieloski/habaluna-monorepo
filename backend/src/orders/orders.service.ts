@@ -7,6 +7,7 @@ import { CartService } from '../cart/cart.service';
 import { convertToUSD } from '../common/utils/currency.utils';
 import { EmailService } from '../common/email/email.service';
 import { OffersService } from '../offers/offers.service';
+import { TransportConfigService } from '../transport-config/transport-config.service';
 
 @Injectable()
 export class OrdersService {
@@ -17,6 +18,7 @@ export class OrdersService {
     private cartService: CartService,
     private emailService: EmailService,
     private offersService: OffersService,
+    private transportConfig: TransportConfigService,
   ) {}
 
   async create(userId: string, createOrderDto: CreateOrderDto) {
@@ -60,12 +62,13 @@ export class OrdersService {
       }
     }
 
-    // Calculate totals (todo en USD)
-    const subtotal = cart.subtotal; // Ya está en USD
-    // En este flujo (Cuba) no se aplica IVA
+    // Calcular totals (todo en USD)
+    const subtotal = cart.subtotal;
     const tax = 0;
-    const shipping = subtotal >= 50 ? 0 : 5.99; // Free shipping over 50 USD
-    const total = subtotal + tax + shipping;
+    const itemCount = cart.items.reduce((s, i) => s + i.quantity, 0);
+    const config = await this.transportConfig.getPublic();
+    const { shipping } = this.transportConfig.computeShipping(itemCount, config);
+    const total = subtotal + tax + Number(shipping);
 
     // Create order (sin descontar stock ni limpiar carrito - se hará cuando se confirme el pago)
     const order = await this.prisma.order.create({

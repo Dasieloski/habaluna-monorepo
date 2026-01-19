@@ -98,16 +98,16 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                   e.preventDefault()
                   if (!isAuthenticated()) {
                     toast({
-                      title: "Inicia sesión",
-                      description: "Para guardar productos en tu wishlist.",
+                      title: "¡Entra primero! 🔐",
+                      description: "Inicia sesión para guardar en tu wishlist.",
                       variant: "destructive",
                     })
                     return
                   }
                   toggleWishlist(product.id).catch((err: any) => {
                     toast({
-                      title: "Error",
-                      description: err?.response?.data?.message || err?.message || "No se pudo actualizar la wishlist.",
+                      title: "Ups… la wishlist se resistió 😅",
+                      description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
                       variant: "destructive",
                     })
                   })
@@ -148,11 +148,11 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                       quantity: 1,
                     })
                     if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-                    else toast({ title: "Añadido al carrito" })
+                    else toast({ title: "¡Al carrito! 🛒" })
                   } catch (err: any) {
                     toast({
-                      title: "No se pudo añadir",
-                      description: err?.response?.data?.message || err?.message || "Intenta nuevamente.",
+                      title: "Ups… no se pudo añadir 😅",
+                      description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
                       variant: "destructive",
                     })
                   }
@@ -216,11 +216,11 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                         quantity: 1,
                       })
                       if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-                      else toast({ title: "Añadido al carrito" })
+                      else toast({ title: "¡Al carrito! 🛒" })
                     } catch (err: any) {
                       toast({
-                        title: "No se pudo añadir",
-                        description: err?.response?.data?.message || err?.message || "Intenta nuevamente.",
+                        title: "Ups… no se pudo añadir 😅",
+                        description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
                         variant: "destructive",
                       })
                     }
@@ -280,8 +280,8 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
               }
               toggleWishlist(product.id).catch((err: any) => {
                 toast({
-                  title: "Error",
-                  description: err?.response?.data?.message || err?.message || "No se pudo actualizar la wishlist.",
+                  title: "Ups… la wishlist se resistió 😅",
+                  description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
                   variant: "destructive",
                 })
               })
@@ -323,11 +323,11 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                   quantity: 1,
                 })
                 if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-                else toast({ title: "Añadido al carrito" })
+                else toast({ title: "¡Al carrito! 🛒" })
               } catch (err: any) {
                 toast({
-                  title: "No se pudo añadir",
-                  description: err?.response?.data?.message || err?.message || "Intenta nuevamente.",
+                  title: "Ups… no se pudo añadir 😅",
+                  description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
                   variant: "destructive",
                 })
               }
@@ -394,11 +394,11 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                     quantity: 1,
                   })
                   if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-                  else toast({ title: "Añadido al carrito" })
+                  else toast({ title: "¡Al carrito! 🛒" })
                 } catch (err: any) {
                   toast({
-                    title: "No se pudo añadir",
-                    description: err?.response?.data?.message || err?.message || "Intenta nuevamente.",
+                    title: "Ups… no se pudo añadir 😅",
+                    description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
                     variant: "destructive",
                   })
                 }

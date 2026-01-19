@@ -51,6 +51,7 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<{ id: string; code: string; discount: number; name: string } | null>(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
   const [couponError, setCouponError] = useState('');
+  const [transportEstimate, setTransportEstimate] = useState<{ shipping: number } | null>(null);
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
   const isBootstrapped = useAuthStore((s) => s.isBootstrapped)
@@ -105,7 +106,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (validation && hasIssues) {
       // Mostrar error pero no redirigir automáticamente para que el usuario vea qué está mal
-      setError('Hay problemas con el stock de algunos productos. Por favor, revisa tu carrito.');
+      setError('Algunos productos tienen poco stock. Revisa tu carrito y ajusta cantidades 👀');
     }
   }, [validation, hasIssues]);
 
@@ -139,13 +140,13 @@ export default function CheckoutPage() {
       setShippingData(data);
       setShowPayment(true);
       showSuccess(
-        'Orden creada',
-        'Tu orden ha sido creada exitosamente. Procede con el pago.'
+        '¡Orden lista! ✅',
+        'Todo en orden. Ahora solo falta el pago.'
       );
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al crear el pedido';
       setError(errorMessage);
-      showError('Error al crear la orden', errorMessage);
+      showError('Ups… no pudimos crear la orden 😅', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -163,8 +164,8 @@ export default function CheckoutPage() {
       
       clearCart();
       showSuccess(
-        'Pago exitoso',
-        'Tu orden ha sido procesada correctamente. Gracias por tu compra.'
+        '¡Pago recibido! 🎉',
+        'Gracias por tu compra. Tu pedido está en camino.'
       );
       router.push(`/profile?order=${orderId}&success=true`);
     } catch (err: any) {
@@ -172,15 +173,15 @@ export default function CheckoutPage() {
       // Aún así redirigir, el pago ya fue exitoso
       clearCart();
       showSuccess(
-        'Pago exitoso',
-        'Tu orden ha sido procesada correctamente. Gracias por tu compra.'
+        '¡Pago recibido! 🎉',
+        'Gracias por tu compra. Tu pedido está en camino.'
       );
       router.push(`/profile?order=${orderId}&success=true`);
     }
   };
 
   const handlePaymentError = (error: { error: string }) => {
-    setError(`Error en el pago: ${error.error}`);
+    setError(`El pago no se completó: ${error.error}. Revisa los datos o intenta de nuevo.`);
     setShowPayment(false);
   };
 
@@ -204,15 +205,15 @@ export default function CheckoutPage() {
           name: result.offer.name,
         });
         setCouponCode('');
-        showSuccess('Cupón aplicado', `Descuento de ${formatPrice(result.discount)} aplicado`);
+        showSuccess('¡Cupón aplicado! 🎟️', `Te descontamos ${formatPrice(result.discount)}`);
       } else {
-        setCouponError(result.message || 'Cupón inválido');
-        showError('Cupón inválido', result.message || 'El cupón no es válido');
+        setCouponError(result.message || 'Ese cupón no aplica');
+        showError('Ese cupón no cuadra 😅', result.message || 'Revisa el código o la vigencia.');
       }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Error al validar el cupón';
+      const errorMessage = err.response?.data?.message || 'No pudimos validar el cupón';
       setCouponError(errorMessage);
-      showError('Error', errorMessage);
+      showError('Ups… el cupón no pasó', errorMessage);
     } finally {
       setValidatingCoupon(false);
     }
@@ -224,9 +225,21 @@ export default function CheckoutPage() {
     setCouponError('');
   };
 
+  const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+  useEffect(() => {
+    if (items.length === 0) {
+      setTransportEstimate(null);
+      return;
+    }
+    let cancelled = false;
+    api.getTransportEstimate(itemCount).then((r) => {
+      if (!cancelled) setTransportEstimate({ shipping: r.shipping });
+    }).catch(() => { if (!cancelled) setTransportEstimate(null); });
+    return () => { cancelled = true; };
+  }, [itemCount, items.length]);
+
   const subtotalWithDiscount = subtotal - (appliedCoupon?.discount || 0);
-  // En Cuba no se aplica IVA en este flujo
-  const shipping = subtotalWithDiscount >= 50 ? 0 : 5.99;
+  const shipping = transportEstimate?.shipping ?? 0;
   const total = subtotalWithDiscount + shipping;
 
   return (
@@ -547,7 +560,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between">
                   <span>Envío</span>
-                  <span>{shipping === 0 ? 'Gratis' : formatPrice(shipping)}</span>
+                  <span>{formatPrice(shipping)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-2 border-t">
                   <span>Total</span>

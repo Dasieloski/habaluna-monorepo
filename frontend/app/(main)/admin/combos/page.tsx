@@ -73,7 +73,7 @@ export default function AdminCombosPage() {
     try {
       await api.deleteProduct(deleteTarget.id)
       setItems((prev) => prev.filter((x) => x.id !== deleteTarget.id))
-      toast({ title: "Eliminado", description: "Combo eliminado correctamente." })
+      toast({ title: "¡Combo eliminado! 🗑️", description: "Se borró bien." })
       setConfirmOpen(false)
       setDeleteTarget(null)
     } catch (e: any) {
