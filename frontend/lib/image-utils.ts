@@ -13,7 +13,10 @@ export function getFirstImage(images?: string | string[]): string | null {
   return images[0] || null
 }
 
-export function getImageUrl(image?: string): string | null {
+export function getImageUrl(
+  image?: string,
+  opts?: { width?: number; height?: number }
+): string | null {
   if (!image) return null
   
   const trimmed = image.trim()
@@ -70,5 +73,8 @@ export function getImageUrl(image?: string): string | null {
   
   // Convertir a /api/media/{id} con optimización WebP por defecto
   // El backend optimizará automáticamente si tiene sharp instalado
-  return `${base}/api/media/${imageId}?format=webp&q=80`
+  const params = new URLSearchParams({ format: 'webp', q: '80' })
+  if (opts?.width) params.set('w', String(opts.width))
+  if (opts?.height) params.set('h', String(opts.height))
+  return `${base}/api/media/${imageId}?${params.toString()}`
 }

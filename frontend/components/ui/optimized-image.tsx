@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Image from 'next/image'
-import { getApiBaseUrlLazy } from "@/lib/api"
+import { getImageUrl } from '@/lib/image-utils'
 
 interface OptimizedImageProps {
   src: string
@@ -41,84 +41,26 @@ export function OptimizedImage({
   placeholder = 'empty',
   blurDataURL,
 }: OptimizedImageProps) {
-  const [imgSrc, setImgSrc] = useState<string>(src)
+  const imgSrc = useMemo(
+    () => getImageUrl(src?.trim(), { width, height }),
+    [src, width, height]
+  )
   const [hasError, setHasError] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
 
-  // Normalizar URL: asegurar HTTPS y formato correcto
   useEffect(() => {
-    if (!src) {
-      setHasError(true)
-      return
-    }
-
-    let normalizedSrc = src.trim()
-    
-    // CRÍTICO: Eliminar referencias a Cloudinary - usar solo imágenes de la BD
-    if (normalizedSrc.includes('cloudinary.com') || normalizedSrc.includes('res.cloudinary')) {
-      console.warn('[OptimizedImage] URL de Cloudinary detectada, ignorando:', normalizedSrc)
-      setHasError(true)
-      return
-    }
-    
-    // Si es una URL completa, retornarla tal cual (forzar HTTPS)
-    if (normalizedSrc.startsWith('http://') || normalizedSrc.startsWith('https://')) {
-      if (normalizedSrc.startsWith('http://')) {
-        normalizedSrc = normalizedSrc.replace('http://', 'https://')
-      }
-      setImgSrc(normalizedSrc)
-      return
-    }
-    
-    // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-    const apiBase = getApiBaseUrlLazy()
-    
-    // Si ya es una ruta completa del backend con /api/media/, retornarla con base
-    if (normalizedSrc.startsWith('/api/media/')) {
-      setImgSrc(`${apiBase}${normalizedSrc}`)
-      return
-    }
-
-    // Si empieza con /uploads, construir la URL completa del backend
-    if (normalizedSrc.startsWith('/uploads/')) {
-      setImgSrc(`${apiBase}${normalizedSrc}`)
-      return
-    }
-
-    // Rutas locales del frontend (public/) - retornar tal cual
-    if (
-      normalizedSrc.startsWith('/placeholder') || 
-      normalizedSrc.startsWith('/images') || 
-      normalizedSrc.startsWith('/logo') ||
-      normalizedSrc.endsWith('.svg') ||
-      normalizedSrc.endsWith('.png') ||
-      normalizedSrc.endsWith('.jpg') ||
-      normalizedSrc.endsWith('.jpeg') ||
-      normalizedSrc.endsWith('.webp')
-    ) {
-      setImgSrc(normalizedSrc)
-      return
-    }
-
-    // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
-    // Si empieza con /, quitar el / primero
-    const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
-    
-    // Si después de quitar el / está vacío, marcar error
-    if (!imageId) {
-      setHasError(true)
-      return
-    }
-    
-    // Convertir a /api/media/{id}
-    setImgSrc(`${apiBase}/api/media/${imageId}`)
+    setHasError(false)
+    setRetryCount(0)
   }, [src])
 
-  const handleError = () => {
-    setHasError(true)
-    if (onError) {
-      onError()
+  const handleError = useCallback(() => {
+    if (retryCount < 2) {
+      setRetryCount((r) => r + 1)
+    } else {
+      setHasError(true)
+      onError?.()
     }
-  }
+  }, [onError, retryCount])
 
   // Si hay error, mostrar placeholder
   if (hasError || !imgSrc) {
@@ -176,7 +118,7 @@ export function OptimizedImage({
     imgSrc.includes('habaluna-backend-production.up.railway.app') ||
     imgSrc.includes('localhost:4000')
 
-  return <Image {...imageProps} unoptimized={shouldUnoptimize} />
+  return <Image key={retryCount} {...imageProps} unoptimized={shouldUnoptimize} />
 }
 
 /**
@@ -198,85 +140,25 @@ export function OptimizedImg({
   onError?: () => void
   [key: string]: any
 }) {
-  const [imgSrc, setImgSrc] = useState<string>(src)
+  const imgSrc = useMemo(() => getImageUrl(src?.trim()), [src])
   const [hasError, setHasError] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
-    if (!src) {
-      setHasError(true)
-      return
-    }
-
-    let normalizedSrc = src.trim()
-    
-    // CRÍTICO: Eliminar referencias a Cloudinary - usar solo imágenes de la BD
-    if (normalizedSrc.includes('cloudinary.com') || normalizedSrc.includes('res.cloudinary')) {
-      console.warn('[OptimizedImg] URL de Cloudinary detectada, ignorando:', normalizedSrc)
-      setHasError(true)
-      return
-    }
-    
-    // Si es una URL completa, retornarla tal cual (forzar HTTPS)
-    if (normalizedSrc.startsWith('http://') || normalizedSrc.startsWith('https://')) {
-      if (normalizedSrc.startsWith('http://')) {
-        normalizedSrc = normalizedSrc.replace('http://', 'https://')
-      }
-      setImgSrc(normalizedSrc)
-      return
-    }
-    
-    // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-    const apiBase = getApiBaseUrlLazy()
-    
-    // Si ya es una ruta completa del backend con /api/media/, retornarla con base
-    if (normalizedSrc.startsWith('/api/media/')) {
-      setImgSrc(`${apiBase}${normalizedSrc}`)
-      return
-    }
-
-    // Si empieza con /uploads, construir la URL completa del backend
-    if (normalizedSrc.startsWith('/uploads/')) {
-      setImgSrc(`${apiBase}${normalizedSrc}`)
-      return
-    }
-
-    // Rutas locales del frontend (public/) - retornar tal cual
-    if (
-      normalizedSrc.startsWith('/placeholder') || 
-      normalizedSrc.startsWith('/images') || 
-      normalizedSrc.startsWith('/logo') ||
-      normalizedSrc.endsWith('.svg') ||
-      normalizedSrc.endsWith('.png') ||
-      normalizedSrc.endsWith('.jpg') ||
-      normalizedSrc.endsWith('.jpeg') ||
-      normalizedSrc.endsWith('.webp')
-    ) {
-      setImgSrc(normalizedSrc)
-      return
-    }
-
-    // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
-    // Si empieza con /, quitar el / primero
-    const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
-    
-    // Si después de quitar el / está vacío, marcar error
-    if (!imageId) {
-      setHasError(true)
-      return
-    }
-    
-    // Convertir a /api/media/{id}
-    setImgSrc(`${apiBase}/api/media/${imageId}`)
+    setHasError(false)
+    setRetryCount(0)
   }, [src])
 
-  const handleError = () => {
-    setHasError(true)
-    if (onError) {
-      onError()
+  const handleError = useCallback(() => {
+    if (retryCount < 2) {
+      setRetryCount((r) => r + 1)
+    } else {
+      setHasError(true)
+      onError?.()
     }
-  }
+  }, [onError, retryCount])
 
-  if (hasError || !imgSrc) {
+  if (!imgSrc || hasError) {
     return (
       <div className={`flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200 ${className}`}>
         <div className="text-center p-4">
@@ -301,6 +183,7 @@ export function OptimizedImg({
 
   return (
     <img
+      key={retryCount}
       src={imgSrc}
       alt={alt}
       className={className}

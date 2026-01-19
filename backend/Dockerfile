@@ -10,7 +10,7 @@ RUN apt-get update \
     python3 \
     make \
     g++ \
-    && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/*
 
 # Copiar solo archivos de dependencias primero (mejor cacheo)
 # En workspaces, package-lock.json puede estar en la raíz, copiar ambos

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Image from 'next/image'
-import { getApiBaseUrlLazy } from "@/lib/api"
+import { getImageUrl } from '@/lib/image-utils'
 import { cn } from "@/lib/utils"
 
 /**
@@ -79,6 +79,51 @@ interface SmartImageProps {
  * - Sin layout shift (respeta dimensiones)
  * - Lazy loading por defecto (excepto priority)
  */
+const MAX_RETRIES = 2
+
+function PlaceholderError({ className, fill, aspectRatio, width, height }: {
+  className?: string
+  fill?: boolean
+  aspectRatio?: string
+  width?: number
+  height?: number
+}) {
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200",
+        className
+      )}
+      style={
+        fill
+          ? { width: '100%', height: '100%' }
+          : aspectRatio
+          ? { aspectRatio }
+          : width && height
+          ? { width, height }
+          : undefined
+      }
+    >
+      <div className="text-center p-4">
+        <svg
+          className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+        <p className="text-xs text-gray-500">Imagen no disponible</p>
+      </div>
+    </div>
+  )
+}
+
 export function SmartImage({
   src,
   alt,
@@ -94,189 +139,43 @@ export function SmartImage({
   blurDataURL,
   aspectRatio,
 }: SmartImageProps) {
-  const [imgSrc, setImgSrc] = useState<string>('')
+  // Normalización SÍNCRONA: URL lista en el primer render, sin esperar useEffect
+  const imgSrc = useMemo(
+    () => getImageUrl(src?.trim(), { width, height: typeof height === 'number' ? height : undefined }),
+    [src, width, height]
+  )
+
   const [hasError, setHasError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [isUrlReady, setIsUrlReady] = useState(false)
-  const [blurPlaceholder, setBlurPlaceholder] = useState<string>(blurDataURL || '')
+  const [retryCount, setRetryCount] = useState(0)
+  const blurPlaceholder = useMemo(() => blurDataURL || generateBlurDataURL(), [blurDataURL])
 
-  // Normalizar URL: asegurar HTTPS y formato correcto
+  // Reset estados al cambiar src
   useEffect(() => {
-    if (!src) {
-      setHasError(true)
-      setIsLoading(false)
-      setIsUrlReady(false)
-      return
-    }
-
-    // Resetear estados al cambiar src
     setHasError(false)
     setIsLoading(true)
-    setIsUrlReady(false)
-
-    let normalizedSrc = src.trim()
-    
-    // CRÍTICO: Eliminar referencias a Cloudinary - usar solo imágenes de la BD
-    if (normalizedSrc.includes('cloudinary.com') || normalizedSrc.includes('res.cloudinary')) {
-      console.warn('[SmartImage] URL de Cloudinary detectada, ignorando:', normalizedSrc)
-      setHasError(true)
-      setIsLoading(false)
-      setIsUrlReady(false)
-      return
-    }
-    
-    // Si es una URL completa, retornarla tal cual (forzar HTTPS)
-    if (normalizedSrc.startsWith('http://') || normalizedSrc.startsWith('https://')) {
-      if (normalizedSrc.startsWith('http://')) {
-        normalizedSrc = normalizedSrc.replace('http://', 'https://')
-      }
-      setImgSrc(normalizedSrc)
-      setIsUrlReady(true)
-      return
-    }
-    
-    // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-    // Esperar a que esté disponible (puede tardar en el cliente)
-    try {
-      const apiBase = getApiBaseUrlLazy()
-      
-      // Si ya es una ruta completa del backend con /api/media/, retornarla con base
-      if (normalizedSrc.startsWith('/api/media/')) {
-        setImgSrc(`${apiBase}${normalizedSrc}`)
-        setIsUrlReady(true)
-        return
-      }
-
-      // Si empieza con /uploads, construir la URL completa del backend
-      if (normalizedSrc.startsWith('/uploads/')) {
-        setImgSrc(`${apiBase}${normalizedSrc}`)
-        setIsUrlReady(true)
-        return
-      }
-
-      // Rutas locales del frontend (public/) - retornar tal cual
-      if (
-        normalizedSrc.startsWith('/placeholder') || 
-        normalizedSrc.startsWith('/images') || 
-        normalizedSrc.startsWith('/logo') ||
-        normalizedSrc.endsWith('.svg') ||
-        normalizedSrc.endsWith('.png') ||
-        normalizedSrc.endsWith('.jpg') ||
-        normalizedSrc.endsWith('.jpeg') ||
-        normalizedSrc.endsWith('.webp')
-      ) {
-        setImgSrc(normalizedSrc)
-        setIsUrlReady(true)
-        return
-      }
-
-      // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
-      // Si empieza con /, quitar el / primero
-      const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
-      
-      // Si después de quitar el / está vacío, marcar error
-      if (!imageId) {
-        setHasError(true)
-        setIsLoading(false)
-        setIsUrlReady(false)
-        return
-      }
-      
-      // Convertir a /api/media/{id} con parámetros de optimización
-      // Agregar parámetros de tamaño y formato para optimización
-      const params = new URLSearchParams()
-      if (width && height) {
-        params.set('w', String(width))
-        params.set('h', String(height))
-      } else if (width) {
-        params.set('w', String(width))
-      } else if (height) {
-        params.set('h', String(height))
-      }
-      // Solicitar WebP por defecto para mejor compresión
-      params.set('format', 'webp')
-      params.set('q', '80')
-      
-      setImgSrc(`${apiBase}/api/media/${imageId}?${params.toString()}`)
-      setIsUrlReady(true)
-    } catch (error) {
-      // Si hay error obteniendo la URL base, reintentar después de un delay
-      console.warn('[SmartImage] Error obteniendo API base URL, reintentando...', error)
-      setTimeout(() => {
-        try {
-          const apiBase = getApiBaseUrlLazy()
-          const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
-          if (imageId) {
-            setImgSrc(`${apiBase}/api/media/${imageId}`)
-            setIsUrlReady(true)
-          }
-        } catch (retryError) {
-          setHasError(true)
-          setIsLoading(false)
-          setIsUrlReady(false)
-        }
-      }, 100)
-    }
-  }, [src, width, height])
-
-  // Generar blur placeholder si no se proporciona
-  useEffect(() => {
-    if (!blurDataURL && !blurPlaceholder) {
-      setBlurPlaceholder(generateBlurDataURL())
-    }
-  }, [blurDataURL, blurPlaceholder])
+    setRetryCount(0)
+  }, [src])
 
   const handleError = useCallback(() => {
-    setHasError(true)
-    setIsLoading(false)
-    if (onError) {
-      onError()
+    if (retryCount < MAX_RETRIES) {
+      setRetryCount((r) => r + 1)
+      setIsLoading(true)
+    } else {
+      setHasError(true)
+      setIsLoading(false)
+      onError?.()
     }
-  }, [onError])
+  }, [onError, retryCount])
 
   const handleLoadingComplete = useCallback(() => {
     setIsLoading(false)
-    if (onLoadingComplete) {
-      onLoadingComplete()
-    }
+    onLoadingComplete?.()
   }, [onLoadingComplete])
 
-  // Si hay error o la URL no está lista, mostrar placeholder
-  if (hasError || !imgSrc || !isUrlReady) {
-    return (
-      <div 
-        className={cn(
-          "flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200",
-          className
-        )}
-        style={
-          fill
-            ? { width: '100%', height: '100%' }
-            : aspectRatio
-            ? { aspectRatio }
-            : width && height
-            ? { width, height }
-            : undefined
-        }
-      >
-        <div className="text-center p-4">
-          <svg
-            className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-          <p className="text-xs text-gray-500">Imagen no disponible</p>
-        </div>
-      </div>
-    )
+  // Sin src válido o error definitivo tras reintentos → placeholder
+  if (!imgSrc || hasError) {
+    return <PlaceholderError className={className} fill={fill} aspectRatio={aspectRatio} width={width} height={height} />
   }
 
   // Usar Next.js Image para optimización automática
@@ -344,8 +243,8 @@ export function SmartImage({
         />
       )}
       
-      {/* Imagen real */}
-      <Image {...imageProps} />
+      {/* key con retryCount fuerza un nuevo request en cada reintento */}
+      <Image key={retryCount} {...imageProps} />
     </div>
   )
 }
@@ -375,173 +274,41 @@ export function SmartImg({
   aspectRatio?: string
   [key: string]: any
 }) {
-  const [imgSrc, setImgSrc] = useState<string>('')
+  const w = typeof width === 'number' ? width : undefined
+  const h = typeof height === 'number' ? height : undefined
+  const imgSrc = useMemo(() => getImageUrl(src?.trim(), { width: w, height: h }), [src, w, h])
+
   const [hasError, setHasError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [isUrlReady, setIsUrlReady] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
-    if (!src) {
-      setHasError(true)
-      setIsLoading(false)
-      setIsUrlReady(false)
-      return
-    }
-
-    // Resetear estados al cambiar src
     setHasError(false)
     setIsLoading(true)
-    setIsUrlReady(false)
-
-    let normalizedSrc = src.trim()
-    
-    // CRÍTICO: Eliminar referencias a Cloudinary - usar solo imágenes de la BD
-    if (normalizedSrc.includes('cloudinary.com') || normalizedSrc.includes('res.cloudinary')) {
-      console.warn('[SmartImg] URL de Cloudinary detectada, ignorando:', normalizedSrc)
-      setHasError(true)
-      setIsLoading(false)
-      setIsUrlReady(false)
-      return
-    }
-    
-    // Si es una URL completa, retornarla tal cual (forzar HTTPS)
-    if (normalizedSrc.startsWith('http://') || normalizedSrc.startsWith('https://')) {
-      if (normalizedSrc.startsWith('http://')) {
-        normalizedSrc = normalizedSrc.replace('http://', 'https://')
-      }
-      setImgSrc(normalizedSrc)
-      setIsUrlReady(true)
-      return
-    }
-    
-    // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-    // Esperar a que esté disponible (puede tardar en el cliente)
-    try {
-      const apiBase = getApiBaseUrlLazy()
-      
-      // Si ya es una ruta completa del backend con /api/media/, retornarla con base
-      if (normalizedSrc.startsWith('/api/media/')) {
-        setImgSrc(`${apiBase}${normalizedSrc}`)
-        setIsUrlReady(true)
-        return
-      }
-
-      // Si empieza con /uploads, construir la URL completa del backend
-      if (normalizedSrc.startsWith('/uploads/')) {
-        setImgSrc(`${apiBase}${normalizedSrc}`)
-        setIsUrlReady(true)
-        return
-      }
-
-      // Rutas locales del frontend (public/) - retornar tal cual
-      if (
-        normalizedSrc.startsWith('/placeholder') || 
-        normalizedSrc.startsWith('/images') || 
-        normalizedSrc.startsWith('/logo') ||
-        normalizedSrc.endsWith('.svg') ||
-        normalizedSrc.endsWith('.png') ||
-        normalizedSrc.endsWith('.jpg') ||
-        normalizedSrc.endsWith('.jpeg') ||
-        normalizedSrc.endsWith('.webp')
-      ) {
-        setImgSrc(normalizedSrc)
-        setIsUrlReady(true)
-        return
-      }
-
-      // CUALQUIER otro string se trata como ID de Media y se convierte a /api/media/{id}
-      // Si empieza con /, quitar el / primero
-      const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
-      
-      // Si después de quitar el / está vacío, marcar error
-      if (!imageId) {
-        setHasError(true)
-        setIsLoading(false)
-        setIsUrlReady(false)
-        return
-      }
-      
-      // Convertir a /api/media/{id} con parámetros de optimización
-      // Agregar parámetros de tamaño y formato para optimización
-      const params = new URLSearchParams()
-      if (width && height) {
-        params.set('w', String(width))
-        params.set('h', String(height))
-      } else if (width) {
-        params.set('w', String(width))
-      } else if (height) {
-        params.set('h', String(height))
-      }
-      // Solicitar WebP por defecto para mejor compresión
-      params.set('format', 'webp')
-      params.set('q', '80')
-      
-      setImgSrc(`${apiBase}/api/media/${imageId}?${params.toString()}`)
-      setIsUrlReady(true)
-    } catch (error) {
-      // Si hay error obteniendo la URL base, reintentar después de un delay
-      console.warn('[SmartImg] Error obteniendo API base URL, reintentando...', error)
-      setTimeout(() => {
-        try {
-          const apiBase = getApiBaseUrlLazy()
-          const imageId = normalizedSrc.startsWith('/') ? normalizedSrc.substring(1) : normalizedSrc
-          if (imageId) {
-            setImgSrc(`${apiBase}/api/media/${imageId}`)
-            setIsUrlReady(true)
-          }
-        } catch (retryError) {
-          setHasError(true)
-          setIsLoading(false)
-          setIsUrlReady(false)
-        }
-      }, 100)
-    }
-  }, [src, width, height])
+    setRetryCount(0)
+  }, [src])
 
   const handleError = useCallback(() => {
-    setHasError(true)
-    setIsLoading(false)
-    if (onError) {
-      onError()
+    if (retryCount < MAX_RETRIES) {
+      setRetryCount((r) => r + 1)
+      setIsLoading(true)
+    } else {
+      setHasError(true)
+      setIsLoading(false)
+      onError?.()
     }
-  }, [onError])
+  }, [onError, retryCount])
 
-  const handleLoad = useCallback(() => {
-    setIsLoading(false)
-  }, [])
+  const handleLoad = useCallback(() => setIsLoading(false), [])
 
-  if (hasError || !imgSrc || !isUrlReady) {
+  if (!imgSrc || hasError) {
     return (
-      <div 
-        className={cn(
-          "flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200",
-          className
-        )}
-        style={
-          aspectRatio
-            ? { aspectRatio }
-            : width && height
-            ? { width, height }
-            : undefined
-        }
-      >
-        <div className="text-center p-4">
-          <svg
-            className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-          <p className="text-xs text-gray-500">Imagen no disponible</p>
-        </div>
-      </div>
+      <PlaceholderError
+        className={className}
+        aspectRatio={aspectRatio}
+        width={w}
+        height={h}
+      />
     )
   }
 
@@ -568,8 +335,9 @@ export function SmartImg({
         />
       )}
       
-      {/* Imagen real */}
+      {/* key con retryCount fuerza un nuevo request en cada reintento */}
       <img
+        key={retryCount}
         src={imgSrc}
         alt={alt}
         className={cn(

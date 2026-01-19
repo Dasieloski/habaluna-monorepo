@@ -1,8 +1,11 @@
 import { Controller, Get, NotFoundException, Param, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiQuery } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { MediaService } from './media.service';
 
+/** Excluido del rate limit: las imágenes son recursos estáticos y no deben competir con el límite de la API. */
+@SkipThrottle()
 @ApiTags('media')
 @Controller('media')
 export class MediaController {
