@@ -95,7 +95,7 @@ function Button({
     return (
       <Slot
         data-slot="button"
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size }), className)}
         {...props}
       >
         {children}
@@ -108,7 +108,7 @@ function Button({
     return (
       <button
         data-slot="button"
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size }), className)}
         disabled={isDisabled}
         {...props}
       >
@@ -125,7 +125,7 @@ function Button({
   return (
     <motion.button
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size }), className)}
       disabled={isDisabled}
       {...buttonMotionProps}
       {...(props as any)}

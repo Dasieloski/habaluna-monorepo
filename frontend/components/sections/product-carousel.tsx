@@ -30,7 +30,7 @@ interface ProductCarouselProps {
 
 // Eliminadas imágenes estáticas - solo usar imágenes de la BD o placeholder
 
-export function ProductCarousel({ title, products, viewAllLink, badgeType, autoSlide = false }: ProductCarouselProps) {
+export function ProductCarousel({ title, products, viewAllLink, badgeType, autoSlide = false, className }: ProductCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
 
