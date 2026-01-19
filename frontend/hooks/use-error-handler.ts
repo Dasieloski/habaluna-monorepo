@@ -1,13 +1,15 @@
 'use client';
 
 import { useCallback } from 'react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 /**
- * Hook para manejar errores de forma consistente en la aplicación
- * Muestra notificaciones amigables al usuario
+ * Hook para manejar errores de forma consistente en la aplicación.
+ * Muestra notificaciones amigables al usuario (Contextual Toast).
  */
 export function useErrorHandler() {
+  const { showError } = useToast();
+
   const handleError = useCallback((error: unknown, customMessage?: string) => {
     let message = customMessage || 'Ha ocurrido un error. Por favor, intenta nuevamente.';
 
@@ -15,11 +17,10 @@ export function useErrorHandler() {
       // Errores de API
       if ('status' in error) {
         const apiError = error as { status?: number; message?: string };
-        
+
         switch (apiError.status) {
           case 401:
             message = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
-            // Redirigir al login si es necesario
             if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
               window.location.href = '/admin/login';
             }
@@ -46,18 +47,14 @@ export function useErrorHandler() {
       message = error;
     }
 
-    // Mostrar notificación
-    toast.error(message, {
-      duration: 5000,
-    });
+    showError('Error', message);
 
-    // Log para debugging (solo en desarrollo)
     if (process.env.NODE_ENV === 'development') {
       console.error('Error manejado:', error);
     }
 
     return message;
-  }, []);
+  }, [showError]);
 
   return { handleError };
 }
