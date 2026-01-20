@@ -161,9 +161,9 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
 
       {/* Panel de filtros avanzados */}
       {isOpen && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-4">
+        <div className="bg-gray-50 dark:bg-card border border-gray-200 dark:border-border rounded-lg p-4 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900">Filtros avanzados</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-card-foreground">Filtros avanzados</h3>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters} className="text-sm">
                 <X className="w-4 h-4 mr-1" />
@@ -231,7 +231,7 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
                   id="inStock"
                   checked={searchParams.get('inStock') === 'true'}
                   onChange={(e) => updateFilter('inStock', e.target.checked ? 'true' : null)}
-                  className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+                  className="w-4 h-4 text-sky-600 dark:text-accent border-gray-300 dark:border-border rounded focus:ring-sky-500 dark:focus:ring-ring"
                 />
                 <Label htmlFor="inStock" className="font-normal cursor-pointer">
                   Solo con stock
@@ -243,7 +243,7 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
                   id="isFeatured"
                   checked={searchParams.get('isFeatured') === 'true'}
                   onChange={(e) => updateFilter('isFeatured', e.target.checked ? 'true' : null)}
-                  className="w-4 h-4 text-sky-600 border-gray-300 rounded focus:ring-sky-500"
+                  className="w-4 h-4 text-sky-600 dark:text-accent border-gray-300 dark:border-border rounded focus:ring-sky-500 dark:focus:ring-ring"
                 />
                 <Label htmlFor="isFeatured" className="font-normal cursor-pointer">
                   Solo destacados

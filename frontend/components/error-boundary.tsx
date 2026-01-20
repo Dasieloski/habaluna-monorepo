@@ -77,7 +77,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       // UI de error por defecto
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-background">
           <Card className="w-full max-w-md">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -90,13 +90,13 @@ export class ErrorBoundary extends Component<Props, State> {
             </CardHeader>
             <CardContent>
               {process.env.NODE_ENV === 'development' && this.state.error && (
-                <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm font-mono overflow-auto max-h-40">
-                  <div className="text-red-600 dark:text-red-400 font-semibold mb-2">
+                <div className="mt-4 p-3 bg-gray-100 dark:bg-secondary rounded text-sm font-mono overflow-auto max-h-40">
+                  <div className="text-red-600 dark:text-destructive font-semibold mb-2">
                     {this.state.error.name}: {this.state.error.message}
                   </div>
                   {this.state.errorInfo && (
                     <details className="mt-2">
-                      <summary className="cursor-pointer text-gray-600 dark:text-gray-400">
+                      <summary className="cursor-pointer text-gray-600 dark:text-muted-foreground">
                         Stack trace
                       </summary>
                       <pre className="mt-2 text-xs overflow-auto">

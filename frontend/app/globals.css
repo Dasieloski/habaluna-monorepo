@@ -58,42 +58,44 @@
 }
 
 .dark {
-  /* Base oscura #212125; acentos más suaves, contraste priorizado */
+  /* PALETA: #212125 fondo, #f7f6f4 texto claro, #473968 marca, #65b233 CTA, #ebe6d8 cards */
   --background: #212125;
   --foreground: #f7f6f4;
-  --card: #2a2a2e;
-  --card-foreground: #f7f6f4;
-  --popover: #2a2a2e;
-  --popover-foreground: #f7f6f4;
+  /* #ebe6d8: cards / superficies claras sobre fondo oscuro */
+  --card: #ebe6d8;
+  --card-foreground: #212125;
+  --popover: #ebe6d8;
+  --popover-foreground: #212125;
 
-  /* CTA: algo más claro para contraste en oscuro */
-  --primary: #6bc238;
-  --primary-foreground: #ffffff;
+  /* #65b233: solo CTA / botones principales / acciones de compra */
+  --primary: #65b233;
+  --primary-foreground: #f7f6f4;
 
-  /* Marca: más suave en fondo oscuro */
-  --accent: #5c4a7a;
-  --accent-foreground: #ffffff;
+  /* #473968: marca / enlaces / estados activos / badges informativos */
+  --accent: #473968;
+  --accent-foreground: #f7f6f4;
 
-  --secondary: #2a2a2e;
+  /* #212125: superficies secundarias */
+  --secondary: #212125;
   --secondary-foreground: #f7f6f4;
-  --muted: #333338;
-  --muted-foreground: #b0adb8;
+  --muted: #212125;
+  --muted-foreground: #473968;
 
-  --destructive: #4a3d65;
-  --destructive-foreground: #ffffff;
+  --destructive: #473968;
+  --destructive-foreground: #f7f6f4;
 
-  --border: #3d3d42;
-  --input: #333338;
-  --ring: #5c4a7a;
+  --border: #473968;
+  --input: #212125;
+  --ring: #473968;
 
-  --sidebar: #2a2a2e;
+  --sidebar: #212125;
   --sidebar-foreground: #f7f6f4;
-  --sidebar-primary: #6bc238;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #333338;
+  --sidebar-primary: #65b233;
+  --sidebar-primary-foreground: #f7f6f4;
+  --sidebar-accent: #212125;
   --sidebar-accent-foreground: #f7f6f4;
-  --sidebar-border: #3d3d42;
-  --sidebar-ring: #5c4a7a;
+  --sidebar-border: #473968;
+  --sidebar-ring: #473968;
 }
 
 @theme inline {

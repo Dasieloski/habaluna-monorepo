@@ -154,8 +154,8 @@ export function SearchAutocomplete({
     >
       <div className="relative w-full group">
         <Search className={cn(
-          "absolute top-1/2 transform -translate-y-1/2 text-muted-foreground group-focus-within:text-sky-500 transition-colors",
-          isNavbar ? "left-4 w-5 h-5" : "left-3 w-4 h-4 text-gray-400"
+          "absolute top-1/2 transform -translate-y-1/2 text-muted-foreground group-focus-within:text-sky-500 dark:group-focus-within:text-accent transition-colors",
+          isNavbar ? "left-4 w-5 h-5" : "left-3 w-4 h-4 text-gray-400 dark:text-muted-foreground"
         )} />
         <Input
           ref={inputRef}
@@ -180,7 +180,7 @@ export function SearchAutocomplete({
           }}
           className={cn(
             isNavbar 
-              ? "pl-12 pr-10 h-12 bg-secondary/50 border-0 rounded-2xl focus:ring-2 focus:ring-sky-300 transition-all duration-300 focus:bg-white"
+              ? "pl-12 pr-10 h-12 bg-secondary/50 border-0 rounded-2xl focus:ring-2 focus:ring-sky-300 dark:focus:ring-ring transition-all duration-300 focus:bg-white dark:focus:bg-card"
               : "pl-10 pr-10"
           )}
         />
@@ -188,7 +188,7 @@ export function SearchAutocomplete({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-muted-foreground hover:text-gray-600 dark:hover:text-foreground"
           >
             <X className="w-4 h-4" />
           </button>

@@ -501,13 +501,13 @@ export default function CheckoutPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-green-900 dark:text-green-100">
-                          Cupón aplicado: {appliedCoupon.code}
-                        </p>
-                        <p className="text-xs text-green-700 dark:text-green-300">
+<div className="bg-green-50 dark:bg-primary/10 border border-green-200 dark:border-primary rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-green-900 dark:text-foreground">
+                            Cupón aplicado: {appliedCoupon.code}
+                          </p>
+                          <p className="text-xs text-green-700 dark:text-muted-foreground">
                           {appliedCoupon.name} - Descuento: {formatPrice(appliedCoupon.discount)}
                         </p>
                       </div>
@@ -549,7 +549,7 @@ export default function CheckoutPage() {
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 {appliedCoupon && (
-                  <div className="flex justify-between text-green-600 dark:text-green-400">
+                  <div className="flex justify-between text-green-600 dark:text-accent">
                     <span>Descuento ({appliedCoupon.code})</span>
                     <span>-{formatPrice(appliedCoupon.discount)}</span>
                   </div>

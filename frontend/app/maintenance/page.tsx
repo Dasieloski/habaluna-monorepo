@@ -304,7 +304,7 @@ export default function MaintenancePage() {
                 <AnimatePresence>
                   {saved && (
                     <motion.p
-                      className="mt-2 text-xs text-emerald-700 dark:text-emerald-400"
+                      className="mt-2 text-xs text-emerald-700 dark:text-accent"
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 6 }}
