@@ -228,8 +228,8 @@ export function Header() {
               {mobileMenuOpen ? <CloseIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
             </button>
 
-            <Link href="/" className="flex items-center group">
-              <span className="text-3xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105" style={{ fontFamily: "'The Choed', cursive" }}>
+            <Link href="/" className="flex items-center group shrink-0">
+              <span className="text-2xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105" style={{ fontFamily: "'The Choed', cursive" }}>
                 Habaluna
               </span>
             </Link>
@@ -242,6 +242,7 @@ export function Header() {
                 onSelect={handleNavbarSearch}
                 placeholder="¿Qué estás buscando?"
                 className="w-full"
+                animatedPlaceholder
               />
             </div>
 

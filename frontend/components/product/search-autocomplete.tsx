@@ -171,7 +171,7 @@ export function SearchAutocomplete({
           delay = 2200;
         } else {
           next = typedRef.current + target[typedRef.current.length];
-          delay = next.slice(-1) === ' ' ? 200 : 90;
+          delay = next.slice(-1) === ' ' ? 280 : 85;
         }
       }
       typedRef.current = next;
@@ -221,7 +221,7 @@ export function SearchAutocomplete({
         )} />
         {animatedPlaceholder && value === '' && (
           <span
-            className="pointer-events-none absolute left-12 top-1/2 -translate-y-1/2 text-muted-foreground text-base"
+            className="pointer-events-none select-none absolute left-12 top-1/2 -translate-y-1/2 text-muted-foreground text-base"
             aria-hidden="true"
           >
             {typedPlaceholder}
