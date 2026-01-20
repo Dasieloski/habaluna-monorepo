@@ -229,7 +229,7 @@ export function Header() {
             </button>
 
             <Link href="/" className="flex items-center group shrink-0">
-              <span className="font-logo text-2xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105">
+              <span className="font-logo text-2xl md:text-5xl text-foreground transition-transform duration-300 group-hover:scale-105">
                 Habaluna
               </span>
             </Link>
