@@ -104,7 +104,7 @@ export function TopSales({ products, className }: TopSalesProps) {
   const getComparePrice = (product: Product) => toNumber(product.variants?.[0]?.comparePriceUSD ?? product.comparePriceUSD)
 
   return (
-    <section ref={sectionRef} className={`py-12 md:py-20 bg-background ${className ?? ""}`}>
+    <section ref={sectionRef} className={`py-12 md:py-20 dark:py-14 dark:md:py-24 bg-background ${className ?? ""}`}>
       <div className="container mx-auto px-4">
         {/* Header */}
         <div
@@ -119,7 +119,7 @@ export function TopSales({ products, className }: TopSalesProps) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6 dark:gap-4 dark:md:gap-8">
           {/* Featured product */}
           <Link
             href={`/products/${featuredProduct.slug}`}
@@ -181,7 +181,7 @@ export function TopSales({ products, className }: TopSalesProps) {
               <div className="relative bg-card rounded-xl md:rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full border border-border">
                 <div className="aspect-square relative overflow-hidden">
                   <SmartImage
-                    src={product.images?.[0] || "/placeholder.svg?height=300&width=300&query=product"}
+                    src={product.images?.[0] || "/placeholder.svg"}
                     alt={product.name}
                     fill
                     className="p-3 md:p-4 group-hover:scale-110 transition-transform duration-500"
@@ -213,7 +213,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-1 md:gap-2 mt-1.5 md:mt-2">
-                    <span className="text-sm md:text-base font-bold text-foreground">
+                    <span className="text-sm md:text-base font-bold dark:font-extrabold text-foreground">
                       ${getPrice(product).toFixed(2)}
                     </span>
                     {getComparePrice(product) !== null && getComparePrice(product)! > getPrice(product) && (

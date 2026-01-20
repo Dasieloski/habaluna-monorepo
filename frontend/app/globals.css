@@ -58,24 +58,24 @@
 }
 
 .dark {
-  /* PALETA: #212125 fondo, #f7f6f4 texto claro, #473968 marca, #65b233 CTA, #ebe6d8 cards */
-  --background: #212125;
+  /* MODO OSCURO: #0D0D0D base, #212125 cards, #473968 marca, #65b233 CTA, #f7f6f4 texto. Prohibido #ebe6d8. */
+  --background: #0D0D0D;
   --foreground: #f7f6f4;
-  /* #ebe6d8: cards / superficies claras sobre fondo oscuro */
-  --card: #ebe6d8;
-  --card-foreground: #212125;
-  --popover: #ebe6d8;
-  --popover-foreground: #212125;
 
-  /* #65b233: solo CTA / botones principales / acciones de compra */
+  /* #212125: cards, popover, secondary, muted. Nunca superficies claras. */
+  --card: #212125;
+  --card-foreground: #f7f6f4;
+  --popover: #212125;
+  --popover-foreground: #f7f6f4;
+
+  /* #65b233: solo CTAs y acciones de compra */
   --primary: #65b233;
   --primary-foreground: #f7f6f4;
 
-  /* #473968: marca / enlaces / estados activos / badges informativos */
+  /* #473968: marca, enlaces, activos, badges. No CTA. */
   --accent: #473968;
   --accent-foreground: #f7f6f4;
 
-  /* #212125: superficies secundarias */
   --secondary: #212125;
   --secondary-foreground: #f7f6f4;
   --muted: #212125;

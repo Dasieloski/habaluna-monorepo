@@ -168,7 +168,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
             </div>
 
             <div className="p-3 md:p-4">
-              <h3 className="text-[11px] md:text-[13px] font-medium text-foreground line-clamp-2 min-h-[2.25rem] md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
+              <h3 className="text-[11px] md:text-[13px] dark:md:text-[12px] font-medium text-foreground line-clamp-2 min-h-[2.25rem] md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
                 {product.name}
               </h3>
               {product.averageRating && product.reviewCount && product.reviewCount > 0 && (
@@ -183,7 +183,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                 </div>
               )}
               <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
-                <span className="text-base md:text-lg font-bold text-foreground">${price.toFixed(2)}</span>
+                <span className="text-base md:text-lg font-bold dark:font-extrabold text-foreground">${price.toFixed(2)}</span>
                 {hasDiscount && (
                   <span className="text-[10px] md:text-sm text-muted-foreground line-through">
                     ${comparePrice!.toFixed(2)}
@@ -345,7 +345,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
         </div>
 
         <div className="p-3 md:p-4">
-          <h3 className="text-[11px] md:text-[13px] font-medium text-foreground line-clamp-2 min-h-[2.25rem] md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
+          <h3 className="text-[11px] md:text-[13px] dark:md:text-[12px] font-medium text-foreground line-clamp-2 min-h-[2.25rem] md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
             {product.name}
           </h3>
           {product.averageRating && product.reviewCount && product.reviewCount > 0 && (
@@ -362,7 +362,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
             </div>
           )}
           <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
-            <span className="text-base md:text-lg font-bold text-foreground">${price.toFixed(2)}</span>
+            <span className="text-base md:text-lg font-bold dark:font-extrabold text-foreground">${price.toFixed(2)}</span>
             {hasDiscount && (
               <span className="text-sm text-muted-foreground line-through">
                 ${comparePrice!.toFixed(2)}

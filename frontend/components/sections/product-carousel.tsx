@@ -100,7 +100,7 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
       initial={{ opacity: 0, y: 28 }}
       animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
       transition={{ type: "spring", stiffness: 80, damping: 20 }}
-      className={`py-12 md:py-20 ${className ?? ""}`}
+      className={`py-12 md:py-20 dark:py-14 dark:md:py-24 ${className ?? ""}`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8 md:mb-10">
@@ -135,7 +135,7 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
 
           <div
             ref={scrollRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4 -mx-2 px-2"
+            className="flex gap-4 md:gap-6 dark:gap-5 dark:md:gap-8 overflow-x-auto scrollbar-hide scroll-smooth pb-4 -mx-2 px-2"
           >
             {productsWithImages.map((product, index) => {
               const badge = getBadge(index)

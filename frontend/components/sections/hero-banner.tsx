@@ -90,7 +90,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
   return (
     <section className="relative overflow-hidden">
       <div
-        className="relative transition-colors duration-700 ease-out"
+        className="relative transition-colors duration-700 ease-out dark:!bg-background"
         style={{ backgroundColor: displayBanners[currentSlide]?.backgroundColor || "#e0f2fe" }}
       >
         <div

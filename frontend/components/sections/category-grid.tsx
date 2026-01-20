@@ -51,15 +51,15 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
         initial={{ opacity: 0, y: 28 }}
         animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
         transition={{ type: "spring", stiffness: 80, damping: 20 }}
-        className="py-12 md:py-20 bg-background"
+        className="py-12 md:py-20 dark:py-14 dark:md:py-24 bg-background"
       >
         <div className="container mx-auto px-4">
           {title && (
-            <h2 className="text-2xl md:text-4xl font-bold text-foreground text-center mb-10 md:mb-12 leading-tight">
+            <h2 className="text-2xl md:text-4xl font-bold dark:font-extrabold text-foreground text-center mb-10 md:mb-12 leading-tight">
               {title}
             </h2>
           )}
-          <div className="grid grid-cols-3 md:flex md:flex-wrap md:justify-center gap-5 md:gap-14">
+          <div className="grid grid-cols-3 md:flex md:flex-wrap md:justify-center gap-5 md:gap-14 dark:gap-6 dark:md:gap-16">
             {categories.slice(0, 6).map((category) => (
               <Link
                 key={category.id}
@@ -92,15 +92,15 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
   if (variant === "banners") {
     const colors = ["#f7f6f4", "#ebe6d8", "#f7f6f4", "#ebe6d8"]
     return (
-      <section ref={sectionRef} className="py-10 md:py-16">
+      <section ref={sectionRef} className="py-10 md:py-16 dark:py-12 dark:md:py-20 dark:bg-background">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 dark:gap-4 dark:md:gap-8">
             {categories.slice(0, 4).map((category, index) => (
               <Link
                 key={category.id}
                 href={`/products?categoryId=${category.id}`}
                 aria-label={`Ver productos de ${category.name}`}
-                className={`group relative aspect-[3/4] md:aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+                className={`group relative aspect-[3/4] md:aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:!bg-[#212125] ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
                 style={{
                   backgroundColor: colors[index % colors.length],
                   transitionDelay: `${index < 5 ? index * 0.08 : 0.35 + (index - 5) * 0.02}s`,
@@ -131,9 +131,9 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
 
   // Default cards variant
   return (
-    <section ref={sectionRef} className="py-12 md:py-20 bg-background">
+    <section ref={sectionRef} className="py-12 md:py-20 dark:py-14 dark:md:py-24 bg-background">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 dark:gap-5 dark:md:gap-10">
           {categories.slice(0, 4).map((category, index) => (
             <Link
               key={category.id}
