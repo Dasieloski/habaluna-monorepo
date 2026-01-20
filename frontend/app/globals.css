@@ -58,7 +58,7 @@
 }
 
 .dark {
-  /* MODO OSCURO: #0D0D0D base, #212125 cards, #473968 marca, #65b233 CTA, #f7f6f4 texto. Prohibido #ebe6d8. */
+  /* MODO OSCURO: #0D0D0D base, #212125 cards, #007c82 enlaces/activos, #65b233 CTA, #f7f6f4 texto. Prohibido #ebe6d8. */
   --background: #0D0D0D;
   --foreground: #f7f6f4;
 
@@ -72,8 +72,8 @@
   --primary: #65b233;
   --primary-foreground: #f7f6f4;
 
-  /* #473968: marca, enlaces, activos, badges. No CTA. */
-  --accent: #473968;
+  /* #007c82: enlaces, estados activos, elementos interactivos secundarios. No CTA. */
+  --accent: #007c82;
   --accent-foreground: #f7f6f4;
 
   --secondary: #212125;
@@ -86,7 +86,7 @@
 
   --border: #473968;
   --input: #212125;
-  --ring: #473968;
+  --ring: #007c82;
 
   --sidebar: #212125;
   --sidebar-foreground: #f7f6f4;
@@ -95,7 +95,7 @@
   --sidebar-accent: #212125;
   --sidebar-accent-foreground: #f7f6f4;
   --sidebar-border: #473968;
-  --sidebar-ring: #473968;
+  --sidebar-ring: #007c82;
 }
 
 @theme inline {
