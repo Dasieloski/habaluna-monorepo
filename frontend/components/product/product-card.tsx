@@ -38,9 +38,11 @@ interface ProductCardProps {
   }
   badge?: string
   badgeColor?: "coral" | "blue" | "mint"
+  /** Solo para las primeras imágenes above the fold (LCP). */
+  priority?: boolean
 }
 
-export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCardProps) {
+export function ProductCard({ product, badge, badgeColor = "coral", priority }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const { toast, showAddToCart } = useToast()
   const addToCart = useCartStore((s) => s.addToCart)
@@ -80,8 +82,9 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                 src={currentImage}
                 alt={product.name}
                 fill
+                priority={priority}
                 className="p-4 md:p-6 transition-all duration-500 group-hover:scale-110"
-                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 objectFit="cover"
               />
 
@@ -258,8 +261,9 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             src={currentImage}
             alt={product.name}
             fill
+            priority={priority}
             className="p-4 md:p-6 transition-all duration-500 group-hover:scale-110"
-            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             objectFit="cover"
           />
 

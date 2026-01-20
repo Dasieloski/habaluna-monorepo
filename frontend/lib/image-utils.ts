@@ -17,8 +17,7 @@ export function getImageUrl(
   image?: string,
   opts?: { width?: number; height?: number }
 ): string | null {
-  if (!image) return null
-  
+  if (image == null || typeof image !== 'string') return null
   const trimmed = image.trim()
   if (!trimmed) return null
   

@@ -149,7 +149,7 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
                     transform: isVisible ? "translateY(0)" : "translateY(20px)",
                   }}
                 >
-                  <ProductCard product={product} badge={badge?.text} badgeColor={badge?.color} />
+                  <ProductCard product={product} badge={badge?.text} badgeColor={badge?.color} priority={index < 4} />
                 </div>
               )
             })}

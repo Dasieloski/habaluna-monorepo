@@ -128,7 +128,7 @@ export function TopSales({ products, className }: TopSalesProps) {
             <div className="relative h-full bg-card rounded-xl md:rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-border">
               <div className="aspect-[4/3] lg:aspect-auto lg:h-full relative overflow-hidden">
                 <SmartImage
-                  src={featuredProduct.images?.[0] || "/placeholder.svg?height=600&width=600&query=featured product"}
+                  src={featuredProduct.images?.[0] || "/placeholder.svg"}
                   alt={featuredProduct.name}
                   fill
                   className="p-4 md:p-8 group-hover:scale-110 transition-transform duration-700 lg:object-contain"
