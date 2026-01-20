@@ -115,10 +115,9 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                   objectFit="cover"
                   loading="lazy"
                 />
-                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-foreground" />
                 <div className="absolute bottom-3 md:bottom-5 left-3 md:left-5 right-3 md:right-5 z-10">
-                  <h3 className="text-background text-sm md:text-xl font-bold mb-0.5 md:mb-1">{category.name}</h3>
-                  <span className="text-background/90 text-[10px] md:text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                  <h3 className="text-white text-sm md:text-xl font-bold mb-0.5 md:mb-1 drop-shadow-lg">{category.name}</h3>
+                  <span className="text-white/90 text-[10px] md:text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1 group-hover:gap-2 transition-all drop-shadow-md">
                     Ver más →
                   </span>
                 </div>
@@ -152,10 +151,9 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                 objectFit="cover"
                 loading="lazy"
               />
-              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-foreground" />
               <div className="absolute bottom-3 md:bottom-5 left-3 md:left-5 right-3 md:right-5 z-10">
-                <h3 className="text-background text-base md:text-2xl font-bold mb-0.5 md:mb-1">{category.name}</h3>
-                <span className="text-background/90 text-[10px] md:text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                <h3 className="text-white text-base md:text-2xl font-bold mb-0.5 md:mb-1 drop-shadow-lg">{category.name}</h3>
+                <span className="text-white/90 text-[10px] md:text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1 group-hover:gap-2 transition-all drop-shadow-md">
                   Explorar →
                 </span>
               </div>
