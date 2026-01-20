@@ -107,7 +107,7 @@ export default function VerifyCodePage() {
           <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-lg">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                <div className="p-3 bg-destructive/10 border border-destructive rounded-lg text-sm text-destructive">
                   {error}
                 </div>
               )}
@@ -128,7 +128,7 @@ export default function VerifyCodePage() {
                       onChange={(e) => handleChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
                       onPaste={index === 0 ? handlePaste : undefined}
-                      className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
+                      className="w-12 h-14 text-center text-2xl font-bold border-2 border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-accent transition-all"
                       autoFocus={index === 0}
                       disabled={isSubmitting}
                     />
@@ -142,7 +142,7 @@ export default function VerifyCodePage() {
               <button
                 type="submit"
                 disabled={isSubmitting || code.join("").length !== 6}
-                className="w-full py-3.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Verificando..." : "Verificar código"}
               </button>

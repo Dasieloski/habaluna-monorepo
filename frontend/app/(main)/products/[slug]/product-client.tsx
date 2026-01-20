@@ -449,7 +449,7 @@ export function ProductClient({
                 onClick={() => setIsFavorite(!isFavorite)}
                 aria-label={isFavorite ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
                 className={`p-3.5 md:p-4 rounded-xl border transition-all ${
-                  isFavorite ? "bg-accent/20 border-accent text-accent-foreground" : "border-border hover:bg-muted"
+                  isFavorite ? "bg-accent/15 border-accent text-accent" : "border-border hover:bg-muted text-highlight hover:text-accent"
                 }`}
               >
                 <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={isFavorite} />
@@ -477,10 +477,10 @@ export function ProductClient({
             </div>
 
             {/* Delivery info */}
-            <div className="bg-sky-50 rounded-xl p-4 mb-4 md:mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div className="bg-card rounded-xl p-4 mb-4 md:mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2 border border-border">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
-                  <TruckIcon className="w-5 h-5 text-sky-600" />
+                <div className="w-10 h-10 bg-highlight/30 rounded-lg flex items-center justify-center">
+                  <TruckIcon className="w-5 h-5 text-accent" />
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Entrega prevista:</p>
@@ -488,8 +488,8 @@ export function ProductClient({
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-sky-600 font-medium">Envío gratis desde $100</p>
-                <Link href="/shipping" className="text-xs text-sky-500 hover:underline">
+                <p className="text-sm text-accent font-medium">Envío gratis desde $100</p>
+                <Link href="/shipping" className="text-xs text-accent hover:underline">
                   Saber más
                 </Link>
               </div>

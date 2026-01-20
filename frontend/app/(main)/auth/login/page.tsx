@@ -97,7 +97,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 flex items-start gap-2">
+                <div className="p-3 bg-destructive/10 border border-destructive rounded-xl text-sm text-destructive flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </div>
@@ -106,7 +106,7 @@ export default function LoginPage() {
               {/* Email */}
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium text-foreground">
-                  Dirección E-Mail <span className="text-red-500">*</span>
+                  Dirección E-Mail <span className="text-destructive">*</span>
                 </label>
                 <input
                   id="email"
@@ -121,7 +121,7 @@ export default function LoginPage() {
               {/* Password */}
               <div className="space-y-2">
                 <label htmlFor="password" className="block text-sm font-medium text-foreground">
-                  Contraseña <span className="text-red-500">*</span>
+                  Contraseña <span className="text-destructive">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -139,7 +139,7 @@ export default function LoginPage() {
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
-                {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+                {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
               </div>
 
               {/* Remember me & Forgot password */}
@@ -166,7 +166,7 @@ export default function LoginPage() {
                 disabled={isSubmitting}
                 loading={isSubmitting}
                 loadingText="Iniciando sesión…"
-                className="w-full py-3.5 h-12 bg-black text-white font-medium rounded-lg hover:bg-gray-800"
+                className="w-full py-3.5 h-12 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90"
               >
                 Continuar
               </Button>

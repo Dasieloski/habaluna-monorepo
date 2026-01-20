@@ -144,7 +144,7 @@ export default function ForgotPasswordPage() {
           <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{error}</div>
+                <div className="p-3 bg-destructive/10 border border-destructive rounded-lg text-sm text-destructive">{error}</div>
               )}
               {message && (
                 <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-700">
@@ -154,7 +154,7 @@ export default function ForgotPasswordPage() {
 
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium text-foreground">
-                  Dirección E-Mail <span className="text-red-500">*</span>
+                  Dirección E-Mail <span className="text-destructive">*</span>
                 </label>
                 <input
                   id="email"
@@ -169,7 +169,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Enviando..." : "Enviar código"}
               </button>
@@ -217,7 +217,7 @@ export default function ForgotPasswordPage() {
                     onChange={(e) => handleCodeChange(index, e.target.value)}
                     onKeyDown={(e) => handleCodeKeyDown(index, e)}
                     onPaste={index === 0 ? handleCodePaste : undefined}
-                    className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
+                    className="w-12 h-14 text-center text-2xl font-bold border-2 border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-accent transition-all"
                     autoFocus={index === 0}
                     disabled={isValidatingCode}
                   />
@@ -236,7 +236,7 @@ export default function ForgotPasswordPage() {
                   setCode(["", "", "", "", "", ""])
                   setCodeError("")
                 }}
-                className="flex-1 py-2.5 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 py-2.5 px-4 border border-border text-foreground font-medium rounded-lg hover:bg-muted transition-colors"
                 disabled={isValidatingCode}
               >
                 Cancelar
@@ -244,7 +244,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={isValidatingCode || code.join("").length !== 6}
-                className="flex-1 py-2.5 px-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2.5 px-4 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isValidatingCode ? "Verificando..." : "Verificar"}
               </button>

@@ -202,7 +202,7 @@ export function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 bg-background shadow-sm transition-transform duration-500 ease-out ${
+        className={`sticky top-0 z-50 bg-card shadow-sm transition-transform duration-500 ease-out ${
           isHidden ? "-translate-y-full" : "translate-y-0"
         }`}
       >

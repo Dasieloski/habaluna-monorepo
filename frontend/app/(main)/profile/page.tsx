@@ -183,7 +183,7 @@ export default function ProfilePage() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-8 h-8 animate-spin text-sky-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-accent" />
               <p className="text-muted-foreground">Cargando tu perfil...</p>
             </div>
           </div>
@@ -219,14 +219,14 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-blue-50 to-sky-50">
+          <Card className="border-0 shadow-md bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Pedidos</p>
-                  <p className="text-2xl font-bold text-blue-600">{totalOrders}</p>
+                  <p className="text-2xl font-bold text-accent">{totalOrders}</p>
                 </div>
-                <ShoppingBag className="w-8 h-8 text-blue-500" />
+                <ShoppingBag className="w-8 h-8 text-accent" />
               </div>
             </CardContent>
           </Card>
@@ -248,9 +248,9 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Completados</p>
-                  <p className="text-2xl font-bold text-emerald-600">{completedOrders}</p>
+                  <p className="text-2xl font-bold text-accent">{completedOrders}</p>
                 </div>
-                <Award className="w-8 h-8 text-emerald-500" />
+                <Award className="w-8 h-8 text-accent" />
               </div>
             </CardContent>
           </Card>
@@ -258,17 +258,17 @@ export default function ProfilePage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border border-border/50 shadow-sm">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-sky-50 data-[state=active]:text-sky-600">
+          <TabsList className="bg-card border border-border/50 shadow-sm">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
               Resumen
             </TabsTrigger>
-            <TabsTrigger value="profile" className="data-[state=active]:bg-sky-50 data-[state=active]:text-sky-600">
+            <TabsTrigger value="profile" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
               Información Personal
             </TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-sky-50 data-[state=active]:text-sky-600">
+            <TabsTrigger value="orders" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
               Mis Pedidos ({totalOrders})
             </TabsTrigger>
-            <TabsTrigger value="wishlist" className="data-[state=active]:bg-sky-50 data-[state=active]:text-sky-600">
+            <TabsTrigger value="wishlist" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
               Favoritos ({wishlistCount})
             </TabsTrigger>
           </TabsList>
@@ -278,10 +278,10 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Información de cuenta */}
               <Card className="lg:col-span-2 border-0 shadow-md">
-                <CardHeader className="bg-gradient-to-r from-sky-50 to-blue-50 border-b">
+                <CardHeader className="bg-accent/10 border-b">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center">
-                      <User className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
+                      <User className="w-6 h-6 text-accent-foreground" />
                     </div>
                     <div>
                       <CardTitle className="text-foreground">
@@ -564,7 +564,7 @@ export default function ProfilePage() {
                       <Link
                         key={order.id}
                         href={`/orders/${order.id}`}
-                        className="block p-6 border rounded-lg hover:bg-sky-50 transition-colors"
+                        className="block p-6 border rounded-lg hover:bg-accent/10 transition-colors"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div>
@@ -678,11 +678,11 @@ export default function ProfilePage() {
                               className="object-cover transition-transform duration-300 group-hover:scale-105"
                             />
                           </div>
-                          <h3 className="text-sm font-medium text-foreground mb-2 line-clamp-2 group-hover:text-sky-600 transition-colors">
+                          <h3 className="text-sm font-medium text-foreground mb-2 line-clamp-2 group-hover:text-accent transition-colors">
                             {p.name}
                           </h3>
                           <div className="flex items-center gap-2">
-                            <span className="text-base font-bold text-sky-600">
+                            <span className="text-base font-bold text-foreground">
                               {formatPrice(price)}
                             </span>
                             {hasDiscount && (

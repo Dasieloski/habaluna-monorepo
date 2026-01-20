@@ -117,8 +117,8 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                 }}
                 className={`absolute top-2 right-2 md:top-3 md:right-3 p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all duration-300 ${
                   isInWishlist
-                    ? "bg-accent text-accent-foreground scale-110"
-                    : "bg-card/90 backdrop-blur-sm text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card"
+                    ? "bg-accent/15 text-accent scale-110"
+                    : "bg-card/90 backdrop-blur-sm text-highlight opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card hover:text-accent"
                 }`}
               >
                 <HeartIcon className="w-4 h-4 md:w-5 md:h-5" filled={isInWishlist} />
@@ -183,9 +183,9 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                 </div>
               )}
               <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
-                <span className="text-base md:text-lg font-bold dark:font-extrabold text-foreground">${price.toFixed(2)}</span>
+                <span className="text-base md:text-lg font-bold dark:font-extrabold text-primary">${price.toFixed(2)}</span>
                 {hasDiscount && (
-                  <span className="text-[10px] md:text-sm text-muted-foreground line-through">
+                  <span className="text-[10px] md:text-sm text-highlight line-through">
                     ${comparePrice!.toFixed(2)}
                   </span>
                 )}
@@ -293,8 +293,8 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
             aria-label={isInWishlist ? `Quitar ${product.name} de la wishlist` : `Agregar ${product.name} a la wishlist`}
             className={`absolute top-2 right-2 md:top-3 md:right-3 p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all duration-300 ${
               isInWishlist
-                ? "bg-accent text-accent-foreground scale-110"
-                : "bg-card/90 backdrop-blur-sm text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card"
+                ? "bg-accent/15 text-accent scale-110"
+                : "bg-card/90 backdrop-blur-sm text-highlight opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card hover:text-accent"
             }`}
           >
             <HeartIcon className="w-4 h-4 md:w-5 md:h-5" filled={isInWishlist} />
@@ -362,9 +362,9 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
             </div>
           )}
           <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
-            <span className="text-base md:text-lg font-bold dark:font-extrabold text-foreground">${price.toFixed(2)}</span>
+            <span className="text-base md:text-lg font-bold dark:font-extrabold text-primary">${price.toFixed(2)}</span>
             {hasDiscount && (
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-sm text-highlight line-through">
                 ${comparePrice!.toFixed(2)}
               </span>
             )}

@@ -105,7 +105,7 @@ export default function RegisterPage() {
           <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{error}</div>
+                <div className="p-3 bg-destructive/10 border border-destructive rounded-lg text-sm text-destructive">{error}</div>
               )}
 
               {/* Personal Information Section */}
@@ -115,7 +115,7 @@ export default function RegisterPage() {
                 {/* Treatment */}
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-foreground">
-                    Tratamiento <span className="text-red-500">*</span>
+                    Tratamiento <span className="text-destructive">*</span>
                   </label>
                   <div className="flex flex-wrap gap-6">
                     {[
@@ -139,7 +139,7 @@ export default function RegisterPage() {
                 {/* Name fields */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-foreground">
-                    Nombre y Apellidos <span className="text-red-500">*</span>
+                    Nombre y Apellidos <span className="text-destructive">*</span>
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -156,16 +156,16 @@ export default function RegisterPage() {
                         type="text"
                         placeholder="Apellidos"
                         {...register("lastName")}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
+                        className="w-full px-4 py-3 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-accent transition-all"
                       />
-                      {errors.lastName && <p className="text-xs text-red-500 mt-1">{errors.lastName.message}</p>}
+                      {errors.lastName && <p className="text-xs text-destructive mt-1">{errors.lastName.message}</p>}
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Registration Information Section */}
-              <div className="space-y-5 pt-4 border-t border-gray-100">
+              <div className="space-y-5 pt-4 border-t border-border">
                 <h2 className="text-lg font-semibold text-foreground">Información de registro</h2>
 
                 {/* Email */}

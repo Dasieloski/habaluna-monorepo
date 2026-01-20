@@ -105,19 +105,19 @@ function ResetPasswordContent() {
           <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                <div className="p-3 bg-destructive/10 border border-destructive rounded-lg text-sm text-destructive">
                   {error}
                 </div>
               )}
               {message && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-700">
+                <div className="p-3 bg-accent/10 border border-accent rounded-lg text-sm text-foreground">
                   {message}
                 </div>
               )}
 
               <div className="space-y-2">
                 <label htmlFor="password" className="block text-sm font-medium text-foreground">
-                  Nueva contraseña <span className="text-red-500">*</span>
+                  Nueva contraseña <span className="text-destructive">*</span>
                 </label>
                 <input
                   id="password"
@@ -136,7 +136,7 @@ function ResetPasswordContent() {
 
               <div className="space-y-2">
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground">
-                  Confirmar contraseña <span className="text-red-500">*</span>
+                  Confirmar contraseña <span className="text-destructive">*</span>
                 </label>
                 <input
                   id="confirmPassword"
@@ -153,7 +153,7 @@ function ResetPasswordContent() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Actualizando..." : "Actualizar contraseña"}
               </button>

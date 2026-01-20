@@ -141,8 +141,8 @@ export function TopSales({ products, className }: TopSalesProps) {
                   aria-label={favorites.has(featuredProduct.id) ? `Quitar ${featuredProduct.name} de favoritos` : `Agregar ${featuredProduct.name} a favoritos`}
                   className={`absolute top-3 right-3 p-2 md:p-3 rounded-xl transition-all duration-300 ${
                     favorites.has(featuredProduct.id)
-                      ? "bg-accent text-accent-foreground scale-110"
-                      : "bg-card/90 backdrop-blur-sm text-foreground hover:bg-card"
+                      ? "bg-accent/15 text-accent scale-110"
+                      : "bg-card/90 backdrop-blur-sm text-highlight hover:bg-card hover:text-accent"
                   }`}
                 >
                   <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={favorites.has(featuredProduct.id)} />
@@ -163,7 +163,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                 <h3 className="text-xs md:text-lg font-medium text-foreground line-clamp-2 group-hover:text-accent transition-colors">
                   {featuredProduct.name}
                 </h3>
-                <p className="text-lg md:text-2xl font-bold text-foreground mt-2 md:mt-3">
+                <p className="text-lg md:text-2xl font-bold text-primary mt-2 md:mt-3">
                   ${getPrice(featuredProduct).toFixed(2)}
                 </p>
               </div>
@@ -193,8 +193,8 @@ export function TopSales({ products, className }: TopSalesProps) {
                     aria-label={favorites.has(product.id) ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
                     className={`absolute top-2 right-2 p-1.5 md:p-2 rounded-lg md:rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100 ${
                       favorites.has(product.id)
-                        ? "bg-accent text-accent-foreground opacity-100 scale-110"
-                        : "bg-card/90 backdrop-blur-sm text-foreground hover:bg-card"
+                        ? "bg-accent/15 text-accent opacity-100 scale-110"
+                        : "bg-card/90 backdrop-blur-sm text-highlight hover:bg-card hover:text-accent"
                     }`}
                   >
                     <HeartIcon className="w-4 h-4 md:w-5 md:h-5" filled={favorites.has(product.id)} />
@@ -213,11 +213,11 @@ export function TopSales({ products, className }: TopSalesProps) {
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-1 md:gap-2 mt-1.5 md:mt-2">
-                    <span className="text-sm md:text-base font-bold dark:font-extrabold text-foreground">
+                    <span className="text-sm md:text-base font-bold dark:font-extrabold text-primary">
                       ${getPrice(product).toFixed(2)}
                     </span>
                     {getComparePrice(product) !== null && getComparePrice(product)! > getPrice(product) && (
-                      <span className="text-[10px] md:text-xs text-muted-foreground line-through">
+                      <span className="text-[10px] md:text-xs text-highlight line-through">
                         ${getComparePrice(product)!.toFixed(2)}
                       </span>
                     )}
