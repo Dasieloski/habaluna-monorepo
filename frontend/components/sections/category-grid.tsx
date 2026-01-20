@@ -51,15 +51,15 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
         initial={{ opacity: 0, y: 28 }}
         animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
         transition={{ type: "spring", stiffness: 80, damping: 20 }}
-        className="py-10 md:py-16 bg-background"
+        className="py-12 md:py-20 bg-background"
       >
         <div className="container mx-auto px-4">
           {title && (
-            <h2 className="text-2xl md:text-3xl font-semibold text-foreground text-center mb-8 md:mb-10 leading-tight">
+            <h2 className="text-2xl md:text-4xl font-bold text-foreground text-center mb-10 md:mb-12 leading-tight">
               {title}
             </h2>
           )}
-          <div className="grid grid-cols-3 md:flex md:flex-wrap md:justify-center gap-4 md:gap-12">
+          <div className="grid grid-cols-3 md:flex md:flex-wrap md:justify-center gap-5 md:gap-14">
             {categories.slice(0, 6).map((category) => (
               <Link
                 key={category.id}
@@ -131,9 +131,9 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
 
   // Default cards variant
   return (
-    <section ref={sectionRef} className="py-10 md:py-16">
+    <section ref={sectionRef} className="py-12 md:py-20 bg-background">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
           {categories.slice(0, 4).map((category, index) => (
             <Link
               key={category.id}

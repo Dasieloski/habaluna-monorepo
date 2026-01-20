@@ -106,7 +106,7 @@ export default async function Home() {
         viewAllLink="/products?filter=offers"
         badgeType="sale"
         autoSlide={true}
-        className="pt-12 md:pt-16"
+        className="pt-16 md:pt-24"
       />
 
       {/* Category Cards */}
@@ -121,7 +121,7 @@ export default async function Home() {
         products={(featuredProducts.length > 0 ? featuredProducts : allProducts).slice(0, 8)}
         viewAllLink="/products?filter=top"
         badgeType="personalized"
-        className="pt-16 md:pt-20"
+        className="pt-20 md:pt-28"
       />
 
       {/* Circle Categories */}

@@ -114,7 +114,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                 }}
                 className={`absolute top-2 right-2 md:top-3 md:right-3 p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all duration-300 ${
                   isInWishlist
-                    ? "bg-red-500 text-white scale-110"
+                    ? "bg-accent text-accent-foreground scale-110"
                     : "bg-card/90 backdrop-blur-sm text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card"
                 }`}
               >
@@ -157,7 +157,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                     })
                   }
                 }}
-                className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-foreground text-background text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-foreground/90"
+                className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90"
                 type="button"
               >
                 Añadir al carrito
@@ -165,13 +165,13 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             </div>
 
             <div className="p-3 md:p-4">
-              <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 leading-relaxed group-hover:text-primary transition-colors">
+              <h3 className="text-[11px] md:text-[13px] font-medium text-foreground line-clamp-2 min-h-[2.25rem] md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
                 {product.name}
               </h3>
               {product.averageRating && product.reviewCount && product.reviewCount > 0 && (
                 <div className="mt-1.5 md:mt-2 flex items-center gap-1.5">
                   <div className="flex items-center gap-0.5">
-                    <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-yellow-400 text-yellow-400" />
+                    <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-accent text-accent" />
                     <span className="text-[10px] md:text-xs font-semibold text-foreground">
                       {Number(product.averageRating).toFixed(1)}
                     </span>
@@ -180,7 +180,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                 </div>
               )}
               <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
-                <span className="text-sm md:text-lg font-bold text-foreground">${price.toFixed(2)}</span>
+                <span className="text-base md:text-lg font-bold text-foreground">${price.toFixed(2)}</span>
                 {hasDiscount && (
                   <span className="text-[10px] md:text-sm text-muted-foreground line-through">
                     ${comparePrice!.toFixed(2)}
@@ -225,7 +225,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                       })
                     }
                   }}
-                  className="w-full bg-foreground text-background text-xs font-semibold py-2.5 rounded-xl active:scale-[0.99] transition"
+                  className="w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl active:scale-[0.99] transition"
                   type="button"
                 >
                   Añadir al carrito
@@ -289,7 +289,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             aria-label={isInWishlist ? `Quitar ${product.name} de la wishlist` : `Agregar ${product.name} a la wishlist`}
             className={`absolute top-2 right-2 md:top-3 md:right-3 p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all duration-300 ${
               isInWishlist
-                ? "bg-red-500 text-white scale-110"
+                ? "bg-accent text-accent-foreground scale-110"
                 : "bg-card/90 backdrop-blur-sm text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card"
             }`}
           >
@@ -333,7 +333,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
               }
             }}
             aria-label={`Añadir ${product.name} al carrito`}
-            className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-foreground text-background text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-foreground/90"
+            className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90"
             type="button"
           >
             Añadir al carrito
@@ -341,13 +341,13 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
         </div>
 
         <div className="p-3 md:p-4">
-          <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 leading-relaxed group-hover:text-primary transition-colors">
+          <h3 className="text-[11px] md:text-[13px] font-medium text-foreground line-clamp-2 min-h-[2.25rem] md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
             {product.name}
           </h3>
           {product.averageRating && product.reviewCount && product.reviewCount > 0 && (
             <div className="mt-1.5 md:mt-2 flex items-center gap-1.5">
               <div className="flex items-center gap-0.5">
-                <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-yellow-400 text-yellow-400" />
+                <Star className="h-3 w-3 md:h-3.5 md:w-3.5 fill-accent text-accent" />
                 <span className="text-[10px] md:text-xs font-semibold text-foreground">
                   {Number(product.averageRating).toFixed(1)}
                 </span>
@@ -358,7 +358,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             </div>
           )}
           <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
-            <span className="text-base md:text-lg font-bold text-accent">${price.toFixed(2)}</span>
+            <span className="text-base md:text-lg font-bold text-foreground">${price.toFixed(2)}</span>
             {hasDiscount && (
               <span className="text-sm text-muted-foreground line-through">
                 ${comparePrice!.toFixed(2)}
@@ -404,7 +404,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                 }
               }}
               aria-label={`Añadir ${product.name} al carrito`}
-              className="w-full bg-foreground text-background text-xs font-semibold py-2.5 rounded-xl active:scale-[0.99] transition"
+              className="w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl active:scale-[0.99] transition"
               type="button"
             >
               Añadir al carrito
