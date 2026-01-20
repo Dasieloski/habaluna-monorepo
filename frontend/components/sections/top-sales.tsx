@@ -141,7 +141,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                   aria-label={favorites.has(featuredProduct.id) ? `Quitar ${featuredProduct.name} de favoritos` : `Agregar ${featuredProduct.name} a favoritos`}
                   className={`absolute top-3 right-3 p-2 md:p-3 rounded-xl transition-all duration-300 ${
                     favorites.has(featuredProduct.id)
-                      ? "bg-red-500 text-white dark:bg-accent dark:text-accent-foreground scale-110"
+                      ? "bg-accent text-accent-foreground scale-110"
                       : "bg-card/90 backdrop-blur-sm text-foreground hover:bg-card"
                   }`}
                 >

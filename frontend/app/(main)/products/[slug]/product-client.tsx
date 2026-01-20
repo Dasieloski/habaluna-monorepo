@@ -182,11 +182,11 @@ export function ProductClient({
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-3 md:py-4">
         <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-sky-600 dark:hover:text-accent transition-colors">
+          <Link href="/" className="hover:text-accent transition-colors">
             Inicio
           </Link>
           <span>/</span>
-          <Link href="/products" className="hover:text-sky-600 dark:hover:text-accent transition-colors">
+          <Link href="/products" className="hover:text-accent transition-colors">
             Productos
           </Link>
           {product?.categoryId && (
@@ -194,7 +194,7 @@ export function ProductClient({
               <span>/</span>
               <Link
                 href={`/products?categoryId=${encodeURIComponent(product.categoryId)}`}
-                className="hover:text-sky-600 dark:hover:text-accent transition-colors"
+                className="hover:text-accent transition-colors"
               >
                 {product?.category?.name || "Categoría"}
               </Link>
@@ -219,8 +219,8 @@ export function ProductClient({
                     onClick={() => setSelectedImage(idx)}
                     className={`shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all relative ${
                       selectedImage === idx
-                        ? "border-sky-500 ring-2 ring-sky-200"
-                        : "border-transparent hover:border-gray-200"
+                        ? "border-accent ring-2 ring-accent/30"
+                        : "border-transparent hover:border-border"
                     }`}
                   >
                     <SmartImage
@@ -253,13 +253,13 @@ export function ProductClient({
                   <>
                     <button
                       onClick={() => setSelectedImage((prev) => (prev > 0 ? prev - 1 : images.length - 1))}
-                      className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white dark:hover:bg-card transition-all z-10 text-foreground"
+                      className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 bg-background/90 dark:bg-card/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-background dark:hover:bg-card transition-all z-10 text-foreground"
                     >
                       <ChevronLeftIcon className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => setSelectedImage((prev) => (prev < images.length - 1 ? prev + 1 : 0))}
-                      className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-card/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white dark:hover:bg-card transition-all z-10 text-foreground"
+                      className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 bg-background/90 dark:bg-card/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-background dark:hover:bg-card transition-all z-10 text-foreground"
                     >
                       <ChevronRightIcon className="w-5 h-5" />
                     </button>
@@ -273,7 +273,7 @@ export function ProductClient({
           <div className="w-full flex flex-col bg-white dark:bg-card relative z-10 rounded-xl md:rounded-2xl p-4 md:p-6 border border-transparent dark:border-border" style={{ minWidth: 0 }}>
             {/* Category */}
             {product?.category?.name && (
-              <span className="text-xs md:text-sm text-sky-600 dark:text-accent font-medium mb-1 md:mb-2">{product.category.name}</span>
+              <span className="text-xs md:text-sm text-accent font-medium mb-1 md:mb-2">{product.category.name}</span>
             )}
 
             {/* Title */}
@@ -283,7 +283,7 @@ export function ProductClient({
                 {isCombo && (
                   <div className="mb-2 md:mb-3">
                     <span className="inline-flex items-center gap-2">
-                      <span className="text-xs font-bold tracking-wide uppercase bg-sky-600 text-white px-3 py-1 rounded-full">
+                      <span className="text-xs font-bold tracking-wide uppercase bg-accent text-accent-foreground px-3 py-1 rounded-full">
                         Combo
                       </span>
                       <span className="text-xs md:text-sm text-muted-foreground">
@@ -370,7 +370,7 @@ export function ProductClient({
                   id="product-variant-select"
                   value={selectedVariantId}
                   onChange={(e) => setSelectedVariantId(e.target.value)}
-                  className="w-full md:w-auto px-4 py-3 border border-border rounded-xl text-sm focus:ring-2 focus:ring-sky-300 dark:focus:ring-ring bg-background dark:bg-input"
+                  className="w-full md:w-auto px-4 py-3 border border-border rounded-xl text-sm focus:ring-2 focus:ring-ring bg-background dark:bg-input"
                   aria-label="Seleccionar variante del producto"
                 >
                   {variants.map((v: any) => (
@@ -433,7 +433,7 @@ export function ProductClient({
                   }
                 }}
                 aria-label={`Añadir ${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} al carrito`}
-                className="flex-1 flex items-center justify-center gap-2 bg-foreground dark:bg-primary text-background dark:text-primary-foreground py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-foreground/90 dark:hover:bg-primary/90 transition-all text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-primary/90 transition-all text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -449,7 +449,7 @@ export function ProductClient({
                 onClick={() => setIsFavorite(!isFavorite)}
                 aria-label={isFavorite ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
                 className={`p-3.5 md:p-4 rounded-xl border transition-all ${
-                  isFavorite ? "bg-red-50 border-red-200 text-red-500" : "border-border hover:bg-muted"
+                  isFavorite ? "bg-accent/20 border-accent text-accent-foreground" : "border-border hover:bg-muted"
                 }`}
               >
                 <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={isFavorite} />
@@ -517,7 +517,7 @@ export function ProductClient({
                 <div key={item.id} className="border-b border-border">
                   <button
                     onClick={() => setOpenAccordion(openAccordion === item.id ? null : item.id)}
-                    className="w-full py-4 flex items-center justify-between text-sm md:text-base font-medium text-foreground hover:text-sky-600 dark:hover:text-accent transition-colors"
+                    className="w-full py-4 flex items-center justify-between text-sm md:text-base font-medium text-foreground hover:text-accent transition-colors"
                   >
                     {item.title}
                     <ChevronRightIcon
@@ -554,7 +554,7 @@ export function ProductClient({
                 <button
                   onClick={() => scrollRelated("right")}
                   aria-label="Desplazar productos relacionados hacia la derecha"
-                  className="p-3 bg-sky-500 dark:bg-accent text-white dark:text-accent-foreground rounded-full hover:bg-sky-600 dark:hover:bg-accent/90 transition-colors"
+                  className="p-3 bg-accent text-accent-foreground rounded-full hover:bg-accent/90 transition-colors"
                 >
                   <ChevronRightIcon className="w-5 h-5" />
                 </button>
@@ -584,7 +584,7 @@ export function ProductClient({
       )}
 
       {/* Reviews Section */}
-      <section className="py-10 md:py-16 bg-sky-50/50">
+      <section className="py-10 md:py-16 bg-muted/50 dark:bg-card">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <ProductReviews

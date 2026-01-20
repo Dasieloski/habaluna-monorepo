@@ -135,7 +135,7 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
           <SlidersHorizontal className="w-4 h-4" />
           Filtros
           {hasActiveFilters && (
-            <span className="ml-1 px-2 py-0.5 text-xs bg-sky-500 text-white rounded-full">
+            <span className="ml-1 px-2 py-0.5 text-xs bg-accent text-accent-foreground rounded-full">
               {Array.from(searchParams.entries()).filter(([k]) => k !== 'page').length}
             </span>
           )}
@@ -231,7 +231,7 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
                   id="inStock"
                   checked={searchParams.get('inStock') === 'true'}
                   onChange={(e) => updateFilter('inStock', e.target.checked ? 'true' : null)}
-                  className="w-4 h-4 text-sky-600 dark:text-accent border-gray-300 dark:border-border rounded focus:ring-sky-500 dark:focus:ring-ring"
+                  className="w-4 h-4 text-accent border-border rounded focus:ring-ring"
                 />
                 <Label htmlFor="inStock" className="font-normal cursor-pointer">
                   Solo con stock
@@ -243,7 +243,7 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
                   id="isFeatured"
                   checked={searchParams.get('isFeatured') === 'true'}
                   onChange={(e) => updateFilter('isFeatured', e.target.checked ? 'true' : null)}
-                  className="w-4 h-4 text-sky-600 dark:text-accent border-gray-300 dark:border-border rounded focus:ring-sky-500 dark:focus:ring-ring"
+                  className="w-4 h-4 text-accent border-border rounded focus:ring-ring"
                 />
                 <Label htmlFor="isFeatured" className="font-normal cursor-pointer">
                   Solo destacados
@@ -258,14 +258,14 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 mt-3">
           {searchParams.get('search') && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-accent/20 text-foreground rounded-full text-sm">
               Búsqueda: {searchParams.get('search')}
               <button
                 onClick={() => {
                   setSearchTerm('');
                   updateFilter('search', null);
                 }}
-                className="hover:text-sky-900"
+                className="hover:text-foreground"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -283,11 +283,11 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
             </span>
           )}
           {searchParams.get('minPrice') && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-accent/20 text-foreground rounded-full text-sm">
               Min: ${searchParams.get('minPrice')}
               <button
                 onClick={() => updateFilter('minPrice', null)}
-                className="hover:text-sky-900"
+                className="hover:text-foreground"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -305,11 +305,11 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
             </span>
           )}
           {searchParams.get('inStock') === 'true' && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-accent/20 text-foreground rounded-full text-sm">
               Con stock
               <button
                 onClick={() => updateFilter('inStock', null)}
-                className="hover:text-sky-900"
+                className="hover:text-foreground"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -327,11 +327,11 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
             </span>
           )}
           {searchParams.get('filter') === 'combos' && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-accent/20 text-foreground rounded-full text-sm">
               Combos
               <button
                 onClick={() => updateFilter('filter', null)}
-                className="hover:text-sky-900"
+                className="hover:text-foreground"
               >
                 <X className="w-3 h-3" />
               </button>

@@ -36,7 +36,7 @@ export function FormSuccess({ message, enableAnimations = true, className }: For
 
   if (!enableAnimations) {
     return (
-      <div className={cn('flex items-center gap-2 text-sm text-green-600', className)}>
+      <div className={cn('flex items-center gap-2 text-sm text-accent', className)}>
         <CheckCircle2 className="w-4 h-4" />
         <span>{message}</span>
       </div>
@@ -51,7 +51,7 @@ export function FormSuccess({ message, enableAnimations = true, className }: For
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: -10 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className={cn('flex items-center gap-2 text-sm text-green-600', className)}
+        className={cn('flex items-center gap-2 text-sm text-accent', className)}
       >
         <motion.div
           initial={{ scale: 0 }}

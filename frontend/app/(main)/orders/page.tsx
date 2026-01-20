@@ -61,37 +61,37 @@ const getStatusBadge = (status: string) => {
       label: 'Pendiente',
       variant: 'secondary',
       icon: Clock,
-      color: 'text-yellow-600 bg-yellow-50 border-yellow-200',
+      color: 'text-muted-foreground bg-muted border-border',
     },
     PROCESSING: {
       label: 'Procesando',
       variant: 'secondary',
       icon: Package,
-      color: 'text-blue-600 bg-blue-50 border-blue-200',
+      color: 'text-accent bg-accent/20 border-accent',
     },
     SHIPPED: {
       label: 'Enviado',
       variant: 'default',
       icon: Truck,
-      color: 'text-indigo-600 bg-indigo-50 border-indigo-200',
+      color: 'text-accent bg-accent/20 border-accent',
     },
     DELIVERED: {
       label: 'Entregado',
       variant: 'default',
       icon: CheckCircle2,
-      color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+      color: 'text-accent bg-accent/20 border-accent',
     },
     COMPLETED: {
       label: 'Completado',
       variant: 'default',
       icon: CheckCircle2,
-      color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+      color: 'text-accent bg-accent/20 border-accent',
     },
     CANCELLED: {
       label: 'Cancelado',
       variant: 'destructive',
       icon: XCircle,
-      color: 'text-red-600 bg-red-50 border-red-200',
+      color: 'text-destructive bg-destructive/10 border-destructive',
     },
   };
   const statusInfo = statusMap[status] || { label: status, variant: 'outline' as const, icon: Package, color: '' };
@@ -233,9 +233,9 @@ export default function OrdersPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Total gastado</p>
-                  <p className="text-2xl font-bold text-sky-600">{formatPrice(totalSpent)}</p>
+                  <p className="text-2xl font-bold text-accent">{formatPrice(totalSpent)}</p>
                 </div>
-                <DollarSign className="w-8 h-8 text-sky-500" />
+                <DollarSign className="w-8 h-8 text-accent" />
               </div>
             </CardContent>
           </Card>
@@ -257,9 +257,9 @@ export default function OrdersPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Completados</p>
-                  <p className="text-2xl font-bold text-emerald-600">{completedOrders}</p>
+                  <p className="text-2xl font-bold text-accent">{completedOrders}</p>
                 </div>
-                <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+                <CheckCircle2 className="w-8 h-8 text-accent" />
               </div>
             </CardContent>
           </Card>
@@ -363,7 +363,7 @@ export default function OrdersPage() {
                 href={`/orders/${order.id}`}
                 className="block group"
               >
-                <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:border-sky-200">
+                <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:border-accent/50">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                       {/* Información principal */}
@@ -395,7 +395,7 @@ export default function OrdersPage() {
                           <div className="flex items-center gap-3">
                             {getStatusBadge(order.status)}
                             <div className="text-right">
-                              <p className="text-2xl font-bold text-sky-600">{formatPrice(order.total)}</p>
+                              <p className="text-2xl font-bold text-foreground">{formatPrice(order.total)}</p>
                               {order.items && order.items.length > 0 && (
                                 <p className="text-sm text-muted-foreground">
                                   {order.items.length}{' '}
@@ -466,8 +466,8 @@ export default function OrdersPage() {
 
                       {/* Flecha de navegación */}
                       <div className="flex items-center md:flex-col md:justify-center">
-                        <div className="w-10 h-10 rounded-full bg-sky-100 group-hover:bg-sky-200 flex items-center justify-center transition-colors">
-                          <ArrowLeft className="w-5 h-5 text-sky-600 rotate-180" />
+                        <div className="w-10 h-10 rounded-full bg-accent/20 group-hover:bg-accent/30 flex items-center justify-center transition-colors">
+                          <ArrowLeft className="w-5 h-5 text-accent rotate-180" />
                         </div>
                       </div>
                     </div>

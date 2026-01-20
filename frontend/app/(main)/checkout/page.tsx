@@ -257,12 +257,12 @@ export default function CheckoutPage() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   {/* Alertas de validación de stock */}
                   {validation && hasIssues && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <div className="bg-destructive/10 border border-destructive rounded-lg p-4 mb-4">
                       <div className="flex items-start gap-3">
-                        <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                        <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
                         <div className="flex-1">
-                          <h3 className="font-semibold text-red-900 mb-2">Problemas de disponibilidad</h3>
-                          <ul className="space-y-1 text-sm text-red-800">
+                          <h3 className="font-semibold text-destructive mb-2">Problemas de disponibilidad</h3>
+                          <ul className="space-y-1 text-sm text-foreground">
                             {validation.items
                               .filter((item) => item.issue !== null)
                               .map((item) => {
@@ -501,13 +501,13 @@ export default function CheckoutPage() {
                     )}
                   </div>
                 ) : (
-<div className="bg-green-50 dark:bg-primary/10 border border-green-200 dark:border-primary rounded-lg p-3">
+<div className="bg-accent/10 border border-accent rounded-lg p-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-green-900 dark:text-foreground">
+                          <p className="text-sm font-medium text-foreground">
                             Cupón aplicado: {appliedCoupon.code}
                           </p>
-                          <p className="text-xs text-green-700 dark:text-muted-foreground">
+                          <p className="text-xs text-muted-foreground">
                           {appliedCoupon.name} - Descuento: {formatPrice(appliedCoupon.discount)}
                         </p>
                       </div>
@@ -549,7 +549,7 @@ export default function CheckoutPage() {
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 {appliedCoupon && (
-                  <div className="flex justify-between text-green-600 dark:text-accent">
+                  <div className="flex justify-between text-accent">
                     <span>Descuento ({appliedCoupon.code})</span>
                     <span>-{formatPrice(appliedCoupon.discount)}</span>
                   </div>

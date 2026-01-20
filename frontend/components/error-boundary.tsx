@@ -77,7 +77,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       // UI de error por defecto
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-background">
+        <div className="min-h-screen flex items-center justify-center p-4 bg-background">
           <Card className="w-full max-w-md">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   </div>
                   {this.state.errorInfo && (
                     <details className="mt-2">
-                      <summary className="cursor-pointer text-gray-600 dark:text-muted-foreground">
+                      <summary className="cursor-pointer text-muted-foreground">
                         Stack trace
                       </summary>
                       <pre className="mt-2 text-xs overflow-auto">

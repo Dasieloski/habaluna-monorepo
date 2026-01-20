@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
  */
 export default function Error500() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-background">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md text-center">
         <CardHeader>
           <div className="flex justify-center mb-4">
@@ -22,7 +22,7 @@ export default function Error500() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600 dark:text-muted-foreground">
+          <p className="text-muted-foreground">
             Nuestro equipo ha sido notificado y está trabajando para solucionarlo.
             Por favor, intenta nuevamente en unos momentos.
           </p>

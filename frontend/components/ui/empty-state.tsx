@@ -27,7 +27,7 @@ interface EmptyStateProps {
    * Por defecto: true
    */
   enableAnimations?: boolean;
-  /** Variante visual: cart (sky-400), search (muted), orders, default. */
+  /** Variante visual: cart (primary), search (muted), orders, default. */
   variant?: 'cart' | 'search' | 'orders' | 'default';
   className?: string;
 }
@@ -69,8 +69,8 @@ export function EmptyState({
     return (
       <div className={cn('flex flex-col items-center justify-center px-4 py-12 text-center', className)}>
         {icon && <div className={cn('mb-6', iconColor)}>{icon}</div>}
-        <h2 className={cn('text-2xl font-semibold text-gray-800 mb-2 leading-tight')}>{title}</h2>
-        {description && <p className="text-gray-500 mb-6 max-w-md leading-relaxed">{description}</p>}
+        <h2 className={cn('text-2xl font-semibold text-foreground mb-2 leading-tight')}>{title}</h2>
+        {description && <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">{description}</p>}
         {action && <div>{action}</div>}
       </div>
     );
@@ -97,7 +97,7 @@ export function EmptyState({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
-        className={cn('text-2xl font-semibold text-gray-800 mb-2 leading-tight')}
+        className={cn('text-2xl font-semibold text-foreground mb-2 leading-tight')}
       >
         {title}
       </motion.h2>
@@ -106,7 +106,7 @@ export function EmptyState({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
-          className="text-gray-500 mb-6 max-w-md leading-relaxed"
+          className="text-muted-foreground mb-6 max-w-md leading-relaxed"
         >
           {description}
         </motion.p>
