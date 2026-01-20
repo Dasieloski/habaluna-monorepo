@@ -74,8 +74,10 @@ const config = {
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
       fontFamily: {
-        sans: ['var(--font-poppins)', 'Poppins', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'Kaluar', 'system-ui', 'sans-serif'],
         display: ["'The Choed'", 'cursive'],
+        heading: ['var(--font-heading)', 'Simple Gudays', 'system-ui', 'sans-serif'],
+        banner: ['var(--font-banner)', 'ConsumerType Headline', 'system-ui', 'sans-serif'],
       },
     },
   },

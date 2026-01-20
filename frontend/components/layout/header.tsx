@@ -470,28 +470,28 @@ export function Header() {
         </nav>
       </div>
 
-      <div className="relative z-10 bg-background dark:bg-card py-2.5 md:py-3 border-b border-border">
+      <div className="relative z-10 bg-background dark:bg-card py-2.5 md:py-3 border-b border-border font-banner">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-start md:justify-center gap-4 md:gap-12 text-[11px] md:text-sm overflow-x-auto scrollbar-hide text-accent">
+          <div className="flex items-center justify-start md:justify-center gap-3 md:gap-12 text-[9px] md:text-sm overflow-x-auto scrollbar-hide text-accent">
             <div
-              className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
+              className="flex items-center gap-1 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
               style={{ animationDelay: "0.1s" }}
             >
-              <TruckIcon className="w-5 h-5 md:w-6 md:h-6 shrink-0" />
+              <TruckIcon className="w-4 h-4 md:w-6 md:h-6 shrink-0" />
               <span className="font-semibold">{ui.highlights[0]}</span>
             </div>
             <div
-              className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
+              className="flex items-center gap-1 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
               style={{ animationDelay: "0.2s" }}
             >
-              <ReturnIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+              <ReturnIcon className="w-3.5 h-3.5 md:w-5 md:h-5 shrink-0" />
               <span className="font-medium">{ui.highlights[1]}</span>
             </div>
             <div
-              className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
+              className="flex items-center gap-1 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
               style={{ animationDelay: "0.3s" }}
             >
-              <ShieldIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+              <ShieldIcon className="w-3.5 h-3.5 md:w-5 md:h-5 shrink-0" />
               <span className="font-medium">{ui.highlights[2]}</span>
             </div>
             <div

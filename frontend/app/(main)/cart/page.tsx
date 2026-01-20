@@ -194,7 +194,7 @@ export default function CartPage() {
         </nav>
 
         {/* Título */}
-        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4 md:mb-6 leading-tight">
+        <h1 className="font-heading text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4 md:mb-6 leading-tight">
           Tu carrito de la compra
         </h1>
 

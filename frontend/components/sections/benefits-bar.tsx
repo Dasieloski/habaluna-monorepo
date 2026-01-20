@@ -83,7 +83,7 @@ export function BenefitsBar() {
                 <div className="inline-flex items-center justify-center w-16 h-16 mb-5 text-accent bg-background dark:bg-card border border-border dark:border-accent rounded-2xl transition-all duration-300 hover:scale-110 hover:bg-muted dark:hover:bg-muted">
                   <IconComponent className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold dark:font-extrabold text-foreground tracking-wider mb-3 leading-tight">{benefit.title}</h3>
+                <h3 className="font-heading text-xl md:text-2xl font-bold dark:font-extrabold text-foreground tracking-wider mb-3 leading-tight">{benefit.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">{benefit.description}</p>
               </div>
             )

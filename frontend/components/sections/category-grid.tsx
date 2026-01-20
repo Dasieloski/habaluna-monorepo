@@ -55,7 +55,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
       >
         <div className="container mx-auto px-4">
           {title && (
-            <h2 className="text-2xl md:text-4xl font-bold dark:font-extrabold text-foreground text-center mb-10 md:mb-12 leading-tight">
+            <h2 className="font-heading text-2xl md:text-4xl font-bold dark:font-extrabold text-foreground text-center mb-10 md:mb-12 leading-tight">
               {title}
             </h2>
           )}

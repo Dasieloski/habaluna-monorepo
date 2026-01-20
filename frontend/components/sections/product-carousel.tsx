@@ -104,7 +104,7 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8 md:mb-10">
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground leading-tight">{title}</h2>
+          <h2 className="font-heading text-2xl md:text-4xl font-bold text-foreground leading-tight">{title}</h2>
           {viewAllLink && (
             <Link
               href={viewAllLink}

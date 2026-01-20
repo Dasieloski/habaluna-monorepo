@@ -72,14 +72,14 @@ export function InfoPage({
 
       <div className="container mx-auto px-4 py-6 md:py-10">
         <header className="mb-6 md:mb-10">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">{title}</h1>
+          <h1 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">{title}</h1>
           {description ? <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-3xl">{description}</p> : null}
         </header>
 
         <div className="grid gap-4 md:gap-6">
           {sections.map((s) => (
             <section key={s.title} className="rounded-2xl border border-border/50 bg-card p-5 md:p-7 shadow-sm">
-              <h2 className="text-lg md:text-xl font-semibold text-foreground">{s.title}</h2>
+              <h2 className="font-heading text-lg md:text-xl font-semibold text-foreground">{s.title}</h2>
               <div className="mt-3 text-sm md:text-[15px] leading-relaxed text-muted-foreground">{s.content}</div>
             </section>
           ))}

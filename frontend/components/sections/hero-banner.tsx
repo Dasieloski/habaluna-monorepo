@@ -146,8 +146,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                 <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12">
                   <div className="max-w-xl">
                     <h1
-                      className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-4 tracking-tight leading-tight drop-shadow-lg"
-                      style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }}
+                      className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-4 tracking-tight leading-tight drop-shadow-lg"
                     >
                       {banner.title}
                     </h1>

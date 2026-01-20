@@ -121,7 +121,7 @@ export default function WishlistPage() {
 
         {/* Title with count */}
         <div className="flex items-center justify-between mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Lista de deseos</h1>
+          <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Lista de deseos</h1>
           <span className="text-sm sm:text-base text-gray-500">{items.length} productos</span>
         </div>
 
@@ -256,7 +256,7 @@ export default function WishlistPage() {
         <section className="mb-10 sm:mb-16">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Tendencia Ahora</h2>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold text-foreground">Tendencia Ahora</h2>
               <p className="text-sm text-gray-500 mt-1">Estos productos seguro te interesan</p>
             </div>
             {/* Navigation arrows - hidden on mobile */}

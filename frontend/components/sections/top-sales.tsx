@@ -110,7 +110,7 @@ export function TopSales({ products, className }: TopSalesProps) {
         <div
           className={`flex items-center justify-between mb-8 md:mb-10 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
         >
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground leading-tight">Top Ventas</h2>
+          <h2 className="font-heading text-2xl md:text-4xl font-bold text-foreground leading-tight">Top Ventas</h2>
           <Link
             href="/products?filter=top"
             className="px-4 md:px-5 py-2 md:py-2.5 bg-primary text-primary-foreground text-xs md:text-sm font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-primary/20"

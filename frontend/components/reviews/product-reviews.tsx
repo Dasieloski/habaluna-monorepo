@@ -115,7 +115,7 @@ export function ProductReviews({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-foreground">
+        <h2 className="font-heading text-2xl font-bold text-foreground">
           Reseñas ({meta.total})
         </h2>
         {user && !userReview && (

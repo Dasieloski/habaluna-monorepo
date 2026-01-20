@@ -156,7 +156,7 @@ export default function ProductsClient() {
 
       <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Title */}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 md:mb-8 leading-tight">
+        <h1 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 md:mb-8 leading-tight">
           {searchParams.get('filter') === 'combos' ? 'Combos' : 'Productos'}
         </h1>
 

@@ -540,7 +540,7 @@ export function ProductClient({
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-6 md:mb-8">
               <div>
-                <h2 className="text-xl md:text-3xl font-bold text-foreground">También te puede interesar</h2>
+                <h2 className="font-heading text-xl md:text-3xl font-bold text-foreground">También te puede interesar</h2>
                 <p className="text-sm text-muted-foreground mt-1">Más productos de la misma categoría</p>
               </div>
               <div className="hidden md:flex items-center gap-2">
