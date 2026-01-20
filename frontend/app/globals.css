@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@config "../tailwind.config";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -18,18 +19,24 @@
   font-family: 'ConsumerType Headline';
   src: url('/fonts/ConsumerType-Headline-Exfontaff5.otf') format('opentype');
   font-display: swap;
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
   font-family: 'Simple Gudays';
   src: url('/fonts/Simple-Gudays-DEMO-VERSION-BF69573282bddfc.otf') format('opentype');
   font-display: swap;
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
   font-family: 'Kaluar';
   src: url('/fonts/Kaluar-Light-Exfont88f8.ttf') format('truetype');
   font-display: swap;
+  font-weight: normal;
+  font-style: normal;
 }
 
 :root {
@@ -162,9 +169,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    font-family: var(--font-sans);
+  }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans);
+    font-family: inherit;
   }
 }
 

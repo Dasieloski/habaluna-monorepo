@@ -56,8 +56,12 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <link rel="dns-prefetch" href="https://habaluna-backend-production.up.railway.app" />
+        {/* Preload fuentes propias para que carguen desde el primer request */}
+        <link rel="preload" href="/fonts/Kaluar-Light-Exfont88f8.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/ConsumerType-Headline-Exfontaff5.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/Simple-Gudays-DEMO-VERSION-BF69573282bddfc.otf" as="font" type="font/otf" crossOrigin="anonymous" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased font-sans">
         <Providers>{children}</Providers>
         <Analytics />
       </body>
