@@ -109,10 +109,9 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
             <Link
               href={viewAllLink}
               aria-label={`Ver todos los productos de ${title}`}
-              className="text-xs md:text-sm font-semibold text-accent hover:text-accent/90 transition-colors flex items-center gap-1 group relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-current after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left"
+              className="px-4 md:px-5 py-2 md:py-2.5 bg-primary text-primary-foreground text-xs md:text-sm font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-primary/20"
             >
               Ver todo
-              <ChevronRightIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           )}
         </div>

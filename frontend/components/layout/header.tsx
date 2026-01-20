@@ -229,7 +229,7 @@ export function Header() {
             </button>
 
             <Link href="/" className="flex items-center group shrink-0">
-              <span className="text-2xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105" style={{ fontFamily: "'The Choed', cursive" }}>
+              <span className="font-logo text-2xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105">
                 Habaluna
               </span>
             </Link>
@@ -472,7 +472,7 @@ export function Header() {
 
       <div className="relative z-10 bg-background dark:bg-card py-2.5 md:py-3 border-b border-border font-banner">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-start md:justify-center gap-3 md:gap-12 text-[9px] md:text-sm overflow-x-auto scrollbar-hide text-accent">
+          <div className="flex items-center justify-center gap-3 md:gap-12 text-[9px] md:text-sm overflow-x-auto scrollbar-hide text-accent">
             <div
               className="flex items-center gap-1 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
               style={{ animationDelay: "0.1s" }}

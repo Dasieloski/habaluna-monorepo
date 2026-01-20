@@ -196,61 +196,61 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-background py-8 md:py-12">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
             Mi Perfil
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Gestiona tu información personal, pedidos y productos favoritos
           </p>
         </div>
 
         {/* Estadísticas */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 md:mb-8">
           <Card className="border-0 shadow-md bg-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Total gastado</p>
-                  <p className="text-2xl font-bold text-sky-600">{formatPrice(totalSpent)}</p>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">Total gastado</p>
+                  <p className="text-lg sm:text-2xl font-bold text-sky-600 truncate">{formatPrice(totalSpent)}</p>
                 </div>
-                <DollarSign className="w-8 h-8 text-sky-500" />
+                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-sky-500 shrink-0" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-md bg-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Pedidos</p>
-                  <p className="text-2xl font-bold text-accent">{totalOrders}</p>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">Pedidos</p>
+                  <p className="text-lg sm:text-2xl font-bold text-accent">{totalOrders}</p>
                 </div>
-                <ShoppingBag className="w-8 h-8 text-accent" />
+                <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-accent shrink-0" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-pink-50 to-rose-50">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Favoritos</p>
-                  <p className="text-2xl font-bold text-rose-600">{wishlistCount}</p>
+          <Card className="border-0 shadow-md bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">Favoritos</p>
+                  <p className="text-lg sm:text-2xl font-bold text-rose-600">{wishlistCount}</p>
                 </div>
-                <Heart className="w-8 h-8 text-rose-500" />
+                <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-rose-500 shrink-0" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-md bg-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Completados</p>
-                  <p className="text-2xl font-bold text-accent">{completedOrders}</p>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">Completados</p>
+                  <p className="text-lg sm:text-2xl font-bold text-accent">{completedOrders}</p>
                 </div>
-                <Award className="w-8 h-8 text-accent" />
+                <Award className="w-6 h-6 sm:w-8 sm:h-8 text-accent shrink-0" />
               </div>
             </CardContent>
           </Card>
@@ -258,17 +258,17 @@ export default function ProfilePage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-card border border-border/50 shadow-sm">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
+          <TabsList className="bg-card border border-border/50 shadow-sm flex-nowrap overflow-x-auto scrollbar-hide w-full justify-start sm:justify-start">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent shrink-0">
               Resumen
             </TabsTrigger>
-            <TabsTrigger value="profile" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
+            <TabsTrigger value="profile" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent shrink-0">
               Información Personal
             </TabsTrigger>
-            <TabsTrigger value="orders" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
+            <TabsTrigger value="orders" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent shrink-0">
               Mis Pedidos ({totalOrders})
             </TabsTrigger>
-            <TabsTrigger value="wishlist" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
+            <TabsTrigger value="wishlist" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent shrink-0">
               Favoritos ({wishlistCount})
             </TabsTrigger>
           </TabsList>
@@ -327,7 +327,7 @@ export default function ProfilePage() {
                         <MapPin className="w-4 h-4" />
                         Dirección
                       </span>
-                      <span className="font-medium text-right max-w-[60%]">
+                      <span className="font-medium text-right max-w-full sm:max-w-[60%] break-words">
                         {profile.address}
                         {profile.city && `, ${profile.city}`}
                         {profile.zipCode && ` ${profile.zipCode}`}
@@ -591,9 +591,9 @@ export default function ProfilePage() {
                               )}
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-xl font-bold text-sky-600">{formatPrice(order.total)}</p>
-                            <ArrowRight className="w-5 h-5 text-muted-foreground mt-2 ml-auto" />
+                          <div className="flex items-center justify-between sm:flex-col sm:items-end sm:text-right gap-1">
+                            <p className="text-lg sm:text-xl font-bold text-sky-600">{formatPrice(order.total)}</p>
+                            <ArrowRight className="w-5 h-5 text-muted-foreground shrink-0" />
                           </div>
                         </div>
                         {order.items && order.items.length > 0 && (

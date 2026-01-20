@@ -489,7 +489,7 @@ export function ProductClient({
               </div>
               <div className="text-right">
                 <p className="text-sm text-accent font-medium">Envío gratis desde $100</p>
-                <Link href="/shipping" className="text-xs text-accent hover:underline">
+                <Link href="/shipping" className="text-xs text-amber-600 hover:text-amber-700 hover:underline font-medium">
                   Saber más
                 </Link>
               </div>
