@@ -202,22 +202,22 @@ export function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 bg-card shadow-sm transition-transform duration-500 ease-out ${
+        className={`sticky top-0 z-50 bg-background dark:bg-card shadow-sm transition-transform duration-500 ease-out ${
           isHidden ? "-translate-y-full" : "translate-y-0"
         }`}
       >
       <div
-        className={`border-b text-foreground text-xs md:text-sm py-2.5 text-center ${
+        className={`border-b text-foreground text-xs md:text-sm py-2.5 text-center bg-background dark:bg-card ${
           ui.announcementVariant === "promo"
-            ? "bg-card border-accent"
-            : "bg-card border-border"
+            ? "border-accent"
+            : "border-border"
         }`}
       >
         <p className="animate-fade-in">{ui.announcement}</p>
       </div>
 
       {/* Main header */}
-      <div className="relative z-20 border-b border-border/50">
+      <div className="relative z-20 border-b border-border/50 bg-background dark:bg-card">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Mobile menu button */}
@@ -471,7 +471,7 @@ export function Header() {
         </nav>
       </div>
 
-      <div className="relative z-10 bg-card py-2.5 md:py-3 border-b border-border">
+      <div className="relative z-10 bg-background dark:bg-card py-2.5 md:py-3 border-b border-border">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-start md:justify-center gap-4 md:gap-12 text-[11px] md:text-sm overflow-x-auto scrollbar-hide text-accent">
             <div

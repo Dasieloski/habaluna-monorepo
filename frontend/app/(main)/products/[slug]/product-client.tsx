@@ -270,7 +270,7 @@ export function ProductClient({
           </div>
 
           {/* Right - Product Info */}
-          <div className="w-full flex flex-col bg-white dark:bg-card relative z-10 rounded-xl md:rounded-2xl p-4 md:p-6 border border-transparent dark:border-border" style={{ minWidth: 0 }}>
+          <div className="w-full flex flex-col bg-background dark:bg-card relative z-10 rounded-xl md:rounded-2xl p-4 md:p-6 border border-transparent dark:border-border" style={{ minWidth: 0 }}>
             {/* Category */}
             {product?.category?.name && (
               <span className="text-xs md:text-sm text-accent font-medium mb-1 md:mb-2">{product.category.name}</span>
@@ -433,7 +433,7 @@ export function ProductClient({
                   }
                 }}
                 aria-label={`Añadir ${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} al carrito`}
-                className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-primary/90 transition-all text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-primary/90 transition-all text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -477,9 +477,9 @@ export function ProductClient({
             </div>
 
             {/* Delivery info */}
-            <div className="bg-card rounded-xl p-4 mb-4 md:mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2 border border-border">
+            <div className="bg-background dark:bg-card rounded-xl p-4 mb-4 md:mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2 border border-border">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-highlight/30 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-transparent dark:bg-highlight/30 rounded-lg flex items-center justify-center">
                   <TruckIcon className="w-5 h-5 text-accent" />
                 </div>
                 <div>

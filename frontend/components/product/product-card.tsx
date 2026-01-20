@@ -117,7 +117,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                 }}
                 className={`absolute top-2 right-2 md:top-3 md:right-3 p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all duration-300 ${
                   isInWishlist
-                    ? "bg-accent/15 text-accent scale-110"
+                    ? "bg-red-50 text-red-500 dark:bg-accent/15 dark:text-accent scale-110 transition-transform duration-200 active:scale-95"
                     : "bg-card/90 backdrop-blur-sm text-highlight opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card hover:text-accent"
                 }`}
               >
@@ -160,7 +160,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                     })
                   }
                 }}
-                className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90"
+                className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90 active:scale-95"
                 type="button"
               >
                 Añadir al carrito
@@ -185,7 +185,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
               <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
                 <span className="text-base md:text-lg font-bold dark:font-extrabold text-primary">${price.toFixed(2)}</span>
                 {hasDiscount && (
-                  <span className="text-[10px] md:text-sm text-highlight line-through">
+                  <span className="text-[10px] md:text-sm text-foreground dark:text-highlight line-through">
                     ${comparePrice!.toFixed(2)}
                   </span>
                 )}
@@ -228,7 +228,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                       })
                     }
                   }}
-                  className="w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl active:scale-[0.99] transition"
+                  className="w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl active:scale-95 transition-transform duration-200"
                   type="button"
                 >
                   Añadir al carrito
@@ -293,7 +293,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
             aria-label={isInWishlist ? `Quitar ${product.name} de la wishlist` : `Agregar ${product.name} a la wishlist`}
             className={`absolute top-2 right-2 md:top-3 md:right-3 p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all duration-300 ${
               isInWishlist
-                ? "bg-accent/15 text-accent scale-110"
+                ? "bg-red-50 text-red-500 dark:bg-accent/15 dark:text-accent scale-110 transition-transform duration-200 active:scale-95"
                 : "bg-card/90 backdrop-blur-sm text-highlight opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card hover:text-accent"
             }`}
           >
@@ -337,7 +337,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
               }
             }}
             aria-label={`Añadir ${product.name} al carrito`}
-            className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90"
+            className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90 active:scale-95"
             type="button"
           >
             Añadir al carrito
@@ -364,7 +364,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
           <div className="mt-2 md:mt-3 flex items-center gap-1.5 md:gap-2">
             <span className="text-base md:text-lg font-bold dark:font-extrabold text-primary">${price.toFixed(2)}</span>
             {hasDiscount && (
-              <span className="text-sm text-highlight line-through">
+              <span className="text-sm text-foreground dark:text-highlight line-through">
                 ${comparePrice!.toFixed(2)}
               </span>
             )}
@@ -408,7 +408,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                 }
               }}
               aria-label={`Añadir ${product.name} al carrito`}
-              className="w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl active:scale-[0.99] transition"
+              className="w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl active:scale-95 transition-transform duration-200"
               type="button"
             >
               Añadir al carrito

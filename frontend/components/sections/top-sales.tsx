@@ -193,7 +193,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                     aria-label={favorites.has(product.id) ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
                     className={`absolute top-2 right-2 p-1.5 md:p-2 rounded-lg md:rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100 ${
                       favorites.has(product.id)
-                        ? "bg-accent/15 text-accent opacity-100 scale-110"
+                        ? "bg-red-50 text-red-500 dark:bg-accent/15 dark:text-accent opacity-100 scale-110 transition-transform duration-200 active:scale-95"
                         : "bg-card/90 backdrop-blur-sm text-highlight hover:bg-card hover:text-accent"
                     }`}
                   >
@@ -201,7 +201,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                   </button>
                   <button
                     onClick={(e) => handleAddToCart(product, e)}
-                    className="absolute bottom-2 right-2 p-2 rounded-lg md:rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                    className="absolute bottom-2 right-2 p-2 rounded-lg md:rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100 active:scale-95"
                     aria-label={`Añadir ${product.name} al carrito`}
                     type="button"
                   >
@@ -217,7 +217,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                       ${getPrice(product).toFixed(2)}
                     </span>
                     {getComparePrice(product) !== null && getComparePrice(product)! > getPrice(product) && (
-                      <span className="text-[10px] md:text-xs text-highlight line-through">
+                      <span className="text-[10px] md:text-xs text-foreground dark:text-highlight line-through">
                         ${getComparePrice(product)!.toFixed(2)}
                       </span>
                     )}
