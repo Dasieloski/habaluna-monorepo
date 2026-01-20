@@ -76,8 +76,8 @@ const config = {
       fontFamily: {
         sans: ['var(--font-sans)', 'Kaluar', 'system-ui', 'sans-serif'],
         display: ["'The Choed'", 'cursive'],
-        heading: ['var(--font-heading)', 'Simple Gudays', 'system-ui', 'sans-serif'],
-        banner: ['var(--font-banner)', 'ConsumerType Headline', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-heading)', 'Galafera', 'system-ui', 'sans-serif'],
+        banner: ['var(--font-banner)', 'Makira', 'system-ui', 'sans-serif'],
       },
     },
   },

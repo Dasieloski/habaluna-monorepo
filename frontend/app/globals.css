@@ -16,16 +16,16 @@
 }
 
 @font-face {
-  font-family: 'ConsumerType Headline';
-  src: url('/fonts/ConsumerType-Headline-Exfontaff5.otf') format('opentype');
+  font-family: 'Makira';
+  src: url('/fonts/Makira-Medium-Exfont13a8.otf') format('opentype');
   font-display: swap;
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Simple Gudays';
-  src: url('/fonts/Simple-Gudays-DEMO-VERSION-BF69573282bddfc.otf') format('opentype');
+  font-family: 'Galafera';
+  src: url('/fonts/Galafera-Bold-Exfont121b.otf') format('opentype');
   font-display: swap;
   font-weight: normal;
   font-style: normal;
@@ -72,8 +72,8 @@
 
   --radius: 0.625rem;
   --font-sans: "Kaluar", system-ui, sans-serif;
-  --font-heading: "Simple Gudays", system-ui, sans-serif;
-  --font-banner: "ConsumerType Headline", system-ui, sans-serif;
+  --font-heading: "Galafera", system-ui, sans-serif;
+  --font-banner: "Makira", system-ui, sans-serif;
   --sidebar: #ffffff;
   --sidebar-foreground: #323232;
   --sidebar-primary: #4d69a5;
@@ -128,8 +128,8 @@
   --font-sans: "Kaluar", system-ui, sans-serif;
   --font-mono: "Geist Mono", monospace;
   --font-display: "The Choed", cursive;
-  --font-heading: "Simple Gudays", system-ui, sans-serif;
-  --font-banner: "ConsumerType Headline", system-ui, sans-serif;
+  --font-heading: "Galafera", system-ui, sans-serif;
+  --font-banner: "Makira", system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

@@ -8,7 +8,7 @@ const Analytics = process.env.VERCEL
   ? require("@vercel/analytics/next").Analytics
   : () => null
 
-// Fuentes: Kaluar (cuerpo), Simple Gudays (títulos), ConsumerType (banner), The Choed (logo) vía @font-face en globals.css
+// Fuentes: Kaluar (cuerpo), Galafera (títulos), Makira (banner), The Choed (logo) vía @font-face en globals.css
 
 export const metadata: Metadata = {
   metadataBase: new URL((process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "")),
@@ -58,8 +58,8 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://habaluna-backend-production.up.railway.app" />
         {/* Preload fuentes propias para que carguen desde el primer request */}
         <link rel="preload" href="/fonts/Kaluar-Light-Exfont88f8.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/ConsumerType-Headline-Exfontaff5.otf" as="font" type="font/otf" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/Simple-Gudays-DEMO-VERSION-BF69573282bddfc.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/Galafera-Bold-Exfont121b.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/Makira-Medium-Exfont13a8.otf" as="font" type="font/otf" crossOrigin="anonymous" />
       </head>
       <body className="antialiased font-sans">
         <Providers>{children}</Providers>
