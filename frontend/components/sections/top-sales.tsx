@@ -104,7 +104,7 @@ export function TopSales({ products, className }: TopSalesProps) {
   const getComparePrice = (product: Product) => toNumber(product.variants?.[0]?.comparePriceUSD ?? product.comparePriceUSD)
 
   return (
-    <section ref={sectionRef} className={`py-10 md:py-16 bg-gradient-to-br from-[var(--habaluna-blue)] via-secondary to-[var(--habaluna-mint)] ${className ?? ""}`}>
+    <section ref={sectionRef} className={`py-10 md:py-16 bg-gradient-to-br from-muted via-secondary to-muted ${className ?? ""}`}>
       <div className="container mx-auto px-4">
         {/* Header */}
         <div
@@ -125,7 +125,7 @@ export function TopSales({ products, className }: TopSalesProps) {
             href={`/products/${featuredProduct.slug}`}
             className={`col-span-2 lg:row-span-2 group transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
           >
-            <div className="relative h-full bg-white rounded-xl md:rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+            <div className="relative h-full bg-card rounded-xl md:rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-border">
               <div className="aspect-[4/3] lg:aspect-auto lg:h-full relative overflow-hidden">
                 <SmartImage
                   src={featuredProduct.images?.[0] || "/placeholder.svg?height=600&width=600&query=featured product"}
@@ -149,7 +149,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                 </button>
                 <button
                   onClick={(e) => handleAddToCart(featuredProduct, e)}
-                  className="absolute bottom-3 right-3 md:bottom-4 md:right-4 p-2.5 md:p-3 rounded-xl bg-white/90 backdrop-blur-sm text-foreground hover:bg-white transition-all duration-300"
+                  className="absolute bottom-3 right-3 md:bottom-4 md:right-4 p-2.5 md:p-3 rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300"
                   aria-label={`Añadir ${featuredProduct.name} al carrito`}
                   type="button"
                 >
@@ -160,7 +160,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                 </span>
               </div>
               <div className="p-4 md:p-5">
-                <h3 className="text-sm md:text-xl font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+                <h3 className="text-sm md:text-xl font-semibold text-foreground line-clamp-2 group-hover:text-accent transition-colors">
                   {featuredProduct.name}
                 </h3>
                 <p className="text-base md:text-2xl font-bold text-foreground mt-2 md:mt-3">
@@ -178,7 +178,7 @@ export function TopSales({ products, className }: TopSalesProps) {
               className={`group transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{ transitionDelay: `${(index + 1) * 0.1}s` }}
             >
-              <div className="relative bg-white rounded-xl md:rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full">
+              <div className="relative bg-card rounded-xl md:rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full border border-border">
                 <div className="aspect-square relative overflow-hidden">
                   <SmartImage
                     src={product.images?.[0] || "/placeholder.svg?height=300&width=300&query=product"}
@@ -201,7 +201,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                   </button>
                   <button
                     onClick={(e) => handleAddToCart(product, e)}
-                    className="absolute bottom-2 right-2 p-2 rounded-lg md:rounded-xl bg-white/90 backdrop-blur-sm text-foreground hover:bg-white transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                    className="absolute bottom-2 right-2 p-2 rounded-lg md:rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100"
                     aria-label={`Añadir ${product.name} al carrito`}
                     type="button"
                   >
@@ -209,7 +209,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                   </button>
                 </div>
                 <div className="p-3 md:p-4">
-                  <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+                  <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 group-hover:text-accent transition-colors">
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-1 md:gap-2 mt-1.5 md:mt-2">

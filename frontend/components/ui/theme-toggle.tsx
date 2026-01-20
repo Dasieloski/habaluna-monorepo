@@ -4,7 +4,24 @@ import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 
-/** Slider pequeño claro/oscuro. Uso: Header (storefront) y Admin. */
+function SunIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </svg>
+  )
+}
+
+function MoonIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  )
+}
+
+/** Switch modo claro/oscuro con íconos sol y luna. Header y Admin. */
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -16,7 +33,7 @@ export function ThemeToggle({ className }: { className?: string }) {
   if (!mounted) {
     return (
       <div
-        className={cn("h-6 w-11 shrink-0 rounded-full bg-muted", className)}
+        className={cn("h-9 w-9 shrink-0 rounded-full bg-muted", className)}
         aria-hidden
       />
     )
@@ -32,17 +49,28 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label={isDark ? "Usar modo claro" : "Usar modo oscuro"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className={cn(
-        "relative h-6 w-11 shrink-0 rounded-full border border-border transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        isDark ? "bg-primary/90" : "bg-muted-foreground/20",
+        "relative h-9 w-9 shrink-0 rounded-full flex items-center justify-center",
+        "bg-muted/80 hover:bg-muted text-foreground",
+        "transition-all duration-300 ease-out",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "active:scale-95",
         className
       )}
     >
-      <span
-        className={cn(
-          "absolute top-0.5 block h-5 w-5 rounded-full bg-background shadow-sm transition-[left] duration-200",
-          isDark ? "left-0.5" : "left-5"
-        )}
-      />
+      <span className="relative w-4 h-4">
+        <SunIcon
+          className={cn(
+            "absolute inset-0 w-4 h-4 transition-all duration-300",
+            isDark ? "opacity-0 -rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"
+          )}
+        />
+        <MoonIcon
+          className={cn(
+            "absolute inset-0 w-4 h-4 transition-all duration-300",
+            isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 rotate-90 scale-75"
+          )}
+        />
+      </span>
     </button>
   )
 }

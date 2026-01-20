@@ -105,14 +105,14 @@ export function AdminSidebar({
         <div className="h-16 flex items-center justify-between px-4 border-b border-border">
           {(!isCollapsed || isMobileOpen) && (
             <Link href="/admin" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-habaluna-blue-dark rounded-xl flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-md">
                 <Store className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-logo text-2xl text-foreground">Habaluna</span>
             </Link>
           )}
           {isCollapsed && !isMobileOpen && (
-            <div className="w-10 h-10 mx-auto bg-gradient-to-br from-primary to-habaluna-blue-dark rounded-xl flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 mx-auto bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-md">
               <Store className="w-5 h-5 text-primary-foreground" />
             </div>
           )}
@@ -145,7 +145,7 @@ export function AdminSidebar({
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200",
                   isActive
-                    ? "bg-gradient-to-r from-primary to-habaluna-blue-dark text-primary-foreground shadow-md"
+                    ? "bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                   (isCollapsed && !isMobileOpen) && "justify-center px-2",
                 )}

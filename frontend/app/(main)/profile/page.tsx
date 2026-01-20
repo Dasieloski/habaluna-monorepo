@@ -523,7 +523,7 @@ export default function ProfilePage() {
                   <Button
                     type="submit"
                     disabled={saving}
-                    className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg"
+                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg"
                   >
                     {saving ? (
                       <>

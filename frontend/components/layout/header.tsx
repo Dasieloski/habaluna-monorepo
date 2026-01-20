@@ -22,7 +22,6 @@ import {
   StarIcon,
 } from "@/components/icons/streamline-icons"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
-import Image from "next/image"
 
 export function Header() {
   const router = useRouter()
@@ -210,7 +209,7 @@ export function Header() {
       <div
         className={`border-b text-foreground text-xs md:text-sm py-2.5 text-center ${
           ui.announcementVariant === "promo"
-            ? "bg-gradient-to-r from-amber-50/80 to-[var(--habaluna-blue)] dark:from-amber-950/30 dark:to-[var(--habaluna-blue)] border-amber-200 dark:border-amber-800"
+            ? "bg-gradient-to-r from-accent/10 to-muted dark:from-accent/20 dark:to-muted border-accent/30 dark:border-accent/20"
             : "bg-secondary border-border"
         }`}
       >
@@ -230,14 +229,12 @@ export function Header() {
             </button>
 
             <Link href="/" className="flex items-center group">
-              <Image
-                src="/logo.svg"
-                alt="Habaluna"
-                width={160}
-                height={52}
-                className="h-9 md:h-12 w-auto transition-transform duration-300 group-hover:scale-105"
-                priority
-              />
+              <span
+                className="text-3xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105"
+                style={{ fontFamily: "'Londrina Shadow', cursive" }}
+              >
+                Habaluna
+              </span>
             </Link>
 
             {/* Desktop Search */}
@@ -268,10 +265,10 @@ export function Header() {
                   <UserIcon className="w-5 h-5" />
                 </button>
                 {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-border/50 overflow-hidden animate-fade-in-up z-50">
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-popover rounded-2xl shadow-xl border border-border overflow-hidden animate-fade-in-up z-50">
                     {authed && user ? (
                       <>
-                        <div className="p-4 bg-gradient-to-r from-[var(--habaluna-blue)] to-secondary border-b border-border/30">
+                        <div className="p-4 bg-gradient-to-r from-muted to-secondary border-b border-border">
                           <p className="text-sm font-medium text-foreground">
                             {user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.email}
                           </p>
@@ -284,7 +281,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-sky-600"
+                              className="w-5 h-5 text-accent"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -304,7 +301,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-sky-600"
+                              className="w-5 h-5 text-accent"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -325,7 +322,7 @@ export function Header() {
                               onClick={() => setUserMenuOpen(false)}
                             >
                               <svg
-                                className="w-5 h-5 text-primary"
+                                className="w-5 h-5 text-accent"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -364,7 +361,7 @@ export function Header() {
                       </>
                     ) : (
                       <>
-                        <div className="p-4 bg-gradient-to-r from-[var(--habaluna-blue)] to-secondary border-b border-border/30">
+                        <div className="p-4 bg-gradient-to-r from-muted to-secondary border-b border-border">
                           <p className="text-sm font-medium text-foreground">Mi cuenta</p>
                           <p className="text-xs text-muted-foreground mt-0.5">Accede o crea tu cuenta</p>
                         </div>
@@ -375,7 +372,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-sky-600"
+                              className="w-5 h-5 text-accent"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -395,7 +392,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-sky-600"
+                              className="w-5 h-5 text-accent"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -474,7 +471,7 @@ export function Header() {
         </nav>
       </div>
 
-      <div className="relative z-10 bg-gradient-to-r from-[var(--habaluna-blue)] via-secondary to-[var(--habaluna-blue)] py-2.5 md:py-3 border-b border-border">
+      <div className="relative z-10 bg-gradient-to-r from-muted via-secondary to-muted py-2.5 md:py-3 border-b border-border">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-start md:justify-center gap-4 md:gap-12 text-[11px] md:text-sm overflow-x-auto scrollbar-hide text-primary">
             <div

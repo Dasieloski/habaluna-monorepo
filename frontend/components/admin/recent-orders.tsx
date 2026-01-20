@@ -63,7 +63,7 @@ export function RecentOrders() {
           style={{ animationDelay: `${index * 100}ms` }}
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-habaluna-blue-dark/20 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg flex items-center justify-center">
               <span className="text-xs font-bold text-primary">{order.id.slice(-3)}</span>
             </div>
             <div>

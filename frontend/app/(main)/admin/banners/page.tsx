@@ -475,7 +475,7 @@ export default function AdminBannersPage() {
         </div>
         <Button
           onClick={openNew}
-          className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg"
+          className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg"
         >
           <Plus className="w-4 h-4 mr-2" />
           Nuevo banner
@@ -486,7 +486,7 @@ export default function AdminBannersPage() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-habaluna-blue-dark rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
                 <ImageIcon className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -606,7 +606,7 @@ export default function AdminBannersPage() {
           </div>
 
           <div className="flex justify-end">
-            <Button onClick={saveUiTexts} disabled={uiLoading || uiSaving} className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg">
+            <Button onClick={saveUiTexts} disabled={uiLoading || uiSaving} className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg">
               {uiSaving ? "Guardando..." : "Guardar textos"}
             </Button>
           </div>
@@ -663,7 +663,7 @@ export default function AdminBannersPage() {
                 type="button"
                 onClick={saveSiteMode}
                 disabled={uiLoading || siteModeSaving}
-                className="bg-gradient-to-r from-primary to-habaluna-blue-dark text-primary-foreground"
+                className="bg-gradient-to-r from-primary to-accent text-primary-foreground"
               >
                 {siteModeSaving ? "Guardando..." : "Aplicar modo"}
               </Button>

@@ -104,10 +104,10 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background">
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-sky-500 transition-colors">
+          <Link href="/" className="hover:text-accent transition-colors">
             Home
           </Link>
           <span>&gt;</span>
@@ -134,7 +134,7 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
                 </div>
                 <Link
                   href="/auth/forgot-password"
-                  className="block text-center text-sky-500 hover:text-sky-600 hover:underline font-medium"
+                  className="block text-center text-accent hover:text-accent/90 hover:underline font-medium"
                 >
                   Solicitar nuevo enlace de recuperación
                 </Link>
@@ -158,7 +158,7 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
                   id="newPassword"
                   type="password"
                   {...register("newPassword")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                 />
                 
                 {/* Indicador de fortaleza de contraseña */}
@@ -202,7 +202,7 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
                   id="confirmPassword"
                   type="password"
                   {...register("confirmPassword")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                 />
                 {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
               </div>
@@ -216,7 +216,7 @@ export function ResetPasswordClient({ token }: ResetPasswordClientProps) {
               </button>
 
               <p className="text-center text-sm text-muted-foreground">
-                <Link href="/auth/login" className="text-sky-500 hover:text-sky-600 hover:underline font-medium">
+                <Link href="/auth/login" className="text-accent hover:text-accent/90 hover:underline font-medium">
                   Volver a iniciar sesión
                 </Link>
               </p>

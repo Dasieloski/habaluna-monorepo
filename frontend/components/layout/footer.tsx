@@ -14,7 +14,7 @@ export function Footer() {
             <div className="col-span-2 md:col-span-1">
               {/* En móvil movemos el logo al bloque "Pago seguro" para evitar huecos */}
               <Link href="/" className="hidden md:inline-block mb-5">
-                <Image src="/logo.svg" alt="Habaluna" width={180} height={64} className="h-12 w-auto" />
+                <Image src="/uploads/logo.png" alt="Habaluna" width={180} height={64} className="h-12 w-auto" />
               </Link>
               <div className="flex items-center gap-2 mt-5">
                 <Image src="/flags/cuba.png" alt="Cuba" width={20} height={14} className="h-4 w-auto rounded-sm" />
@@ -91,7 +91,7 @@ export function Footer() {
                 {/* Logo en móvil, al lado del bloque de pago */}
                 <Link href="/" className="md:hidden shrink-0">
                   <Image
-                    src="/logo.svg"
+                    src="/uploads/logo.png"
                     alt="Habaluna"
                     width={240}
                     height={86}

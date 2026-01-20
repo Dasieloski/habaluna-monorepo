@@ -70,11 +70,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background">
       {/* Breadcrumbs */}
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-sky-500 transition-colors">
+          <Link href="/" className="hover:text-accent transition-colors">
             Home
           </Link>
           <span>&gt;</span>
@@ -88,11 +88,11 @@ export default function LoginPage() {
           {/* Title */}
           <div className="text-center mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 leading-tight">Acceso del cliente</h1>
-            <p className="text-sky-500">¡Bienvenido de nuevo!</p>
+            <p className="text-accent">¡Bienvenido de nuevo!</p>
           </div>
 
           {/* Form Card */}
-          <div className="bg-white border border-sky-100 rounded-xl p-6 md:p-8 shadow-lg">
+          <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-lg">
             <h2 className="text-xl font-semibold text-foreground mb-6">Acceder</h2>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -113,7 +113,7 @@ export default function LoginPage() {
                   type="email"
                   placeholder="Dirección E-Mail"
                   {...register("email")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                 />
                 {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
               </div>
@@ -129,7 +129,7 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Contraseña"
                     {...register("password")}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                   />
                   <button
                     type="button"
@@ -148,13 +148,13 @@ export default function LoginPage() {
                   <input
                     type="checkbox"
                     {...register("rememberMe")}
-                    className="w-4 h-4 border-gray-300 rounded text-sky-500 focus:ring-sky-400"
+                    className="w-4 h-4 border-gray-300 rounded text-accent focus:ring-accent"
                   />
                   <span className="text-sm text-muted-foreground">Recordarme</span>
                 </label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-sm text-sky-500 hover:text-sky-600 hover:underline transition-colors"
+                  className="text-sm text-accent hover:text-accent/90 hover:underline transition-colors"
                 >
                   ¿Has olvidado tu contraseña?
                 </Link>
@@ -174,7 +174,7 @@ export default function LoginPage() {
               {/* Register link */}
               <p className="text-center text-sm text-muted-foreground pt-2">
                 ¿Es nuevo aquí?{" "}
-                <Link href="/auth/register" className="text-sky-500 hover:text-sky-600 hover:underline font-medium">
+                <Link href="/auth/register" className="text-accent hover:text-accent/90 hover:underline font-medium">
                   Crear una cuenta
                 </Link>
               </p>

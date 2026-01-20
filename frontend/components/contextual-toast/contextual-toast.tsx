@@ -90,8 +90,8 @@ export function ContextualToast({ state, progress, showProgressBar, statusLabel,
     >
       <div className="-translate-x-1/2 -translate-y-1/2">
         <motion.div
-          className={`rounded-2xl border bg-white px-4 py-3 shadow-xl ${
-            milestoneJustReached ? 'ring-2 ring-emerald-400 ring-offset-2' : 'border-primary/20'
+          className={`rounded-2xl border border-border bg-card px-4 py-3 shadow-xl ${
+            milestoneJustReached ? 'ring-2 ring-accent-2 ring-offset-2' : ''
           }`}
           style={{ minWidth: 280, maxWidth: 360 }}
         >
@@ -118,7 +118,7 @@ export function ContextualToast({ state, progress, showProgressBar, statusLabel,
               initial={false}
             >
               <motion.div
-                className="h-full rounded-full bg-sky-500"
+                className="h-full rounded-full bg-primary"
                 initial={false}
                 animate={{ width: `${progress * 100}%` }}
                 transition={{ type: 'spring', ...SPRING }}
@@ -164,7 +164,7 @@ function SimpleToast({
         className={`rounded-xl border px-4 py-3 shadow-lg ${
           isError
             ? 'border-l-4 border-l-red-400 border-red-200 bg-red-50 text-red-900'
-            : 'border-l-4 border-l-primary border-primary/20 bg-background text-foreground'
+            : 'border-l-4 border-l-accent bg-card text-foreground border border-border'
         }`}
         animate={isError ? { x: [0, -6, 6, -4, 4, 0] } : {}}
         transition={isError ? { duration: 0.4 } : {}}

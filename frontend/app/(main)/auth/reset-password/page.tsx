@@ -80,14 +80,14 @@ function ResetPasswordContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background">
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-sky-500 transition-colors">
+          <Link href="/" className="hover:text-accent transition-colors">
             Home
           </Link>
           <span>&gt;</span>
-          <Link href="/auth/login" className="hover:text-sky-500 transition-colors">
+          <Link href="/auth/login" className="hover:text-accent transition-colors">
             Acceso del cliente
           </Link>
           <span>&gt;</span>
@@ -102,7 +102,7 @@ function ResetPasswordContent() {
             <p className="text-muted-foreground">Ingresa tu nueva contraseña</p>
           </div>
 
-          <div className="bg-white border border-sky-100 rounded-xl p-6 md:p-8 shadow-lg">
+          <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
@@ -124,7 +124,7 @@ function ResetPasswordContent() {
                   type="password"
                   placeholder="Nueva contraseña"
                   {...register("password")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                 />
                 {errors.password && (
                   <p className="text-sm text-red-500">{errors.password.message}</p>
@@ -143,7 +143,7 @@ function ResetPasswordContent() {
                   type="password"
                   placeholder="Confirmar contraseña"
                   {...register("confirmPassword")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                 />
                 {errors.confirmPassword && (
                   <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
@@ -159,7 +159,7 @@ function ResetPasswordContent() {
               </button>
 
               <p className="text-center text-sm text-muted-foreground">
-                <Link href="/auth/login" className="text-sky-500 hover:text-sky-600 hover:underline font-medium">
+                <Link href="/auth/login" className="text-accent hover:text-accent/90 hover:underline font-medium">
                   Volver a iniciar sesión
                 </Link>
               </p>

@@ -327,7 +327,7 @@ export default function OrdersPage() {
                       Comienza a explorar nuestros productos y realiza tu primer pedido
                     </p>
                     <Link href="/products">
-                      <Button className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg">
+                      <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg">
                         Explorar productos
                       </Button>
                     </Link>

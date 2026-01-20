@@ -91,7 +91,7 @@ export default function AdminCombosPage() {
           <p className="text-muted-foreground mt-1">Gestiona los combos (productos con composición)</p>
         </div>
         <Link href="/admin/combos/new">
-          <Button className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg">
+          <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
             Nuevo combo
           </Button>

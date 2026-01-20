@@ -152,7 +152,7 @@ export default function CartPage() {
   // Mostrar skeleton mientras carga el carrito
   if (isLoadingCart) {
     return (
-      <div className="bg-gray-50 min-h-screen">
+      <div className="bg-muted/50 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, index) => (
@@ -182,7 +182,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-muted/50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         {/* Breadcrumbs */}
         <nav className="text-sm text-gray-500 mb-4 md:mb-6">
@@ -190,11 +190,11 @@ export default function CartPage() {
             Home
           </Link>
           <span className="mx-2">{">"}</span>
-          <span className="text-gray-800">Carrito de la compra</span>
+          <span className="text-foreground">Carrito de la compra</span>
         </nav>
 
         {/* Título */}
-        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4 md:mb-6 leading-tight">
           Tu carrito de la compra
         </h1>
 
@@ -257,7 +257,7 @@ export default function CartPage() {
               <div key={item.id} className="bg-white rounded-xl p-4 md:p-6">
                 <div className="flex gap-4">
                   {/* Imagen: SmartImage resuelve IDs de Media a /api/media/{id} */}
-                  <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 relative">
+                  <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-muted relative">
                     <SmartImage
                       src={imageSrc}
                       alt={item.product.name}
@@ -269,7 +269,7 @@ export default function CartPage() {
 
                     {/* Info del producto */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-1 truncate">{item.product.name}</h3>
+                    <h3 className="font-semibold text-foreground text-sm md:text-base mb-1 truncate">{item.product.name}</h3>
                     <p className="text-xs md:text-sm text-gray-500 mb-2">Opción: {option}</p>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-bold text-primary">${price.toFixed(2)}</span>
@@ -325,7 +325,7 @@ export default function CartPage() {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                            className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:border-primary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-8 h-8 flex items-center justify-center rounded-full border border-input text-foreground hover:border-accent hover:text-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Reducir cantidad"
                             disabled={item.quantity <= 1}
                           >
@@ -357,9 +357,9 @@ export default function CartPage() {
 
             {/* Sección Mejora tu pedido */}
             {suggestedProducts.length > 0 && (
-              <div className="bg-white rounded-xl p-4 md:p-6">
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Gift className="h-5 w-5 text-sky-500" />
+              <div className="bg-card rounded-xl p-4 md:p-6 border border-border">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Gift className="h-5 w-5 text-accent" />
                   Mejora tu pedido
                 </h3>
                 {loadingSuggestions ? (
@@ -381,7 +381,7 @@ export default function CartPage() {
                       return (
                         <div key={product.id} className="flex-shrink-0 w-32 md:w-40">
                           <Link href={`/products/${product.slug}`} className="block mb-2">
-                            <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative">
+                            <div className="aspect-square rounded-lg overflow-hidden bg-muted relative">
                               <SmartImage
                                 src={image}
                                 alt={product.name}
@@ -397,7 +397,7 @@ export default function CartPage() {
                               {product.name}
                             </h4>
                           </Link>
-                          <p className="text-sm font-bold text-gray-900 mb-2">
+                          <p className="text-sm font-bold text-foreground mb-2">
                             ${price.toFixed(2)}
                           </p>
                           <button
@@ -418,8 +418,8 @@ export default function CartPage() {
 
           {/* Panel Resumen */}
           <div className="lg:col-span-1">
-            <div className="bg-[var(--habaluna-blue)]/50 rounded-xl p-4 md:p-6 sticky top-24 border border-border">
-              <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Resumen</h2>
+            <div className="bg-muted/80 rounded-xl p-4 md:p-6 sticky top-24 border border-border">
+              <h2 className="text-lg md:text-xl font-bold text-foreground mb-4">Resumen</h2>
 
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between text-sm md:text-base">
@@ -432,7 +432,7 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-4 mb-4">
+              <div className="border-t border-border pt-4 mb-4">
                 <div className="flex justify-between text-base md:text-lg font-bold">
                   <span>Total</span>
                   <span>${total.toFixed(2)}</span>
@@ -456,7 +456,7 @@ export default function CartPage() {
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     placeholder="Código de descuento"
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="flex-1 border border-input rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-background"
                   />
                   <button 
                     aria-label="Aplicar código de descuento"
@@ -468,13 +468,13 @@ export default function CartPage() {
               )}
 
               {/* Fecha estimada de entrega */}
-              <div className="bg-sky-50 rounded-lg p-3 mb-4 flex items-center gap-3">
-                <div className="w-10 h-10 bg-sky-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Truck className="h-5 w-5 text-white" />
+              <div className="bg-accent/10 rounded-lg p-3 mb-4 flex items-center gap-3">
+                <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Truck className="h-5 w-5 text-accent-foreground" />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Fecha estimada de entrega:</p>
-                  <p className="text-sm font-medium text-gray-900">Lun. 05.01 - Mié. 07.01</p>
+                  <p className="text-sm font-medium text-foreground">Lun. 05.01 - Mié. 07.01</p>
                 </div>
               </div>
 
@@ -516,7 +516,7 @@ export default function CartPage() {
             </div>
             <div className="text-center md:text-right">
               <p className="text-sm text-gray-600 mb-2">Qué opinan nuestros clientes</p>
-              <div className="inline-block bg-white rounded-lg p-4 shadow-sm">
+              <div className="inline-block bg-card rounded-lg p-4 shadow-sm border border-border">
                 <p className="text-xs text-gray-500 mb-1">CLIENTES SATISFECHOS</p>
                 <div className="flex items-center justify-center gap-1 mb-1">
                   {[1, 2, 3, 4].map((i) => (
@@ -528,7 +528,7 @@ export default function CartPage() {
                     <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                   </svg>
                 </div>
-                <p className="text-lg font-bold text-gray-900">
+                <p className="text-lg font-bold text-foreground">
                   4.00 <span className="text-sm font-normal text-gray-500">/ 5.00</span>
                 </p>
               </div>

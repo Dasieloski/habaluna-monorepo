@@ -60,9 +60,9 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
   const currentImage = isHovered && normalizedImages[1] ? secondImage : firstImage
 
   const badgeColors = {
-    coral: "bg-gradient-to-r from-habaluna-coral to-orange-400 text-white",
-    blue: "bg-gradient-to-r from-primary to-[var(--habaluna-blue-dark)] text-primary-foreground",
-    mint: "bg-gradient-to-r from-habaluna-mint to-cyan-400 text-white",
+    coral: "bg-accent-2 text-accent-2-foreground",
+    blue: "bg-accent text-accent-foreground",
+    mint: "bg-accent text-accent-foreground",
   }
 
   if (prefersReducedMotion) {
@@ -74,8 +74,8 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border/50 bg-gradient-to-b from-gray-50 via-white to-white shadow-sm transition-shadow duration-300 hover:shadow-xl">
-            <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+          <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-xl">
+            <div className="aspect-square relative overflow-hidden bg-muted">
               <SmartImage
                 src={currentImage}
                 alt={product.name}
@@ -115,7 +115,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
                 className={`absolute top-2 right-2 md:top-3 md:right-3 p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all duration-300 ${
                   isInWishlist
                     ? "bg-red-500 text-white scale-110"
-                    : "bg-white/90 backdrop-blur-sm text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-white"
+                    : "bg-card/90 backdrop-blur-sm text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card"
                 }`}
               >
                 <HeartIcon className="w-4 h-4 md:w-5 md:h-5" filled={isInWishlist} />
@@ -165,7 +165,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             </div>
 
             <div className="p-3 md:p-4">
-              <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 leading-relaxed group-hover:text-primary transition-colors">
+              <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 leading-relaxed group-hover:text-accent transition-colors">
                 {product.name}
               </h3>
               {product.averageRating && product.reviewCount && product.reviewCount > 0 && (
@@ -252,8 +252,8 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border/50 bg-gradient-to-b from-gray-50 via-white to-white shadow-sm transition-shadow duration-300 hover:shadow-xl">
-        <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-xl">
+        <div className="aspect-square relative overflow-hidden bg-muted">
           <SmartImage
             src={currentImage}
             alt={product.name}
@@ -290,7 +290,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
             className={`absolute top-2 right-2 md:top-3 md:right-3 p-1.5 md:p-2.5 rounded-lg md:rounded-xl transition-all duration-300 ${
               isInWishlist
                 ? "bg-red-500 text-white scale-110"
-                : "bg-white/90 backdrop-blur-sm text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-white"
+                : "bg-card/90 backdrop-blur-sm text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-card"
             }`}
           >
             <HeartIcon className="w-4 h-4 md:w-5 md:h-5" filled={isInWishlist} />
@@ -341,7 +341,7 @@ export function ProductCard({ product, badge, badgeColor = "coral" }: ProductCar
         </div>
 
         <div className="p-3 md:p-4">
-          <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 leading-relaxed group-hover:text-primary transition-colors">
+          <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 min-h-8 md:min-h-10 leading-relaxed group-hover:text-accent transition-colors">
             {product.name}
           </h3>
           {product.averageRating && product.reviewCount && product.reviewCount > 0 && (

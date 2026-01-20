@@ -68,7 +68,7 @@ export function AdminHeader({ onMenuToggle, isMenuOpen }: AdminHeaderProps) {
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="w-5 h-5 text-muted-foreground" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-habaluna-coral text-[10px] font-bold text-white rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent-2 text-accent-2-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
             3
           </span>
         </Button>
@@ -77,7 +77,7 @@ export function AdminHeader({ onMenuToggle, isMenuOpen }: AdminHeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-3 px-3 hover:bg-secondary">
-              <div className="w-9 h-9 bg-gradient-to-br from-primary to-habaluna-blue-dark rounded-full flex items-center justify-center">
+              <div className="w-9 h-9 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-primary-foreground" />
               </div>
               <div className="hidden md:block text-left">

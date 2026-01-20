@@ -224,7 +224,7 @@ export default function ProductsPage() {
           <p className="text-muted-foreground mt-1">Gestiona tu catálogo de productos</p>
         </div>
         <Link href="/admin/products/new">
-          <Button className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg">
+          <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
             Nuevo producto
           </Button>
@@ -236,7 +236,7 @@ export default function ProductsPage() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-habaluna-blue-dark rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
                 <Package className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -277,7 +277,7 @@ export default function ProductsPage() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-habaluna-coral to-orange-400 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-accent-2 rounded-xl flex items-center justify-center">
                 <Package className="w-5 h-5 text-white" />
               </div>
               <div>

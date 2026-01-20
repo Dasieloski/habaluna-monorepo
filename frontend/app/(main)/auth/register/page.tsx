@@ -81,11 +81,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background">
       {/* Breadcrumbs */}
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-sky-500 transition-colors">
+          <Link href="/" className="hover:text-accent transition-colors">
             Home
           </Link>
           <span>&gt;</span>
@@ -102,7 +102,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Form Card */}
-          <div className="bg-white border border-sky-100 rounded-xl p-6 md:p-8 shadow-lg">
+          <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{error}</div>
@@ -128,7 +128,7 @@ export default function RegisterPage() {
                           type="radio"
                           value={option.value}
                           {...register("treatment")}
-                          className="w-4 h-4 border-gray-300 text-sky-500 focus:ring-sky-400"
+                          className="w-4 h-4 border-gray-300 text-accent focus:ring-accent"
                         />
                         <span className="text-sm text-foreground">{option.label}</span>
                       </label>
@@ -147,7 +147,7 @@ export default function RegisterPage() {
                         type="text"
                         placeholder="Nombre"
                         {...register("firstName")}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                       />
                       {errors.firstName && <p className="text-xs text-red-500 mt-1">{errors.firstName.message}</p>}
                     </div>
@@ -156,7 +156,7 @@ export default function RegisterPage() {
                         type="text"
                         placeholder="Apellidos"
                         {...register("lastName")}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                       />
                       {errors.lastName && <p className="text-xs text-red-500 mt-1">{errors.lastName.message}</p>}
                     </div>
@@ -177,7 +177,7 @@ export default function RegisterPage() {
                     id="email"
                     type="email"
                     {...register("email")}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                   />
                   {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
                 </div>
@@ -192,7 +192,7 @@ export default function RegisterPage() {
                       id="password"
                       type={showPassword ? "text" : "password"}
                       {...register("password")}
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                     />
                     <button
                       type="button"
@@ -246,7 +246,7 @@ export default function RegisterPage() {
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
                       {...register("confirmPassword")}
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                     />
                     <button
                       type="button"
@@ -264,7 +264,7 @@ export default function RegisterPage() {
                   <input
                     type="checkbox"
                     {...register("newsletter")}
-                    className="w-4 h-4 mt-0.5 border-gray-300 rounded text-sky-500 focus:ring-sky-400"
+                    className="w-4 h-4 mt-0.5 border-gray-300 rounded text-accent focus:ring-accent"
                   />
                   <span className="text-sm text-muted-foreground">Regístrate para recibir nuestra newsletter</span>
                 </label>
@@ -295,7 +295,7 @@ export default function RegisterPage() {
               {/* Login link */}
               <p className="text-center text-sm text-muted-foreground">
                 ¿Ya tienes cuenta?{" "}
-                <Link href="/auth/login" className="text-sky-500 hover:text-sky-600 hover:underline font-medium">
+                <Link href="/auth/login" className="text-accent hover:text-accent/90 hover:underline font-medium">
                   Iniciar sesión
                 </Link>
               </p>

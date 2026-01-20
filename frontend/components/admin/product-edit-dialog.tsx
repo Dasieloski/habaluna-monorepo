@@ -566,7 +566,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-gradient-to-r from-primary to-habaluna-blue-dark text-primary-foreground"
+              className="bg-gradient-to-r from-primary to-accent text-primary-foreground"
             >
               {isLoading ? (
                 <>

@@ -84,12 +84,12 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-habaluna-blue via-background to-habaluna-mint">
+    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
       {/* barra superior + progreso */}
       <div className="sticky top-0 z-20 border-b bg-background/60 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-habaluna-blue-dark flex items-center justify-center text-primary-foreground shadow">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground shadow">
               <Wrench className="w-5 h-5" />
             </div>
             <div className="min-w-0">
@@ -108,7 +108,7 @@ export default function MaintenancePage() {
           </div>
         </div>
         <div className="h-1 w-full bg-secondary/60">
-          <motion.div className="h-1 bg-gradient-to-r from-primary to-habaluna-blue-dark" style={{ width: progressWidth }} />
+          <motion.div className="h-1 bg-gradient-to-r from-primary to-accent" style={{ width: progressWidth }} />
         </div>
       </div>
 
@@ -156,7 +156,7 @@ export default function MaintenancePage() {
             </div>
 
             <div className="relative rounded-2xl border bg-background/70 backdrop-blur shadow-2xl p-6 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-habaluna-mint/10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10" />
               <div className="relative">
                 <div className="grid gap-3">
                   {/* estanterías */}
@@ -205,7 +205,7 @@ export default function MaintenancePage() {
             </div>
 
             <div className="relative rounded-2xl border bg-background/70 backdrop-blur shadow-2xl p-6 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-habaluna-blue/10 to-primary/10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-muted/80 to-primary/10" />
               <div className="relative h-80">
                 {/* cartel */}
                 <div className="absolute right-6 top-6 rounded-xl border bg-background/80 px-4 py-3 shadow">
@@ -296,7 +296,7 @@ export default function MaintenancePage() {
                     }}
                     aria-label="Correo para avisarme"
                   />
-                  <Button onClick={saveEmail} disabled={saving || !email.trim()} className="bg-gradient-to-r from-primary to-habaluna-blue-dark">
+                  <Button onClick={saveEmail} disabled={saving || !email.trim()} className="bg-gradient-to-r from-primary to-accent">
                     {saving ? "Guardando..." : "Avísame"}
                   </Button>
                 </div>
@@ -318,7 +318,7 @@ export default function MaintenancePage() {
             </div>
 
             <div className="relative rounded-2xl border bg-background/70 backdrop-blur shadow-2xl p-6 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-habaluna-mint/10 to-primary/10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-primary/10" />
               <div className="relative h-80">
                 <div className="absolute left-6 top-6 rounded-xl border bg-background/80 px-4 py-3 shadow">
                   <p className="text-sm font-semibold text-foreground">Re-stock</p>

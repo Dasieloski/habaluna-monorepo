@@ -11,7 +11,7 @@ const stats = [
     change: "+12.5%",
     trend: "up",
     icon: DollarSign,
-    color: "from-primary to-habaluna-blue-dark",
+    color: "from-primary to-accent",
   },
   {
     label: "Pedidos",
@@ -19,7 +19,7 @@ const stats = [
     change: "+8.2%",
     trend: "up",
     icon: ShoppingCart,
-    color: "from-habaluna-coral to-orange-400",
+    color: "from-accent-2 to-accent-2/80",
   },
   {
     label: "Clientes",
@@ -27,7 +27,7 @@ const stats = [
     change: "+15.3%",
     trend: "up",
     icon: Users,
-    color: "from-habaluna-mint to-teal-400",
+    color: "from-accent to-accent/80",
   },
   {
     label: "Productos activos",
@@ -35,7 +35,7 @@ const stats = [
     change: "-2.4%",
     trend: "down",
     icon: Package,
-    color: "from-habaluna-yellow to-amber-400",
+    color: "from-accent-2 to-accent-2/80",
   },
 ]
 

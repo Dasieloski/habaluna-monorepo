@@ -25,7 +25,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-[var(--habaluna-blue)] to-background">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-muted to-background">
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -38,7 +38,7 @@ export default function Error({
         </CardHeader>
         <CardContent>
           {process.env.NODE_ENV === 'development' && (
-            <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm font-mono overflow-auto max-h-40">
+            <div className="mt-4 p-3 bg-muted rounded text-sm font-mono overflow-auto max-h-40">
               <div className="text-red-600 dark:text-red-400 font-semibold mb-2">
                 {error.name}: {error.message}
               </div>

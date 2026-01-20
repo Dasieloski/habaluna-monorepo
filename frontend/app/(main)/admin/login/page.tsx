@@ -53,15 +53,15 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-habaluna-blue via-background to-habaluna-mint p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-muted via-background to-muted p-4">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-habaluna-coral/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-2/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
       <Card className="w-full max-w-md relative animate-fade-in-up shadow-2xl border-0">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-primary to-habaluna-blue-dark rounded-2xl flex items-center justify-center shadow-lg">
+          <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
             <Lock className="w-8 h-8 text-primary-foreground" />
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">Panel de Administración</CardTitle>
@@ -123,7 +123,7 @@ export default function AdminLoginPage() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground font-semibold text-base shadow-lg transition-all duration-300 hover:shadow-xl"
+              className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground font-semibold text-base shadow-lg transition-all duration-300 hover:shadow-xl"
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">

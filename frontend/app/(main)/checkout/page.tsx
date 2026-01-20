@@ -456,7 +456,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="lg:col-span-1">
-          <Card className="sticky top-24 bg-[var(--habaluna-blue)]/50 border-border">
+          <Card className="sticky top-24 bg-muted/80 border-border">
             <CardHeader>
               <CardTitle>Resumen del Pedido</CardTitle>
             </CardHeader>

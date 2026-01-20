@@ -69,7 +69,7 @@ export function BenefitsBar() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-24 bg-white">
+    <section ref={sectionRef} className="py-20 md:py-24 bg-card border-y border-border">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
           {benefits.map((benefit, index) => {
@@ -80,7 +80,7 @@ export function BenefitsBar() {
                 className={`text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
                 style={{ transitionDelay: `${index * 0.15}s` }}
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 mb-5 text-primary bg-primary/10 rounded-2xl transition-all duration-300 hover:scale-110 hover:bg-primary/20">
+                <div className="inline-flex items-center justify-center w-16 h-16 mb-5 text-accent bg-accent/10 rounded-2xl transition-all duration-300 hover:scale-110 hover:bg-accent/20">
                   <IconComponent className="w-8 h-8" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground tracking-wider mb-3 leading-tight">{benefit.title}</h3>

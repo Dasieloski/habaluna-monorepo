@@ -17,7 +17,7 @@ export function TopProducts() {
         <div key={product.name} className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="w-6 h-6 bg-gradient-to-br from-primary to-habaluna-blue-dark rounded-lg flex items-center justify-center text-xs font-bold text-primary-foreground">
+              <span className="w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center text-xs font-bold text-primary-foreground">
                 {index + 1}
               </span>
               <div>
@@ -35,7 +35,7 @@ export function TopProducts() {
           </div>
           <div className="h-2 bg-secondary rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-primary to-habaluna-blue-dark rounded-full transition-all duration-1000 ease-out"
+              className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${(product.sales / maxSales) * 100}%` }}
             />
           </div>

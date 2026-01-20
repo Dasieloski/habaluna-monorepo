@@ -33,11 +33,6 @@ const config = {
           DEFAULT: 'var(--secondary)',
           foreground: 'var(--secondary-foreground)',
         },
-        'luna-blue': {
-          DEFAULT: '#2D4581',
-          light: '#3d5a9e',
-          pastel: 'var(--habaluna-blue)',
-        },
         destructive: {
           DEFAULT: 'var(--destructive)',
           foreground: 'var(--destructive-foreground)',
@@ -50,6 +45,10 @@ const config = {
           DEFAULT: 'var(--accent)',
           foreground: 'var(--accent-foreground)',
         },
+        'accent-2': {
+          DEFAULT: 'var(--accent-2)',
+          foreground: 'var(--accent-2-foreground)',
+        },
         popover: {
           DEFAULT: 'var(--popover)',
           foreground: 'var(--popover-foreground)',
@@ -58,11 +57,6 @@ const config = {
           DEFAULT: 'var(--card)',
           foreground: 'var(--card-foreground)',
         },
-        'habaluna-coral': 'var(--habaluna-coral)',
-        'habaluna-yellow': 'var(--habaluna-yellow)',
-        'habaluna-mint': 'var(--habaluna-mint)',
-        'habaluna-blue': 'var(--habaluna-blue)',
-        'habaluna-blue-dark': 'var(--habaluna-blue-dark)',
       },
       borderRadius: {
         lg: 'var(--radius)',

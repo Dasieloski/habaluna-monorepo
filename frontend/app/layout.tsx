@@ -24,12 +24,8 @@ export const metadata: Metadata = {
   description:
     "Descubre productos únicos: alimentos, materiales y mucho más. Calidad y originalidad en cada compra.",
   icons: {
-    icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/logo.svg", type: "image/svg+xml" },
-      { url: "/uploads/logo.png", type: "image/png" },
-    ],
-    shortcut: "/icon.svg",
+    icon: [{ url: "/uploads/logo.png", type: "image/png" }],
+    shortcut: "/uploads/logo.png",
     apple: [{ url: "/uploads/logo.png", type: "image/png" }],
   },
   openGraph: {
@@ -51,7 +47,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#2D4581",
+  themeColor: "#3E5641",
   width: "device-width",
   initialScale: 1,
 }

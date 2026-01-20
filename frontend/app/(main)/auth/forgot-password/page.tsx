@@ -119,14 +119,14 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50/50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background">
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-sky-500 transition-colors">
+          <Link href="/" className="hover:text-accent transition-colors">
             Home
           </Link>
           <span>&gt;</span>
-          <Link href="/auth/login" className="hover:text-sky-500 transition-colors">
+          <Link href="/auth/login" className="hover:text-accent transition-colors">
             Acceso del cliente
           </Link>
           <span>&gt;</span>
@@ -141,7 +141,7 @@ export default function ForgotPasswordPage() {
             <p className="text-muted-foreground">Te enviaremos un código de 6 dígitos válido por 15 minutos.</p>
           </div>
 
-          <div className="bg-white border border-sky-100 rounded-xl p-6 md:p-8 shadow-lg">
+          <div className="bg-card border border-border rounded-xl p-6 md:p-8 shadow-lg">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{error}</div>
@@ -161,7 +161,7 @@ export default function ForgotPasswordPage() {
                   type="email"
                   placeholder="Dirección E-Mail"
                   {...register("email")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                 />
                 {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
               </div>
@@ -175,7 +175,7 @@ export default function ForgotPasswordPage() {
               </button>
 
               <p className="text-center text-sm text-muted-foreground">
-                <Link href="/auth/login" className="text-sky-500 hover:text-sky-600 hover:underline font-medium">
+                <Link href="/auth/login" className="text-accent hover:text-accent/90 hover:underline font-medium">
                   Volver a iniciar sesión
                 </Link>
               </p>
@@ -217,7 +217,7 @@ export default function ForgotPasswordPage() {
                     onChange={(e) => handleCodeChange(index, e.target.value)}
                     onKeyDown={(e) => handleCodeKeyDown(index, e)}
                     onPaste={index === 0 ? handleCodePaste : undefined}
-                    className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
+                    className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
                     autoFocus={index === 0}
                     disabled={isValidatingCode}
                   />

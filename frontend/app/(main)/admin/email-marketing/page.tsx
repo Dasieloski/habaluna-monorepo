@@ -358,7 +358,7 @@ export default function AdminEmailMarketingPage() {
                 <Button
                   onClick={handleAddSubscriber}
                   disabled={subSaving || !newEmail.trim()}
-                  className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg"
+                  className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg"
                 >
                   {subSaving ? "Guardando..." : "Añadir suscriptor"}
                 </Button>
@@ -427,7 +427,7 @@ export default function AdminEmailMarketingPage() {
                       key={c.id}
                       onClick={() => setSelectedCampaignId(c.id)}
                       className={`w-full text-left rounded-xl border px-3 py-3 transition ${
-                        selectedCampaignId === c.id ? "bg-gradient-to-r from-primary/10 to-habaluna-mint/10 border-primary/30" : "bg-background hover:bg-secondary/40"
+                        selectedCampaignId === c.id ? "bg-gradient-to-r from-primary/10 to-accent/10 border-primary/30" : "bg-background hover:bg-secondary/40"
                       }`}
                       type="button"
                     >
@@ -577,7 +577,7 @@ export default function AdminEmailMarketingPage() {
                     <Button
                       onClick={selectedCampaignId ? handleSaveCampaign : handleCreateCampaign}
                       disabled={campSaving || !campSubject.trim() || !campHtml.trim()}
-                      className="bg-gradient-to-r from-primary to-habaluna-blue-dark hover:opacity-90 text-primary-foreground shadow-lg"
+                      className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg"
                     >
                       {campSaving ? "Guardando..." : selectedCampaignId ? "Guardar campaña" : "Crear campaña"}
                     </Button>
