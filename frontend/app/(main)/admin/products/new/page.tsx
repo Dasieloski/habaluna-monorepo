@@ -468,12 +468,12 @@ export default function NewProductPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-accent/5">
+            <Card className="border-0 shadow-md bg-card">
               <CardContent className="p-4">
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg h-12"
+                  className="w-full bg-primary hover:opacity-90 text-primary-foreground shadow-lg h-12"
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-2">

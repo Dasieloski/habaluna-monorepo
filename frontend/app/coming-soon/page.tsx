@@ -40,7 +40,7 @@ export default function ComingSoonPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-hidden">
       {/* brillos */}
       {!prefersReducedMotion && (
         <>
@@ -61,7 +61,7 @@ export default function ComingSoonPage() {
         <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-10 items-center">
           <div className="rounded-2xl border bg-background/75 backdrop-blur shadow-2xl p-8">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground shadow">
+              <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow">
                 <Rocket className="w-6 h-6" />
               </div>
               <div>
@@ -95,7 +95,7 @@ export default function ComingSoonPage() {
                   }}
                   aria-label="Correo para avisarme"
                 />
-                <Button onClick={saveEmail} disabled={saving || !email.trim()} className="bg-gradient-to-r from-primary to-accent">
+                <Button onClick={saveEmail} disabled={saving || !email.trim()} className="bg-primary">
                   {saving ? "Guardando..." : "Avísame"}
                 </Button>
               </div>
@@ -118,7 +118,7 @@ export default function ComingSoonPage() {
 
           {/* lado visual */}
           <div className="relative rounded-2xl border bg-background/60 backdrop-blur shadow-2xl p-8 overflow-hidden min-h-[380px]">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10" />
+            <div className="absolute inset-0 bg-card" />
 
             <div className="relative h-full flex items-center justify-center">
               {!prefersReducedMotion ? (

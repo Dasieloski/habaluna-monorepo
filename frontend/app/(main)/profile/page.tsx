@@ -179,7 +179,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white py-12">
+      <div className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="flex flex-col items-center gap-4">
@@ -193,7 +193,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white py-8 md:py-12">
+    <div className="min-h-screen bg-background py-8 md:py-12">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
@@ -207,7 +207,7 @@ export default function ProfilePage() {
 
         {/* Estadísticas */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="border-0 shadow-md bg-gradient-to-br from-sky-50 to-blue-50">
+          <Card className="border-0 shadow-md bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -243,7 +243,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-50 to-green-50">
+          <Card className="border-0 shadow-md bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -523,7 +523,7 @@ export default function ProfilePage() {
                   <Button
                     type="submit"
                     disabled={saving}
-                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg"
+                    className="bg-primary hover:opacity-90 text-primary-foreground shadow-lg"
                   >
                     {saving ? (
                       <>

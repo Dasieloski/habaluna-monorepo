@@ -104,7 +104,7 @@ export function TopSales({ products, className }: TopSalesProps) {
   const getComparePrice = (product: Product) => toNumber(product.variants?.[0]?.comparePriceUSD ?? product.comparePriceUSD)
 
   return (
-    <section ref={sectionRef} className={`py-10 md:py-16 bg-gradient-to-br from-muted via-secondary to-muted ${className ?? ""}`}>
+    <section ref={sectionRef} className={`py-10 md:py-16 bg-card ${className ?? ""}`}>
       <div className="container mx-auto px-4">
         {/* Header */}
         <div

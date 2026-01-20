@@ -5,12 +5,12 @@ import { Plus, Package, Percent, Users, FileText, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const actions = [
-  { label: "Nuevo producto", href: "/admin/products/new", icon: Plus, color: "from-primary to-accent" },
-  { label: "Ver inventario", href: "/admin/products", icon: Package, color: "from-accent to-accent/80" },
-  { label: "Crear oferta", href: "/admin/offers/new", icon: Percent, color: "from-accent to-accent/80" },
-  { label: "Clientes", href: "/admin/customers", icon: Users, color: "from-accent to-accent/80" },
-  { label: "Reportes", href: "/admin/reports", icon: FileText, color: "from-accent to-accent/80" },
-  { label: "Ajustes", href: "/admin/settings", icon: Settings, color: "from-accent to-accent/60" },
+  { label: "Nuevo producto", href: "/admin/products/new", icon: Plus, color: "bg-primary" },
+  { label: "Ver inventario", href: "/admin/products", icon: Package, color: "bg-accent" },
+  { label: "Crear oferta", href: "/admin/offers/new", icon: Percent, color: "bg-accent" },
+  { label: "Clientes", href: "/admin/customers", icon: Users, color: "bg-accent" },
+  { label: "Reportes", href: "/admin/reports", icon: FileText, color: "bg-accent" },
+  { label: "Ajustes", href: "/admin/settings", icon: Settings, color: "bg-accent" },
 ]
 
 export function QuickActions() {
@@ -20,11 +20,11 @@ export function QuickActions() {
         <Link
           key={action.label}
           href={action.href}
-          className="flex flex-col items-center gap-2 p-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-200 hover-lift group"
+          className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card hover:bg-muted transition-all duration-200 hover-lift group"
         >
           <div
             className={cn(
-              "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center transition-transform group-hover:scale-110",
+              "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110",
               action.color,
             )}
           >

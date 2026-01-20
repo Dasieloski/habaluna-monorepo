@@ -3,102 +3,97 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  JERARQUÍA VISUAL – Roles de color (no reemplazo uniforme)
-  #00a8e0 → PRIMARY/IDENTIDAD: CTAs, enlaces importantes, activo
-  #f0bc99 → ACENTO SUAVE: secciones, fondos secundarios
-  #c6d4ac → SUPPORT: cards, bordes suaves, separadores (nunca CTA)
-  #957c53 → ACENTO FUERTE: badges, precios, highlights (énfasis puntual)
-  #ede0d3 → FONDOS CLAROS: superficies, contenedores
+  PALETA ÚNICA (sin degradados, sin overlays, sin colores extra)
+  #212125 → Base oscura / texto en claro / headers, footer, admin dark
+  #473968 → Marca / activos / links (no abusar)
+  #65b233 → CTA / acción / confirmación (solo botones principales)
+  #ebe6d8 → Fondos secundarios / secciones / cards
+  #f7f6f4 → Fondo claro principal / superficies
 */
 
 :root {
-  /* Fondos claros / superficies */
-  --background: #ede0d3;
-  --foreground: #1a1a1a;
+  /* Fondo claro principal / superficies */
+  --background: #f7f6f4;
+  --foreground: #212125;
 
-  /* Support #c6d4ac: cards (tinte suave), bordes */
-  --card: #e8ebe0;
-  --card-foreground: #1a1a1a;
-  --popover: #f7f5f1;
-  --popover-foreground: #1a1a1a;
+  /* Fondos secundarios / secciones / cards */
+  --card: #ebe6d8;
+  --card-foreground: #212125;
+  --popover: #f7f6f4;
+  --popover-foreground: #212125;
 
-  /* PRIMARY #00a8e0: identidad, CTAs, enlaces, activo */
-  --primary: #00a8e0;
+  /* CTA #65b233: solo botones principales, acciones clave */
+  --primary: #65b233;
   --primary-foreground: #ffffff;
 
-  /* Acento suave #f0bc99: secciones, fondos secundarios */
-  --secondary: #f0bc99;
-  --secondary-foreground: #2d2318;
-
-  /* Neutral, no competir con contenido */
-  --muted: #e4ddd4;
-  --muted-foreground: #5c5c5c;
-
-  /* ACENTO FUERTE #957c53: badges, precios, highlights (puntual, no saturar) */
-  --accent: #957c53;
+  /* Marca #473968: activos, links, selección (no abusar) */
+  --accent: #473968;
   --accent-foreground: #ffffff;
 
-  /* Destructive: derivado oscuro de #957c53 (prioridad legibilidad) */
-  --destructive: #6b5a3f;
+  /* Derivado: neutral, no competir */
+  --secondary: #ebe6d8;
+  --secondary-foreground: #212125;
+
+  --muted: #e5e0d4;
+  --muted-foreground: #4a4852;
+
+  /* Destructive: derivado oscuro de #473968 */
+  --destructive: #3a2e54;
   --destructive-foreground: #ffffff;
 
-  /* Support #c6d4ac: bordes, separadores */
-  --border: #c6d4ac;
-  --input: #d4dcc4;
-  --ring: #00a8e0;
-  --support: #c6d4ac;
+  /* Bordes: tono derivado de #ebe6d8 */
+  --border: #d9d4c8;
+  --input: #d9d4c8;
+  --ring: #473968;
 
   --radius: 0.625rem;
-  --sidebar: #e8ebe0;
-  --sidebar-foreground: #1a1a1a;
-  --sidebar-primary: #00a8e0;
+  --sidebar: #ebe6d8;
+  --sidebar-foreground: #212125;
+  --sidebar-primary: #65b233;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e4ddd4;
-  --sidebar-accent-foreground: #1a1a1a;
-  --sidebar-border: #c6d4ac;
-  --sidebar-ring: #00a8e0;
+  --sidebar-accent: #e5e0d4;
+  --sidebar-accent-foreground: #212125;
+  --sidebar-border: #d9d4c8;
+  --sidebar-ring: #473968;
 }
 
 .dark {
-  /* Estructura oscura intacta; paleta adaptada: acentos suaves, menos saturación */
-  --background: #1a1a1a;
-  --foreground: #e8e4de;
-  --card: #252525;
-  --card-foreground: #e8e4de;
-  --popover: #252525;
-  --popover-foreground: #e8e4de;
+  /* Base oscura #212125; acentos más suaves, contraste priorizado */
+  --background: #212125;
+  --foreground: #f7f6f4;
+  --card: #2a2a2e;
+  --card-foreground: #f7f6f4;
+  --popover: #2a2a2e;
+  --popover-foreground: #f7f6f4;
 
-  /* Primary: un toque más claro para contraste en oscuro */
-  --primary: #2ba3d4;
+  /* CTA: algo más claro para contraste en oscuro */
+  --primary: #6bc238;
   --primary-foreground: #ffffff;
 
-  /* Acento suave: tono apagado para secciones en oscuro */
-  --secondary: #2a2520;
-  --secondary-foreground: #e8e4de;
-
-  --muted: #2d2d2d;
-  --muted-foreground: #a0a0a0;
-
-  /* Acento fuerte: más suave para no chillar en fondo oscuro */
-  --accent: #a68b65;
+  /* Marca: más suave en fondo oscuro */
+  --accent: #5c4a7a;
   --accent-foreground: #ffffff;
 
-  --destructive: #8b7355;
+  --secondary: #2a2a2e;
+  --secondary-foreground: #f7f6f4;
+  --muted: #333338;
+  --muted-foreground: #b0adb8;
+
+  --destructive: #4a3d65;
   --destructive-foreground: #ffffff;
 
-  --border: #3d3d3d;
-  --input: #2d2d2d;
-  --ring: #2ba3d4;
-  --support: #2d3028;
+  --border: #3d3d42;
+  --input: #333338;
+  --ring: #5c4a7a;
 
-  --sidebar: #252525;
-  --sidebar-foreground: #e8e4de;
-  --sidebar-primary: #2ba3d4;
+  --sidebar: #2a2a2e;
+  --sidebar-foreground: #f7f6f4;
+  --sidebar-primary: #6bc238;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2d2d2d;
-  --sidebar-accent-foreground: #e8e4de;
-  --sidebar-border: #3d3d3d;
-  --sidebar-ring: #2ba3d4;
+  --sidebar-accent: #333338;
+  --sidebar-accent-foreground: #f7f6f4;
+  --sidebar-border: #3d3d42;
+  --sidebar-ring: #5c4a7a;
 }
 
 @theme inline {
@@ -124,7 +119,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-support: var(--support);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

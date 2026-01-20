@@ -33,7 +33,7 @@ function ImageSkeleton({
   return (
     <div
       className={cn(
-        "relative overflow-hidden bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100",
+        "relative overflow-hidden bg-muted",
         "animate-pulse",
         className
       )}
@@ -46,7 +46,7 @@ function ImageSkeleton({
       }
     >
       {/* Shimmer effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer" />
+      <div className="absolute inset-0 bg-card animate-shimmer" />
     </div>
   )
 }
@@ -91,7 +91,7 @@ function PlaceholderError({ className, fill, aspectRatio, width, height }: {
   return (
     <div
       className={cn(
-        "flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200",
+        "flex items-center justify-center bg-muted",
         className
       )}
       style={

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
  */
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-muted to-background">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md text-center">
         <CardHeader>
           <div className="text-6xl font-bold text-muted-foreground mb-4">404</div>

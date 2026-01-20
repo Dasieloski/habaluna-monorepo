@@ -226,7 +226,7 @@ export default function SettingsPage() {
         <Button
           onClick={handleSave}
           disabled={isLoading}
-          className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg px-8"
+          className="bg-primary hover:opacity-90 text-primary-foreground shadow-lg px-8"
         >
           {isLoading ? (
             <div className="flex items-center gap-2">

@@ -237,7 +237,7 @@ export function ProductClient({
               </div>
 
               {/* Main Image */}
-              <div className="relative w-full aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl md:rounded-2xl overflow-hidden">
+              <div className="relative w-full aspect-square bg-muted rounded-xl md:rounded-2xl overflow-hidden">
                 <SmartImage
                   src={images[selectedImage] || "/placeholder.svg"}
                   alt={product?.name || "Producto"}
@@ -302,7 +302,7 @@ export function ProductClient({
             <div className="flex items-center gap-3 mb-4 md:mb-6">
               <ProductPrice priceUSD={priceUSD} comparePriceUSD={comparePriceUSD ?? undefined} variant="large" />
               {salePercentage !== null && (
-                <span className="text-xs md:text-sm font-semibold text-white bg-gradient-to-r from-orange-400 to-red-500 px-3 py-1 rounded-full">
+                <span className="text-xs md:text-sm font-semibold text-accent-foreground bg-accent px-3 py-1 rounded-full">
                   -{salePercentage}%
                 </span>
               )}

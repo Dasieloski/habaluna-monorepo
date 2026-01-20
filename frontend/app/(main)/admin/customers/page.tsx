@@ -143,7 +143,7 @@ function CustomersContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                 <Users className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -156,7 +156,7 @@ function CustomersContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -169,7 +169,7 @@ function CustomersContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-accent rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center">
                 <ShoppingCart className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -182,7 +182,7 @@ function CustomersContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-accent rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -254,7 +254,7 @@ function CustomersContent() {
                   <TableRow key={customer.id} className="hover:bg-secondary/30 transition-colors">
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
                           <span className="text-sm font-bold text-primary-foreground">
                             {getCustomerName(customer)
                               .split(" ")

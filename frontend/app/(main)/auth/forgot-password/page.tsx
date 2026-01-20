@@ -119,7 +119,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-muted to-background">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-4">
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-accent transition-colors">

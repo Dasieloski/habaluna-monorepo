@@ -523,7 +523,7 @@ export default function NewComboPage() {
                   </Select>
                 </div>
 
-                <Button type="submit" disabled={isLoading} className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg">
+                <Button type="submit" disabled={isLoading} className="w-full bg-primary hover:opacity-90 text-primary-foreground shadow-lg">
                   {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                   {isLoading ? "Guardando..." : "Crear combo"}
                 </Button>

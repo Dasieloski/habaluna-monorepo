@@ -133,7 +133,7 @@ function OffersContent() {
           <p className="text-muted-foreground mt-1">Gestiona tus promociones y descuentos</p>
         </div>
         <Link href="/admin/offers/new">
-          <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg">
+          <Button className="bg-primary hover:opacity-90 text-primary-foreground shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
             Nueva oferta
           </Button>
@@ -145,7 +145,7 @@ function OffersContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                 <Tag className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -158,7 +158,7 @@ function OffersContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                 <Percent className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -171,7 +171,7 @@ function OffersContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-accent rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -184,7 +184,7 @@ function OffersContent() {
         <Card className="border-0 shadow-md">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-accent rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -247,8 +247,8 @@ function OffersContent() {
                       className={cn(
                         "w-12 h-12 rounded-xl flex items-center justify-center",
                         offer.type === "PERCENTAGE"
-                          ? "bg-gradient-to-br from-accent"
-                          : "bg-gradient-to-br from-primary to-accent",
+                          ? "bg-accent"
+                          : "bg-primary",
                       )}
                     >
                       <span className="text-lg font-bold text-white">

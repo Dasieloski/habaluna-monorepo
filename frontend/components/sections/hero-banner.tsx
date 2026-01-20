@@ -144,7 +144,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                   />
                 )}
                 {/* Overlay sutil */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-foreground" />
 
                 <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12">
                   <div className="max-w-xl">

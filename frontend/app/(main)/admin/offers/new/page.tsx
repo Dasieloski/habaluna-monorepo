@@ -131,7 +131,7 @@ export default function NewOfferPage() {
                         : "border-border hover:border-primary/50",
                     )}
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-accent rounded-lg flex items-center justify-center mb-3">
+                    <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center mb-3">
                       <Percent className="w-5 h-5 text-white" />
                     </div>
                     <p className="font-semibold text-foreground">Porcentaje</p>
@@ -145,7 +145,7 @@ export default function NewOfferPage() {
                       offerType === "FIXED" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50",
                     )}
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center mb-3">
+                    <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mb-3">
                       <DollarSign className="w-5 h-5 text-white" />
                     </div>
                     <p className="font-semibold text-foreground">Cantidad fija</p>
@@ -254,12 +254,12 @@ export default function NewOfferPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-accent/5">
+            <Card className="border-0 shadow-md bg-card">
               <CardContent className="p-4">
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg h-12"
+                  className="w-full bg-primary hover:opacity-90 text-primary-foreground shadow-lg h-12"
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-2">

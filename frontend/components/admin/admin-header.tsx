@@ -77,7 +77,7 @@ export function AdminHeader({ onMenuToggle, isMenuOpen }: AdminHeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-3 px-3 hover:bg-secondary">
-              <div className="w-9 h-9 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+              <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-primary-foreground" />
               </div>
               <div className="hidden md:block text-left">

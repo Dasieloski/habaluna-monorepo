@@ -195,7 +195,7 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white py-12">
+      <div className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="flex flex-col items-center gap-4">
@@ -209,7 +209,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white py-8 md:py-12">
+    <div className="min-h-screen bg-background py-8 md:py-12">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
@@ -228,7 +228,7 @@ export default function OrdersPage() {
 
         {/* Estadísticas */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="border-0 shadow-md bg-gradient-to-br from-sky-50 to-blue-50">
+          <Card className="border-0 shadow-md bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -240,7 +240,7 @@ export default function OrdersPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-blue-50 to-sky-50">
+          <Card className="border-0 shadow-md bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -252,7 +252,7 @@ export default function OrdersPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-50 to-green-50">
+          <Card className="border-0 shadow-md bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -264,7 +264,7 @@ export default function OrdersPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-md bg-gradient-to-br from-yellow-50 to-orange-50">
+          <Card className="border-0 shadow-md bg-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -327,7 +327,7 @@ export default function OrdersPage() {
                       Comienza a explorar nuestros productos y realiza tu primer pedido
                     </p>
                     <Link href="/products">
-                      <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground shadow-lg">
+                      <Button className="bg-primary hover:opacity-90 text-primary-foreground shadow-lg">
                         Explorar productos
                       </Button>
                     </Link>
@@ -371,7 +371,7 @@ export default function OrdersPage() {
                         {/* Header del pedido */}
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-sky-100 to-blue-100 flex items-center justify-center flex-shrink-0">
+                            <div className="w-12 h-12 rounded-lg bg-card flex items-center justify-center flex-shrink-0">
                               <Package className="w-6 h-6 text-sky-600" />
                             </div>
                             <div>

@@ -45,7 +45,6 @@ const config = {
           DEFAULT: 'var(--accent)',
           foreground: 'var(--accent-foreground)',
         },
-        support: 'var(--support)',
         popover: {
           DEFAULT: 'var(--popover)',
           foreground: 'var(--popover-foreground)',

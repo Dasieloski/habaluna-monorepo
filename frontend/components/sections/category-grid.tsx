@@ -51,7 +51,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
         initial={{ opacity: 0, y: 28 }}
         animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
         transition={{ type: "spring", stiffness: 80, damping: 20 }}
-        className="py-10 md:py-16 bg-gradient-to-b from-background to-muted/50"
+        className="py-10 md:py-16 bg-background"
       >
         <div className="container mx-auto px-4">
           {title && (
@@ -67,7 +67,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                 aria-label={`Ver productos de ${category.name}`}
                 className="group flex flex-col items-center"
               >
-                <div className="w-16 h-16 md:w-28 md:h-28 rounded-full overflow-hidden bg-gradient-to-br from-muted to-primary/20 mb-2 md:mb-4 ring-2 md:ring-4 ring-transparent group-hover:ring-primary/50 transition-all duration-300 group-hover:scale-110 shadow-lg relative">
+                <div className="w-16 h-16 md:w-28 md:h-28 rounded-full overflow-hidden bg-card mb-2 md:mb-4 ring-2 md:ring-4 ring-transparent group-hover:ring-accent transition-all duration-300 group-hover:scale-110 shadow-lg relative">
                   <SmartImage
                     src={getImageUrl(category.image) || "/placeholder.svg"}
                     alt={category.name}
@@ -78,7 +78,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                     loading="lazy"
                   />
                 </div>
-                <span className="text-xs md:text-sm font-semibold text-foreground text-center group-hover:text-primary transition-colors line-clamp-1">
+                <span className="text-xs md:text-sm font-semibold text-foreground text-center group-hover:text-accent transition-colors line-clamp-1">
                   {category.name}
                 </span>
               </Link>
@@ -90,7 +90,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
   }
 
   if (variant === "banners") {
-    const colors = ["#e0f2fe", "#ecfeff", "#f0f9ff", "#e0f7fa"]
+    const colors = ["#f7f6f4", "#ebe6d8", "#f7f6f4", "#ebe6d8"]
     return (
       <section ref={sectionRef} className="py-10 md:py-16">
         <div className="container mx-auto px-4">
@@ -115,10 +115,10 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                   objectFit="cover"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-3 md:bottom-5 left-3 md:left-5 right-3 md:right-5">
-                  <h3 className="text-white text-sm md:text-xl font-bold mb-0.5 md:mb-1">{category.name}</h3>
-                  <span className="text-white/90 text-[10px] md:text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-foreground" />
+                <div className="absolute bottom-3 md:bottom-5 left-3 md:left-5 right-3 md:right-5 z-10">
+                  <h3 className="text-background text-sm md:text-xl font-bold mb-0.5 md:mb-1">{category.name}</h3>
+                  <span className="text-background/90 text-[10px] md:text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                     Ver más →
                   </span>
                 </div>
@@ -140,7 +140,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               key={category.id}
               href={`/products?categoryId=${category.id}`}
               aria-label={`Ver productos de ${category.name}`}
-              className={`group relative aspect-[4/5] md:aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-gradient-to-br from-muted to-accent/20 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+              className={`group relative aspect-[4/5] md:aspect-square rounded-xl md:rounded-2xl overflow-hidden bg-card transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{ transitionDelay: `${index < 5 ? index * 0.08 : 0.35 + (index - 5) * 0.02}s` }}
             >
               <SmartImage
@@ -152,10 +152,10 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                 objectFit="cover"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-              <div className="absolute bottom-3 md:bottom-5 left-3 md:left-5 right-3 md:right-5">
-                <h3 className="text-white text-base md:text-2xl font-bold mb-0.5 md:mb-1">{category.name}</h3>
-                <span className="text-white/90 text-[10px] md:text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-foreground" />
+              <div className="absolute bottom-3 md:bottom-5 left-3 md:left-5 right-3 md:right-5 z-10">
+                <h3 className="text-background text-base md:text-2xl font-bold mb-0.5 md:mb-1">{category.name}</h3>
+                <span className="text-background/90 text-[10px] md:text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                   Explorar →
                 </span>
               </div>

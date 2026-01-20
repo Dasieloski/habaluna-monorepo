@@ -209,8 +209,8 @@ export function Header() {
       <div
         className={`border-b text-foreground text-xs md:text-sm py-2.5 text-center ${
           ui.announcementVariant === "promo"
-            ? "bg-gradient-to-r from-accent/10 to-muted dark:from-accent/20 dark:to-muted border-accent/30 dark:border-accent/20"
-            : "bg-secondary border-border"
+            ? "bg-card border-accent"
+            : "bg-card border-border"
         }`}
       >
         <p className="animate-fade-in">{ui.announcement}</p>
@@ -268,7 +268,7 @@ export function Header() {
                   <div className="absolute right-0 top-full mt-2 w-56 bg-popover rounded-2xl shadow-xl border border-border overflow-hidden animate-fade-in-up z-50">
                     {authed && user ? (
                       <>
-                        <div className="p-4 bg-gradient-to-r from-muted to-secondary border-b border-border">
+                        <div className="p-4 bg-card border-b border-border">
                           <p className="text-sm font-medium text-foreground">
                             {user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.email}
                           </p>
@@ -281,7 +281,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-primary"
+                              className="w-5 h-5 text-accent"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -301,7 +301,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-primary"
+                              className="w-5 h-5 text-accent"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -322,7 +322,7 @@ export function Header() {
                               onClick={() => setUserMenuOpen(false)}
                             >
                               <svg
-                                className="w-5 h-5 text-primary"
+                                className="w-5 h-5 text-accent"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -340,7 +340,7 @@ export function Header() {
                           )}
                           <button
                             onClick={handleLogout}
-                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-secondary rounded-xl transition-all duration-300 w-full text-left text-red-600"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-card rounded-xl transition-all duration-300 w-full text-left text-destructive"
                           >
                             <svg
                               className="w-5 h-5"
@@ -361,7 +361,7 @@ export function Header() {
                       </>
                     ) : (
                       <>
-                        <div className="p-4 bg-gradient-to-r from-muted to-secondary border-b border-border">
+                        <div className="p-4 bg-card border-b border-border">
                           <p className="text-sm font-medium text-foreground">Mi cuenta</p>
                           <p className="text-xs text-muted-foreground mt-0.5">Accede o crea tu cuenta</p>
                         </div>
@@ -372,7 +372,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-primary"
+                              className="w-5 h-5 text-accent"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -392,7 +392,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-primary"
+                              className="w-5 h-5 text-accent"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -459,7 +459,7 @@ export function Header() {
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-1.5 px-5 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 hover:bg-secondary ${isActive ? "font-semibold text-primary bg-primary/15" : ""}`}
+                      className={`flex items-center gap-1.5 px-5 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 hover:bg-card ${isActive ? "font-semibold text-accent bg-card border-b-2 border-accent" : ""}`}
                     >
                       {item.name}
                     </Link>
@@ -471,9 +471,9 @@ export function Header() {
         </nav>
       </div>
 
-      <div className="relative z-10 bg-gradient-to-r from-muted via-secondary to-muted py-2.5 md:py-3 border-b border-border">
+      <div className="relative z-10 bg-card py-2.5 md:py-3 border-b border-border">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-start md:justify-center gap-4 md:gap-12 text-[11px] md:text-sm overflow-x-auto scrollbar-hide text-primary">
+          <div className="flex items-center justify-start md:justify-center gap-4 md:gap-12 text-[11px] md:text-sm overflow-x-auto scrollbar-hide text-accent">
             <div
               className="flex items-center gap-1.5 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
               style={{ animationDelay: "0.1s" }}

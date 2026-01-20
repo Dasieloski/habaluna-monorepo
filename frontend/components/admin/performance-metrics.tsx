@@ -6,34 +6,10 @@ import { TrendingUp, ShoppingBag, Target, UserPlus } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const metrics = [
-  {
-    label: "Valor medio pedido",
-    value: `€${weeklyStats.avgOrderValue.toFixed(2)}`,
-    change: "+5.2%",
-    icon: ShoppingBag,
-    color: "from-violet-400 to-violet-600",
-  },
-  {
-    label: "Tasa de conversión",
-    value: `${weeklyStats.conversionRate}%`,
-    change: "+0.3%",
-    icon: Target,
-    color: "from-emerald-400 to-emerald-600",
-  },
-  {
-    label: "Clientes nuevos",
-    value: weeklyStats.newCustomers.toString(),
-    change: "+12",
-    icon: UserPlus,
-    color: "from-pink-400 to-pink-600",
-  },
-  {
-    label: "Clientes recurrentes",
-    value: weeklyStats.returningCustomers.toString(),
-    change: "+8.4%",
-    icon: TrendingUp,
-    color: "from-sky-400 to-sky-600",
-  },
+  { label: "Valor medio pedido", value: `€${weeklyStats.avgOrderValue.toFixed(2)}`, change: "+5.2%", icon: ShoppingBag, color: "bg-primary" },
+  { label: "Tasa de conversión", value: `${weeklyStats.conversionRate}%`, change: "+0.3%", icon: Target, color: "bg-primary" },
+  { label: "Clientes nuevos", value: weeklyStats.newCustomers.toString(), change: "+12", icon: UserPlus, color: "bg-accent" },
+  { label: "Clientes recurrentes", value: weeklyStats.returningCustomers.toString(), change: "+8.4%", icon: TrendingUp, color: "bg-accent" },
 ]
 
 interface PerformanceMetricsProps {
@@ -55,7 +31,7 @@ export function PerformanceMetrics({ isLoaded }: PerformanceMetricsProps) {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div
-                className={cn("w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center", metric.color)}
+                className={cn("w-10 h-10 rounded-xl flex items-center justify-center", metric.color)}
               >
                 <metric.icon className="w-5 h-5 text-white" />
               </div>
@@ -66,7 +42,7 @@ export function PerformanceMetrics({ isLoaded }: PerformanceMetricsProps) {
                 </div>
               </div>
             </div>
-            <div className="mt-2 text-xs text-green-500 font-medium">{metric.change} esta semana</div>
+            <div className="mt-2 text-xs text-primary font-medium">{metric.change} esta semana</div>
           </CardContent>
         </Card>
       ))}
