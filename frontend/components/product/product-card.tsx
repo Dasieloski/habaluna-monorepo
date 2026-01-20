@@ -62,9 +62,9 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
   const currentImage = isHovered && normalizedImages[1] ? secondImage : firstImage
 
   const badgeColors = {
-    coral: "bg-accent text-accent-foreground",
-    blue: "bg-accent text-accent-foreground",
-    mint: "bg-accent text-accent-foreground",
+    coral: "bg-highlight text-highlight-foreground",
+    blue: "bg-highlight text-highlight-foreground",
+    mint: "bg-highlight text-highlight-foreground",
   }
 
   if (prefersReducedMotion) {

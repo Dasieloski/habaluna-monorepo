@@ -3,52 +3,51 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  PALETA ÚNICA: #00435c #020072 #007c8a #54a8af #abe0e9
-  Modo claro: fondo #abe0e9, cards #54a8af, texto #00435c, secundario #007c8a, enlaces/activos/CTA #020072.
-  Modo oscuro: base #0D0D0D, cards #212125, texto #abe0e9, secundario #54a8af, enlaces/activos #007c8a, CTA #020072.
+  PALETA ÚNICA: #dcceab #009c6c #fac59e #8f6d5f #f3e4dd
+  Claro: fondo #f3e4dd, cards #dcceab, texto #8f6d5f, secundario/metadata #009c6c, enlaces/CTA #009c6c, badges #fac59e, bordes #8f6d5f/35%.
+  Oscuro: base #0D0D0D, cards #212125, texto #f3e4dd, secundario #dcceab, enlaces/CTA #009c6c, acentos #fac59e, bordes #8f6d5f/22%.
 */
 
 :root {
-  /* Fondo principal / superficies */
-  --background: #abe0e9;
-  --foreground: #00435c;
+  --background: #f3e4dd;
+  --foreground: #8f6d5f;
 
-  /* Cards / contenedores secundarios */
-  --card: #54a8af;
-  --card-foreground: #00435c;
-  --popover: #54a8af;
-  --popover-foreground: #00435c;
+  --card: #dcceab;
+  --card-foreground: #8f6d5f;
+  --popover: #dcceab;
+  --popover-foreground: #8f6d5f;
 
-  /* CTAs / botones principales */
-  --primary: #020072;
-  --primary-foreground: #abe0e9;
+  --primary: #009c6c;
+  --primary-foreground: #f3e4dd;
 
-  /* Enlaces / estados activos / marca */
-  --accent: #020072;
-  --accent-foreground: #abe0e9;
+  --accent: #009c6c;
+  --accent-foreground: #f3e4dd;
 
-  --secondary: #54a8af;
-  --secondary-foreground: #00435c;
+  --secondary: #dcceab;
+  --secondary-foreground: #8f6d5f;
 
-  --muted: #54a8af;
-  --muted-foreground: #007c8a;
+  --muted: #dcceab;
+  --muted-foreground: #009c6c;
 
-  --destructive: #00435c;
-  --destructive-foreground: #abe0e9;
+  --destructive: #8f6d5f;
+  --destructive-foreground: #f3e4dd;
 
-  --border: #007c8a;
-  --input: #007c8a;
-  --ring: #020072;
+  --highlight: #fac59e;
+  --highlight-foreground: #8f6d5f;
+
+  --border: rgba(143, 109, 95, 0.35);
+  --input: rgba(143, 109, 95, 0.4);
+  --ring: #009c6c;
 
   --radius: 0.625rem;
-  --sidebar: #54a8af;
-  --sidebar-foreground: #00435c;
-  --sidebar-primary: #020072;
-  --sidebar-primary-foreground: #abe0e9;
-  --sidebar-accent: #54a8af;
-  --sidebar-accent-foreground: #00435c;
-  --sidebar-border: #007c8a;
-  --sidebar-ring: #020072;
+  --sidebar: #dcceab;
+  --sidebar-foreground: #8f6d5f;
+  --sidebar-primary: #009c6c;
+  --sidebar-primary-foreground: #f3e4dd;
+  --sidebar-accent: #dcceab;
+  --sidebar-accent-foreground: #8f6d5f;
+  --sidebar-border: rgba(143, 109, 95, 0.35);
+  --sidebar-ring: #009c6c;
 }
 
 .dark {
@@ -127,6 +126,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
 }
 
 @layer base {

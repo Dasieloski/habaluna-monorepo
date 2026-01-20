@@ -155,7 +155,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                 >
                   <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
-                <span className="absolute top-3 left-3 px-2 md:px-3 py-1 md:py-1.5 bg-accent text-accent-foreground text-[10px] md:text-xs font-bold uppercase rounded-full shadow-lg">
+                <span className="absolute top-3 left-3 px-2 md:px-3 py-1 md:py-1.5 bg-highlight text-highlight-foreground text-[10px] md:text-xs font-bold uppercase rounded-full shadow-lg">
                   #1 Top
                 </span>
               </div>

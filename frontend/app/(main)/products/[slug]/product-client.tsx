@@ -302,8 +302,8 @@ export function ProductClient({
             <div className="flex items-center gap-3 mb-4 md:mb-6">
               <ProductPrice priceUSD={priceUSD} comparePriceUSD={comparePriceUSD ?? undefined} variant="large" />
               {salePercentage !== null && (
-                <span className="text-xs md:text-sm font-semibold text-accent-foreground bg-accent px-3 py-1 rounded-full">
-                  -{salePercentage}%
+<span className="text-xs md:text-sm font-semibold text-highlight-foreground bg-highlight px-3 py-1 rounded-full">
+                -{salePercentage}%
                 </span>
               )}
             </div>
