@@ -229,7 +229,7 @@ export function Header() {
             </button>
 
             <Link href="/" className="flex items-center group">
-              <span className="logo-animate text-3xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105">
+              <span className="text-3xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105" style={{ fontFamily: "'The Choed', cursive" }}>
                 Habaluna
               </span>
             </Link>

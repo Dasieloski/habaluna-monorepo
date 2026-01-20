@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#009c6c",
+  themeColor: "#a9a6d0",
   width: "device-width",
   initialScale: 1,
 }
@@ -64,9 +64,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://habaluna-backend-production.up.railway.app" />
-        {/* Logo: base Londrina Shadow; rotación con Monda (GF) + 14 fuentes obligatorias vía @font-face si se tienen */}
-        <link href="https://fonts.googleapis.com/css2?family=Londrina+Shadow&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Monda:wght@400;700&display=swap" rel="stylesheet" />
+        {/* Logo: The Choed vía @font-face en globals (añadir /public/fonts/TheChoed.woff2) */}
       </head>
       <body className={`${poppins.className} antialiased`}>
         <Providers>{children}</Providers>

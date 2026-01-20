@@ -75,7 +75,7 @@ const config = {
       },
       fontFamily: {
         sans: ['var(--font-poppins)', 'Poppins', 'system-ui', 'sans-serif'],
-        display: ["'Londrina Shadow'", 'cursive'],
+        display: ["'The Choed'", 'cursive'],
       },
     },
   },

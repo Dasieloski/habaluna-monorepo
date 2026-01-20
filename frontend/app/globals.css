@@ -3,96 +3,103 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  PALETA ÚNICA: #dcceab #009c6c #fac59e #8f6d5f #f3e4dd
-  Claro: fondo #f3e4dd, header/footer/cards #dcceab, texto #8f6d5f, secundario #8f6d5f/72%, enlaces/CTA #009c6c, precios #009c6c, anterior #fac59e, badges #fac59e/8f6d5f, bordes #8f6d5f/35%. Oscuro: base #0D0D0D, cards #212125, texto #f3e4dd, enlaces/CTA #009c6c.
+  PALETA: #b5c5d7 #ebdaed #a9a6d0 #e2e2ca #c0e2e0
+  Claro: fondo #e2e2ca, cards #ebdaed, texto/CTA #a9a6d0, muted #b5c5d7, highlight #c0e2e0, bordes #b5c5d7.
+  Oscuro: base #0D0D0D, cards #212125, texto #e2e2ca, acentos #c0e2e0.
 */
 
+@font-face {
+  font-family: 'The Choed';
+  src: url('/fonts/TheChoed.woff2') format('woff2');
+  font-display: swap;
+}
+
 :root {
-  --background: #f3e4dd;
-  --foreground: #8f6d5f;
+  --background: #e2e2ca;
+  --foreground: #a9a6d0;
 
-  --card: #dcceab;
-  --card-foreground: #8f6d5f;
-  --popover: #dcceab;
-  --popover-foreground: #8f6d5f;
+  --card: #ebdaed;
+  --card-foreground: #a9a6d0;
+  --popover: #ebdaed;
+  --popover-foreground: #a9a6d0;
 
-  --primary: #009c6c;
-  --primary-foreground: #f3e4dd;
+  --primary: #a9a6d0;
+  --primary-foreground: #e2e2ca;
 
-  --accent: #009c6c;
-  --accent-foreground: #f3e4dd;
+  --accent: #a9a6d0;
+  --accent-foreground: #e2e2ca;
 
-  --secondary: #dcceab;
-  --secondary-foreground: #8f6d5f;
+  --secondary: #c0e2e0;
+  --secondary-foreground: #a9a6d0;
 
-  --muted: #dcceab;
-  --muted-foreground: rgba(143, 109, 95, 0.72);
+  --muted: #b5c5d7;
+  --muted-foreground: rgba(169, 166, 208, 0.75);
 
-  --destructive: #8f6d5f;
-  --destructive-foreground: #f3e4dd;
+  --destructive: #a9a6d0;
+  --destructive-foreground: #e2e2ca;
 
-  --highlight: #fac59e;
-  --highlight-foreground: #8f6d5f;
+  --highlight: #c0e2e0;
+  --highlight-foreground: #a9a6d0;
 
-  --border: rgba(143, 109, 95, 0.35);
-  --input: rgba(143, 109, 95, 0.4);
-  --ring: #009c6c;
+  --border: rgba(181, 197, 215, 0.45);
+  --input: rgba(181, 197, 215, 0.5);
+  --ring: #a9a6d0;
 
   --radius: 0.625rem;
-  --sidebar: #dcceab;
-  --sidebar-foreground: #8f6d5f;
-  --sidebar-primary: #009c6c;
-  --sidebar-primary-foreground: #f3e4dd;
-  --sidebar-accent: #dcceab;
-  --sidebar-accent-foreground: #8f6d5f;
-  --sidebar-border: rgba(143, 109, 95, 0.35);
-  --sidebar-ring: #009c6c;
+  --sidebar: #ebdaed;
+  --sidebar-foreground: #a9a6d0;
+  --sidebar-primary: #a9a6d0;
+  --sidebar-primary-foreground: #e2e2ca;
+  --sidebar-accent: #c0e2e0;
+  --sidebar-accent-foreground: #a9a6d0;
+  --sidebar-border: rgba(181, 197, 215, 0.45);
+  --sidebar-ring: #a9a6d0;
 }
 
 .dark {
   --background: #0D0D0D;
-  --foreground: #f3e4dd;
+  --foreground: #e2e2ca;
 
   --card: #212125;
-  --card-foreground: #f3e4dd;
+  --card-foreground: #e2e2ca;
   --popover: #212125;
-  --popover-foreground: #f3e4dd;
+  --popover-foreground: #e2e2ca;
 
-  --primary: #009c6c;
-  --primary-foreground: #f3e4dd;
+  --primary: #c0e2e0;
+  --primary-foreground: #0D0D0D;
 
-  --accent: #009c6c;
-  --accent-foreground: #f3e4dd;
+  --accent: #c0e2e0;
+  --accent-foreground: #0D0D0D;
 
   --secondary: #212125;
-  --secondary-foreground: #f3e4dd;
+  --secondary-foreground: #e2e2ca;
   --muted: #212125;
-  --muted-foreground: rgba(220, 206, 171, 0.9);
+  --muted-foreground: rgba(194, 226, 224, 0.9);
 
-  --destructive: #8f6d5f;
-  --destructive-foreground: #f3e4dd;
+  --destructive: #ebdaed;
+  --destructive-foreground: #0D0D0D;
 
-  --highlight: #fac59e;
-  --highlight-foreground: #8f6d5f;
+  --highlight: #c0e2e0;
+  --highlight-foreground: #a9a6d0;
 
-  --border: rgba(143, 109, 95, 0.22);
+  --border: rgba(194, 226, 224, 0.22);
   --input: #212125;
-  --ring: #009c6c;
+  --ring: #c0e2e0;
 
   --sidebar: #212125;
-  --sidebar-foreground: #f3e4dd;
-  --sidebar-primary: #009c6c;
-  --sidebar-primary-foreground: #f3e4dd;
+  --sidebar-foreground: #e2e2ca;
+  --sidebar-primary: #c0e2e0;
+  --sidebar-primary-foreground: #0D0D0D;
   --sidebar-accent: #212125;
-  --sidebar-accent-foreground: #f3e4dd;
-  --sidebar-border: rgba(143, 109, 95, 0.22);
-  --sidebar-ring: #009c6c;
+  --sidebar-accent-foreground: #e2e2ca;
+  --sidebar-border: rgba(194, 226, 224, 0.22);
+  --sidebar-ring: #c0e2e0;
 }
 
 @theme inline {
   --font-sans: "Poppins", sans-serif;
   --font-mono: "Geist Mono", monospace;
-  --font-display: "Londrina Shadow", cursive;
+  --font-display: "The Choed", cursive;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -180,36 +187,3 @@
   .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15); }
 }
 
-/* Logo navbar: animaciones en CSS raíz (fuera de @layer) para que no las anule la cascada */
-@keyframes logoBreath { 0%, 100% { opacity: 1; } 50% { opacity: 0.9; } }
-@keyframes logoGlow { 0%, 100% { text-shadow: 0 0 12px rgba(143,109,95,0.03); } 50% { text-shadow: 0 0 20px rgba(143,109,95,0.07); } }
-@keyframes logoGlowDark { 0%, 100% { text-shadow: 0 0 14px rgba(243,236,221,0.02); } 50% { text-shadow: 0 0 22px rgba(243,236,221,0.05); } }
-@keyframes logoFontCycle {
-  0%, 6.25%     { --logo-f: "Londrina Shadow", cursive; }
-  6.25%, 12.5%  { --logo-f: "Sherin Brush", cursive; }
-  12.5%, 18.75% { --logo-f: "The Choed", cursive; }
-  18.75%, 25%   { --logo-f: "The Harmony", cursive; }
-  25%, 31.25%   { --logo-f: "Holiday Mango", cursive; }
-  31.25%, 37.5% { --logo-f: "NOS", cursive; }
-  37.5%, 43.75% { --logo-f: "Brexter Outline", cursive; }
-  43.75%, 50%   { --logo-f: "Dirtyline 36 Days", cursive; }
-  50%, 56.25%   { --logo-f: "Duck Elegant", cursive; }
-  56.25%, 62.5% { --logo-f: "Black Phantom", cursive; }
-  62.5%, 68.75% { --logo-f: "Magic Vintage", cursive; }
-  68.75%, 75%   { --logo-f: "Over Heat", cursive; }
-  75%, 81.25%   { --logo-f: "Jedira", cursive; }
-  81.25%, 87.5% { --logo-f: "Monda", sans-serif; }
-  87.5%, 93.75% { --logo-f: "CCS Loviena", cursive; }
-  93.75%, 100%  { --logo-f: "Chasa Marelo", cursive; }
-}
-.logo-animate {
-  --logo-f: "Londrina Shadow", cursive;
-  font-family: var(--logo-f) !important;
-  animation: logoBreath 5.5s ease-in-out infinite, logoGlow 5.5s ease-in-out infinite, logoFontCycle 24s ease-in-out infinite;
-}
-.dark .logo-animate {
-  animation: logoBreath 5.5s ease-in-out infinite, logoGlowDark 5.5s ease-in-out infinite, logoFontCycle 24s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .logo-animate, .dark .logo-animate { animation: logoBreath 5.5s ease-in-out infinite; }
-}
