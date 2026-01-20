@@ -172,54 +172,44 @@
     100% { transform: scale(1); }
   }
 
-  /*
-   * Logo navbar: 3 animaciones (solo CSS, sin layout shift).
-   * A) Breathing opacity: 0.9 ↔ 1, lento y continuo.
-   * B) Glow sutil: basado en color del logo, discreto, armónico con breathing.
-   * C) Rotación tipográfica: Londrina Shadow (base) + 15 fuentes obligatorias;
-   *    cambio más rápido que breathing/glow; transición por pasos suaves.
-   * Fuentes obligatorias: Sherin Brush, The Choed, The Harmony, Holiday Mango,
-   * NOS, Brexter Outline, Dirtyline 36 Days, Duck Elegant, Black Phantom,
-   * Magic Vintage, Over Heat, Jedira, Monda, CCS Loviena, Chasa Marelo.
-   * Cargar vía @font-face o CDN las que no estén en layout (p. ej. Monda).
-   */
-  .logo-animate {
-    --logo-f: "Londrina Shadow", cursive;
-    font-family: var(--logo-f) !important;
-    animation: logoBreath 5.5s ease-in-out infinite, logoGlow 5.5s ease-in-out infinite, logoFontCycle 24s ease-in-out infinite;
-  }
-  /* A) Breathing: oscilación 0.9 ↔ 1, lento, marca viva, sin parpadeo */
-  @keyframes logoBreath { 0%, 100% { opacity: 1; } 50% { opacity: 0.9; } }
-  /* B) Glow: extremadamente discreto, basado en foreground (#8f6d5f), pulso armónico */
-  @keyframes logoGlow { 0%, 100% { text-shadow: 0 0 12px rgba(143,109,95,0.03); } 50% { text-shadow: 0 0 20px rgba(143,109,95,0.07); } }
-  .dark .logo-animate { animation: logoBreath 5.5s ease-in-out infinite, logoGlowDark 5.5s ease-in-out infinite, logoFontCycle 24s ease-in-out infinite; }
-  @keyframes logoGlowDark { 0%, 100% { text-shadow: 0 0 14px rgba(243,236,221,0.02); } 50% { text-shadow: 0 0 22px rgba(243,236,221,0.05); } }
-  /* C) Rotación tipográfica: base Londrina Shadow + 15 obligatorias; inicio y fin en base */
-  @keyframes logoFontCycle {
-    0%, 6.25%     { --logo-f: "Londrina Shadow", cursive; }
-    6.25%, 12.5%  { --logo-f: "Sherin Brush", cursive; }
-    12.5%, 18.75% { --logo-f: "The Choed", cursive; }
-    18.75%, 25%   { --logo-f: "The Harmony", cursive; }
-    25%, 31.25%   { --logo-f: "Holiday Mango", cursive; }
-    31.25%, 37.5% { --logo-f: "NOS", cursive; }
-    37.5%, 43.75% { --logo-f: "Brexter Outline", cursive; }
-    43.75%, 50%   { --logo-f: "Dirtyline 36 Days", cursive; }
-    50%, 56.25%   { --logo-f: "Duck Elegant", cursive; }
-    56.25%, 62.5% { --logo-f: "Black Phantom", cursive; }
-    62.5%, 68.75% { --logo-f: "Magic Vintage", cursive; }
-    68.75%, 75%   { --logo-f: "Over Heat", cursive; }
-    75%, 81.25%   { --logo-f: "Jedira", cursive; }
-    81.25%, 87.5% { --logo-f: "Monda", sans-serif; }
-    87.5%, 93.75% { --logo-f: "CCS Loviena", cursive; }
-    93.75%, 100%  { --logo-f: "Chasa Marelo", cursive; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .logo-animate, .dark .logo-animate { animation: logoBreath 5.5s ease-in-out infinite; }
-  }
   .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .font-logo { font-family: var(--font-display), cursive; }
   .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
   .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15); }
+}
+
+/* Logo navbar: animaciones en CSS raíz (fuera de @layer) para que no las anule la cascada */
+@keyframes logoBreath { 0%, 100% { opacity: 1; } 50% { opacity: 0.9; } }
+@keyframes logoGlow { 0%, 100% { text-shadow: 0 0 12px rgba(143,109,95,0.03); } 50% { text-shadow: 0 0 20px rgba(143,109,95,0.07); } }
+@keyframes logoGlowDark { 0%, 100% { text-shadow: 0 0 14px rgba(243,236,221,0.02); } 50% { text-shadow: 0 0 22px rgba(243,236,221,0.05); } }
+@keyframes logoFontCycle {
+  0%, 6.25%     { --logo-f: "Londrina Shadow", cursive; }
+  6.25%, 12.5%  { --logo-f: "Sherin Brush", cursive; }
+  12.5%, 18.75% { --logo-f: "The Choed", cursive; }
+  18.75%, 25%   { --logo-f: "The Harmony", cursive; }
+  25%, 31.25%   { --logo-f: "Holiday Mango", cursive; }
+  31.25%, 37.5% { --logo-f: "NOS", cursive; }
+  37.5%, 43.75% { --logo-f: "Brexter Outline", cursive; }
+  43.75%, 50%   { --logo-f: "Dirtyline 36 Days", cursive; }
+  50%, 56.25%   { --logo-f: "Duck Elegant", cursive; }
+  56.25%, 62.5% { --logo-f: "Black Phantom", cursive; }
+  62.5%, 68.75% { --logo-f: "Magic Vintage", cursive; }
+  68.75%, 75%   { --logo-f: "Over Heat", cursive; }
+  75%, 81.25%   { --logo-f: "Jedira", cursive; }
+  81.25%, 87.5% { --logo-f: "Monda", sans-serif; }
+  87.5%, 93.75% { --logo-f: "CCS Loviena", cursive; }
+  93.75%, 100%  { --logo-f: "Chasa Marelo", cursive; }
+}
+.logo-animate {
+  --logo-f: "Londrina Shadow", cursive;
+  font-family: var(--logo-f) !important;
+  animation: logoBreath 5.5s ease-in-out infinite, logoGlow 5.5s ease-in-out infinite, logoFontCycle 24s ease-in-out infinite;
+}
+.dark .logo-animate {
+  animation: logoBreath 5.5s ease-in-out infinite, logoGlowDark 5.5s ease-in-out infinite, logoFontCycle 24s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-animate, .dark .logo-animate { animation: logoBreath 5.5s ease-in-out infinite; }
 }
