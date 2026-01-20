@@ -14,27 +14,41 @@ interface SearchAutocompleteProps {
   onSelect?: (value: string) => void;
   placeholder?: string;
   className?: string;
+  /** Placeholder typing: "Busca arroz…", "Busca café…", etc. Se detiene al escribir. */
+  animatedPlaceholder?: boolean;
 }
 
 /**
  * Componente de búsqueda con autocompletado
  * Muestra sugerencias basadas en productos mientras el usuario escribe
  */
+const TYPING_PHRASES = ['Busca arroz…', 'Busca café…', 'Busca detergente…'];
+
 export function SearchAutocomplete({
   value,
   onChange,
   onSelect,
   placeholder = 'Buscar productos...',
   className,
+  animatedPlaceholder = false,
 }: SearchAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [historySuggestions, setHistorySuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [typedPlaceholder, setTypedPlaceholder] = useState('');
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const valueRef = useRef(value);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const phraseIndexRef = useRef(0);
+  const isDeletingRef = useRef(false);
+  const typedRef = useRef('');
+
+  valueRef.current = value;
+  typedRef.current = typedPlaceholder;
 
   // Cargar historial de búsquedas cuando el input está vacío
   useEffect(() => {
@@ -122,6 +136,54 @@ export function SearchAutocomplete({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Placeholder typing: letra a letra, pausas, borrado. Se detiene si value.length > 0.
+  useEffect(() => {
+    if (!animatedPlaceholder || value.length > 0) {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+      setTypedPlaceholder('');
+      return;
+    }
+    phraseIndexRef.current = 0;
+    isDeletingRef.current = false;
+    typedRef.current = '';
+    setTypedPlaceholder('');
+    const phrases = TYPING_PHRASES;
+    const run = () => {
+      if (valueRef.current.length > 0) return;
+      const target = phrases[phraseIndexRef.current];
+      let next: string;
+      let delay: number;
+      if (isDeletingRef.current) {
+        if (typedRef.current.length === 0) {
+          isDeletingRef.current = false;
+          phraseIndexRef.current = (phraseIndexRef.current + 1) % phrases.length;
+          next = '';
+          delay = 400;
+        } else {
+          next = typedRef.current.slice(0, -1);
+          delay = 50;
+        }
+      } else {
+        if (typedRef.current.length >= target.length) {
+          isDeletingRef.current = true;
+          next = typedRef.current;
+          delay = 2200;
+        } else {
+          next = typedRef.current + target[typedRef.current.length];
+          delay = next.slice(-1) === ' ' ? 200 : 90;
+        }
+      }
+      typedRef.current = next;
+      setTypedPlaceholder(next);
+      timeoutRef.current = setTimeout(run, delay);
+    };
+    run();
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [animatedPlaceholder, value]);
+
   const handleSelect = (suggestion: string) => {
     onChange(suggestion);
     setShowSuggestions(false);
@@ -157,10 +219,18 @@ export function SearchAutocomplete({
           "absolute top-1/2 transform -translate-y-1/2 text-muted-foreground group-focus-within:text-accent transition-colors",
           isNavbar ? "left-4 w-5 h-5" : "left-3 w-4 h-4 text-muted-foreground"
         )} />
+        {animatedPlaceholder && value === '' && (
+          <span
+            className="pointer-events-none absolute left-12 top-1/2 -translate-y-1/2 text-muted-foreground text-base"
+            aria-hidden="true"
+          >
+            {typedPlaceholder}
+          </span>
+        )}
         <Input
           ref={inputRef}
           type="text"
-          placeholder={placeholder}
+          placeholder={animatedPlaceholder ? '' : placeholder}
           value={value}
           onChange={(e) => {
             onChange(e.target.value);

@@ -229,10 +229,7 @@ export function Header() {
             </button>
 
             <Link href="/" className="flex items-center group">
-              <span
-                className="text-3xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105"
-                style={{ fontFamily: "'Londrina Shadow', cursive" }}
-              >
+              <span className="logo-animate text-3xl md:text-5xl tracking-wide text-foreground transition-transform duration-300 group-hover:scale-105">
                 Habaluna
               </span>
             </Link>
@@ -414,14 +411,14 @@ export function Header() {
               </div>
               <Link
                 href="/wishlist"
-                className="p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 hidden md:flex"
+                className="heart-btn p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 hidden md:flex text-red-500"
               >
                 <HeartIcon className="w-5 h-5" />
               </Link>
               <Link
                 href="/cart"
                 data-contextual-toast-cart
-                className={`p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 relative ${cartBounce ? 'animate-bounce' : ''}`}
+                className={`cart-btn p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 relative text-black dark:text-foreground ${cartBounce ? 'animate-bounce' : ''}`}
               >
                 <CartIcon className="w-5 h-5" />
                 {mounted && cartCount > 0 && (
@@ -442,6 +439,7 @@ export function Header() {
                 onSelect={handleNavbarSearch}
                 placeholder="Buscar productos..."
                 className="w-full"
+                animatedPlaceholder
               />
             </div>
           )}

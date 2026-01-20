@@ -139,17 +139,17 @@ export function TopSales({ products, className }: TopSalesProps) {
                 <button
                   onClick={(e) => toggleFavorite(featuredProduct.id, e)}
                   aria-label={favorites.has(featuredProduct.id) ? `Quitar ${featuredProduct.name} de favoritos` : `Agregar ${featuredProduct.name} a favoritos`}
-                  className={`absolute top-3 right-3 p-2 md:p-3 rounded-xl transition-all duration-300 ${
+                  className={`heart-btn absolute top-3 right-3 p-2 md:p-3 rounded-xl transition-all duration-300 ${
                     favorites.has(featuredProduct.id)
-                      ? "bg-accent/15 text-accent scale-110"
-                      : "bg-card/90 backdrop-blur-sm text-highlight hover:bg-card hover:text-accent"
+                      ? "bg-red-500/10 text-red-500 scale-110"
+                      : "bg-card/90 backdrop-blur-sm text-muted-foreground hover:bg-card hover:text-foreground"
                   }`}
                 >
                   <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={favorites.has(featuredProduct.id)} />
                 </button>
                 <button
                   onClick={(e) => handleAddToCart(featuredProduct, e)}
-                  className="absolute bottom-3 right-3 md:bottom-4 md:right-4 p-2.5 md:p-3 rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300"
+                  className="cart-btn absolute bottom-3 right-3 md:bottom-4 md:right-4 p-2.5 md:p-3 rounded-xl bg-card/90 backdrop-blur-sm text-black dark:text-foreground hover:bg-card transition-all duration-300"
                   aria-label={`Añadir ${featuredProduct.name} al carrito`}
                   type="button"
                 >
@@ -191,17 +191,17 @@ export function TopSales({ products, className }: TopSalesProps) {
                   <button
                     onClick={(e) => toggleFavorite(product.id, e)}
                     aria-label={favorites.has(product.id) ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
-                    className={`absolute top-2 right-2 p-1.5 md:p-2 rounded-lg md:rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100 ${
+                    className={`heart-btn absolute top-2 right-2 p-1.5 md:p-2 rounded-lg md:rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100 ${
                       favorites.has(product.id)
-                        ? "bg-red-50 text-red-500 dark:bg-accent/15 dark:text-accent opacity-100 scale-110 transition-transform duration-200 active:scale-95"
-                        : "bg-card/90 backdrop-blur-sm text-highlight hover:bg-card hover:text-accent"
+                        ? "bg-red-500/10 text-red-500 opacity-100 scale-110"
+                        : "bg-card/90 backdrop-blur-sm text-muted-foreground hover:bg-card hover:text-foreground"
                     }`}
                   >
                     <HeartIcon className="w-4 h-4 md:w-5 md:h-5" filled={favorites.has(product.id)} />
                   </button>
                   <button
                     onClick={(e) => handleAddToCart(product, e)}
-                    className="absolute bottom-2 right-2 p-2 rounded-lg md:rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100 active:scale-95"
+                    className="cart-btn absolute bottom-2 right-2 p-2 rounded-lg md:rounded-xl bg-card/90 backdrop-blur-sm text-black dark:text-foreground hover:bg-card transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100"
                     aria-label={`Añadir ${product.name} al carrito`}
                     type="button"
                   >

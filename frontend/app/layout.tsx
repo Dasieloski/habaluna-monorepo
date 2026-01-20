@@ -64,8 +64,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://habaluna-backend-production.up.railway.app" />
-        {/* Fonts con display=swap para mejor rendimiento */}
+        {/* Fonts con display=swap para mejor rendimiento (logo: rotación sutil) */}
         <link href="https://fonts.googleapis.com/css2?family=Londrina+Shadow&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bungee&family=Comfortaa&family=Fredoka+One&family=Nunito&family=Outfit&family=Pacifico&family=Quicksand&family=Righteous&family=Sora&display=swap" rel="stylesheet" />
       </head>
       <body className={`${poppins.className} antialiased`}>
         <Providers>{children}</Providers>

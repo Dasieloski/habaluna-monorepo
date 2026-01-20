@@ -154,6 +154,50 @@
   @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); } 20%, 40%, 60%, 80% { transform: translateX(4px); } }
   .animate-shimmer { animation: shimmer 2s infinite; }
   @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+  /* Microinteracciones: corazón y carrito (solo CSS, :active) */
+  .heart-btn:active { animation: heartTap 0.4s ease; }
+  .cart-btn:not(:disabled):active { animation: cartTap 0.35s ease; }
+  @keyframes heartTap {
+    0% { transform: scale(1); }
+    20% { transform: scale(0.9); }
+    45% { transform: scale(1.08); }
+    65% { transform: scale(0.98); }
+    100% { transform: scale(1); }
+  }
+  @keyframes cartTap {
+    0% { transform: scale(1); }
+    25% { transform: scale(0.94); }
+    55% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+
+  /* Logo: breathing, glow sutil, rotación de fuentes (premium, muy sutil) */
+  .logo-animate {
+    --logo-f: "Londrina Shadow", cursive;
+    font-family: var(--logo-f) !important;
+    animation: logoBreath 4.5s ease-in-out infinite, logoGlow 5.5s ease-in-out infinite, logoFontCycle 66s ease-in-out infinite;
+  }
+  @keyframes logoBreath { 0%, 100% { opacity: 1; } 50% { opacity: 0.94; } }
+  @keyframes logoGlow { 0%, 100% { text-shadow: 0 0 16px rgba(0,0,0,0.04); } 50% { text-shadow: 0 0 22px rgba(0,0,0,0.08); } }
+  .dark .logo-animate { animation: logoBreath 4.5s ease-in-out infinite, logoGlowDark 5.5s ease-in-out infinite, logoFontCycle 66s ease-in-out infinite; }
+  @keyframes logoGlowDark { 0%, 100% { text-shadow: 0 0 18px rgba(255,255,255,0.03); } 50% { text-shadow: 0 0 24px rgba(255,255,255,0.06); } }
+  @keyframes logoFontCycle {
+    0%, 9.09%   { --logo-f: "Londrina Shadow", cursive; }
+    9.09%, 18.18%  { --logo-f: "Bungee", cursive; }
+    18.18%, 27.27% { --logo-f: "Righteous", cursive; }
+    27.27%, 36.36% { --logo-f: "Pacifico", cursive; }
+    36.36%, 45.45% { --logo-f: "Fredoka One", cursive; }
+    45.45%, 54.54% { --logo-f: "Comfortaa", cursive; }
+    54.54%, 63.63% { --logo-f: "Quicksand", cursive; }
+    63.63%, 72.72% { --logo-f: "Outfit", cursive; }
+    72.72%, 81.81% { --logo-f: "Sora", cursive; }
+    81.81%, 90.9%  { --logo-f: "Archivo Black", cursive; }
+    90.9%, 100%    { --logo-f: "Londrina Shadow", cursive; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logo-animate, .dark .logo-animate { animation: logoBreath 4.5s ease-in-out infinite; }
+  }
   .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }

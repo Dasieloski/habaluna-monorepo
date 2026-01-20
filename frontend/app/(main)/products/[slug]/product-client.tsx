@@ -433,7 +433,7 @@ export function ProductClient({
                   }
                 }}
                 aria-label={`Añadir ${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} al carrito`}
-                className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-primary/90 transition-all text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                className="cart-btn flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-primary/90 transition-all text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -448,8 +448,8 @@ export function ProductClient({
               <button
                 onClick={() => setIsFavorite(!isFavorite)}
                 aria-label={isFavorite ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
-                className={`p-3.5 md:p-4 rounded-xl border transition-all ${
-                  isFavorite ? "bg-accent/15 border-accent text-accent" : "border-border hover:bg-muted text-highlight hover:text-accent"
+                className={`heart-btn p-3.5 md:p-4 rounded-xl border transition-all ${
+                  isFavorite ? "bg-red-500/10 border-red-400 text-red-500" : "border-border hover:bg-muted text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={isFavorite} />
