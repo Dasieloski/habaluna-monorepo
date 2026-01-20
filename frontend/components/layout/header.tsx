@@ -418,7 +418,7 @@ export function Header() {
               <Link
                 href="/cart"
                 data-contextual-toast-cart
-                className={`cart-btn p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 relative text-black dark:text-foreground ${cartBounce ? 'animate-bounce' : ''}`}
+                className={`cart-btn p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 relative text-foreground ${cartBounce ? 'animate-bounce' : ''}`}
               >
                 <CartIcon className="w-5 h-5" />
                 {mounted && cartCount > 0 && (

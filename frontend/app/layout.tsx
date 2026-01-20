@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#a9a6d0",
+  themeColor: "#4d69a5",
   width: "device-width",
   initialScale: 1,
 }
@@ -64,7 +64,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://habaluna-backend-production.up.railway.app" />
-        {/* Logo: The Choed vía @font-face en globals (añadir /public/fonts/TheChoed.woff2) */}
+        {/* Logo: The Choed vía @font-face en globals (/fonts/TheChoedRegular.ttf) */}
       </head>
       <body className={`${poppins.className} antialiased`}>
         <Providers>{children}</Providers>

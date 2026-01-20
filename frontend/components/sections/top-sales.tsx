@@ -149,7 +149,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                 </button>
                 <button
                   onClick={(e) => handleAddToCart(featuredProduct, e)}
-                  className="cart-btn absolute bottom-3 right-3 md:bottom-4 md:right-4 p-2.5 md:p-3 rounded-xl bg-card/90 backdrop-blur-sm text-black dark:text-foreground hover:bg-card transition-all duration-300"
+                  className="cart-btn absolute bottom-3 right-3 md:bottom-4 md:right-4 p-2.5 md:p-3 rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300"
                   aria-label={`Añadir ${featuredProduct.name} al carrito`}
                   type="button"
                 >
@@ -201,7 +201,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                   </button>
                   <button
                     onClick={(e) => handleAddToCart(product, e)}
-                    className="cart-btn absolute bottom-2 right-2 p-2 rounded-lg md:rounded-xl bg-card/90 backdrop-blur-sm text-black dark:text-foreground hover:bg-card transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                    className="cart-btn absolute bottom-2 right-2 p-2 rounded-lg md:rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100"
                     aria-label={`Añadir ${product.name} al carrito`}
                     type="button"
                   >
