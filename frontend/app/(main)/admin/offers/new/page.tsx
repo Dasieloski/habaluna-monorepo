@@ -131,7 +131,7 @@ export default function NewOfferPage() {
                         : "border-border hover:border-primary/50",
                     )}
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-accent-2 rounded-lg flex items-center justify-center mb-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-accent rounded-lg flex items-center justify-center mb-3">
                       <Percent className="w-5 h-5 text-white" />
                     </div>
                     <p className="font-semibold text-foreground">Porcentaje</p>

@@ -2,92 +2,103 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Paleta obligatoria: #1A1A1A, #F0F0F0, #004D61, #822659, #3E5641 */
+/*
+  JERARQUÍA VISUAL – Roles de color (no reemplazo uniforme)
+  #00a8e0 → PRIMARY/IDENTIDAD: CTAs, enlaces importantes, activo
+  #f0bc99 → ACENTO SUAVE: secciones, fondos secundarios
+  #c6d4ac → SUPPORT: cards, bordes suaves, separadores (nunca CTA)
+  #957c53 → ACENTO FUERTE: badges, precios, highlights (énfasis puntual)
+  #ede0d3 → FONDOS CLAROS: superficies, contenedores
+*/
+
 :root {
-  --background: #FAFAFA;
-  --foreground: #1A1A1A;
-  --card: #FFFFFF;
-  --card-foreground: #1A1A1A;
-  --popover: #FFFFFF;
-  --popover-foreground: #1A1A1A;
+  /* Fondos claros / superficies */
+  --background: #ede0d3;
+  --foreground: #1a1a1a;
 
-  /* Botones / CTA: #3E5641 */
-  --primary: #3E5641;
-  --primary-foreground: #FFFFFF;
+  /* Support #c6d4ac: cards (tinte suave), bordes */
+  --card: #e8ebe0;
+  --card-foreground: #1a1a1a;
+  --popover: #f7f5f1;
+  --popover-foreground: #1a1a1a;
 
-  /* Fondos secundarios */
-  --secondary: #F0F0F0;
-  --secondary-foreground: #1A1A1A;
+  /* PRIMARY #00a8e0: identidad, CTAs, enlaces, activo */
+  --primary: #00a8e0;
+  --primary-foreground: #ffffff;
 
-  --muted: #F5F5F5;
-  --muted-foreground: #737373;
+  /* Acento suave #f0bc99: secciones, fondos secundarios */
+  --secondary: #f0bc99;
+  --secondary-foreground: #2d2318;
 
-  /* Acento 1: #004D61 - enlaces, detalles, hover sutil */
-  --accent: #004D61;
-  --accent-foreground: #FFFFFF;
+  /* Neutral, no competir con contenido */
+  --muted: #e4ddd4;
+  --muted-foreground: #5c5c5c;
 
-  /* Acento 2: #822659 - badges, énfasis */
-  --accent-2: #822659;
-  --accent-2-foreground: #FFFFFF;
+  /* ACENTO FUERTE #957c53: badges, precios, highlights (puntual, no saturar) */
+  --accent: #957c53;
+  --accent-foreground: #ffffff;
 
-  /* Destructive: derivado de acento-2 */
-  --destructive: #6b1f47;
-  --destructive-foreground: #FFFFFF;
+  /* Destructive: derivado oscuro de #957c53 (prioridad legibilidad) */
+  --destructive: #6b5a3f;
+  --destructive-foreground: #ffffff;
 
-  --border: #E5E5E5;
-  --input: #E5E5E5;
-  --ring: #004D61;
+  /* Support #c6d4ac: bordes, separadores */
+  --border: #c6d4ac;
+  --input: #d4dcc4;
+  --ring: #00a8e0;
+  --support: #c6d4ac;
+
   --radius: 0.625rem;
-
-  --sidebar: #F5F5F5;
-  --sidebar-foreground: #1A1A1A;
-  --sidebar-primary: #3E5641;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F0F0F0;
-  --sidebar-accent-foreground: #1A1A1A;
-  --sidebar-border: #E5E5E5;
-  --sidebar-ring: #004D61;
+  --sidebar: #e8ebe0;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #00a8e0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e4ddd4;
+  --sidebar-accent-foreground: #1a1a1a;
+  --sidebar-border: #c6d4ac;
+  --sidebar-ring: #00a8e0;
 }
 
 .dark {
-  /* Fondo principal modo oscuro: #1A1A1A, texto: #F0F0F0 */
-  --background: #1A1A1A;
-  --foreground: #F0F0F0;
+  /* Estructura oscura intacta; paleta adaptada: acentos suaves, menos saturación */
+  --background: #1a1a1a;
+  --foreground: #e8e4de;
   --card: #252525;
-  --card-foreground: #F0F0F0;
+  --card-foreground: #e8e4de;
   --popover: #252525;
-  --popover-foreground: #F0F0F0;
+  --popover-foreground: #e8e4de;
 
-  /* CTA: ligera variante para contraste en oscuro */
-  --primary: #4a6b4e;
-  --primary-foreground: #FFFFFF;
+  /* Primary: un toque más claro para contraste en oscuro */
+  --primary: #2ba3d4;
+  --primary-foreground: #ffffff;
 
-  --secondary: #252525;
-  --secondary-foreground: #F0F0F0;
-  --muted: #2D2D2D;
-  --muted-foreground: #A8A8A8;
+  /* Acento suave: tono apagado para secciones en oscuro */
+  --secondary: #2a2520;
+  --secondary-foreground: #e8e4de;
 
-  /* Acento 1: más visible en oscuro */
-  --accent: #006077;
-  --accent-foreground: #FFFFFF;
-  --accent-2: #9a2d6b;
-  --accent-2-foreground: #FFFFFF;
+  --muted: #2d2d2d;
+  --muted-foreground: #a0a0a0;
 
-  --destructive: #8b3a6b;
-  --destructive-foreground: #FFFFFF;
+  /* Acento fuerte: más suave para no chillar en fondo oscuro */
+  --accent: #a68b65;
+  --accent-foreground: #ffffff;
 
-  --border: #333333;
-  --input: #2D2D2D;
-  --ring: #006077;
+  --destructive: #8b7355;
+  --destructive-foreground: #ffffff;
+
+  --border: #3d3d3d;
+  --input: #2d2d2d;
+  --ring: #2ba3d4;
+  --support: #2d3028;
 
   --sidebar: #252525;
-  --sidebar-foreground: #F0F0F0;
-  --sidebar-primary: #4a6b4e;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #2D2D2D;
-  --sidebar-accent-foreground: #F0F0F0;
-  --sidebar-border: #333333;
-  --sidebar-ring: #006077;
+  --sidebar-foreground: #e8e4de;
+  --sidebar-primary: #2ba3d4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2d2d2d;
+  --sidebar-accent-foreground: #e8e4de;
+  --sidebar-border: #3d3d3d;
+  --sidebar-ring: #2ba3d4;
 }
 
 @theme inline {
@@ -108,13 +119,12 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-accent-2: var(--accent-2);
-  --color-accent-2-foreground: var(--accent-2-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-support: var(--support);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -139,105 +149,26 @@
 }
 
 @layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
-  }
-
-  .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out forwards;
-  }
-
-  .animate-slide-in-left {
-    animation: slideInLeft 0.5s ease-out forwards;
-  }
-
-  .animate-slide-in-right {
-    animation: slideInRight 0.5s ease-out forwards;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.4s ease-out forwards;
-  }
-
-  .animate-bounce-subtle {
-    animation: bounceSubtle 2s ease-in-out infinite;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes slideInLeft {
-    from { opacity: 0; transform: translateX(-40px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  @keyframes slideInRight {
-    from { opacity: 0; transform: translateX(40px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  @keyframes bounceSubtle {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-  }
-
-  .animate-shake {
-    animation: shake 0.4s ease-in-out;
-  }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-    20%, 40%, 60%, 80% { transform: translateX(4px); }
-  }
-
-  .animate-shimmer {
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  .font-logo {
-    font-family: var(--font-display), cursive;
-  }
-
-  .hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
-  }
+  .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+  .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+  .animate-slide-in-left { animation: slideInLeft 0.5s ease-out forwards; }
+  .animate-slide-in-right { animation: slideInRight 0.5s ease-out forwards; }
+  .animate-scale-in { animation: scaleIn 0.4s ease-out forwards; }
+  .animate-bounce-subtle { animation: bounceSubtle 2s ease-in-out infinite; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+  @keyframes bounceSubtle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  .animate-shake { animation: shake 0.4s ease-in-out; }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); } 20%, 40%, 60%, 80% { transform: translateX(4px); } }
+  .animate-shimmer { animation: shimmer 2s infinite; }
+  @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+  .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .font-logo { font-family: var(--font-display), cursive; }
+  .hover-lift { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+  .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15); }
 }

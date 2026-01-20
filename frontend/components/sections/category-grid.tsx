@@ -78,7 +78,7 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                     loading="lazy"
                   />
                 </div>
-                <span className="text-xs md:text-sm font-semibold text-foreground text-center group-hover:text-accent transition-colors line-clamp-1">
+                <span className="text-xs md:text-sm font-semibold text-foreground text-center group-hover:text-primary transition-colors line-clamp-1">
                   {category.name}
                 </span>
               </Link>

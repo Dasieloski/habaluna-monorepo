@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils"
 
 const actions = [
   { label: "Nuevo producto", href: "/admin/products/new", icon: Plus, color: "from-primary to-accent" },
-  { label: "Ver inventario", href: "/admin/products", icon: Package, color: "from-accent-2 to-accent-2/80" },
+  { label: "Ver inventario", href: "/admin/products", icon: Package, color: "from-accent to-accent/80" },
   { label: "Crear oferta", href: "/admin/offers/new", icon: Percent, color: "from-accent to-accent/80" },
-  { label: "Clientes", href: "/admin/customers", icon: Users, color: "from-accent-2 to-accent-2/80" },
-  { label: "Reportes", href: "/admin/reports", icon: FileText, color: "from-accent-2 to-accent-2/80" },
+  { label: "Clientes", href: "/admin/customers", icon: Users, color: "from-accent to-accent/80" },
+  { label: "Reportes", href: "/admin/reports", icon: FileText, color: "from-accent to-accent/80" },
   { label: "Ajustes", href: "/admin/settings", icon: Settings, color: "from-accent to-accent/60" },
 ]
 

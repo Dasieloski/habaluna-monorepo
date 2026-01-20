@@ -281,7 +281,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-accent"
+                              className="w-5 h-5 text-primary"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -301,7 +301,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-accent"
+                              className="w-5 h-5 text-primary"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -322,7 +322,7 @@ export function Header() {
                               onClick={() => setUserMenuOpen(false)}
                             >
                               <svg
-                                className="w-5 h-5 text-accent"
+                                className="w-5 h-5 text-primary"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -372,7 +372,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-accent"
+                              className="w-5 h-5 text-primary"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -392,7 +392,7 @@ export function Header() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
-                              className="w-5 h-5 text-accent"
+                              className="w-5 h-5 text-primary"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"

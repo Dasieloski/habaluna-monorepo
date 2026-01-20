@@ -69,7 +69,7 @@ export function BenefitsBar() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-24 bg-card border-y border-border">
+    <section ref={sectionRef} className="py-20 md:py-24 bg-secondary/40 border-y border-border">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
           {benefits.map((benefit, index) => {

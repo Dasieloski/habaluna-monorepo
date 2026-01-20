@@ -19,7 +19,7 @@ const stats = [
     change: "+8.2%",
     trend: "up",
     icon: ShoppingCart,
-    color: "from-accent-2 to-accent-2/80",
+    color: "from-accent to-accent/80",
   },
   {
     label: "Clientes",
@@ -35,7 +35,7 @@ const stats = [
     change: "-2.4%",
     trend: "down",
     icon: Package,
-    color: "from-accent-2 to-accent-2/80",
+    color: "from-accent to-accent/80",
   },
 ]
 

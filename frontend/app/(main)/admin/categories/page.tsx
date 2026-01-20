@@ -339,7 +339,7 @@ function CategoriesContent() {
                 e.preventDefault()
                 confirmDelete("delete_with_products")
               }}
-              className="w-full sm:flex-1 sm:min-w-64 whitespace-normal text-center leading-snug bg-gradient-to-r from-destructive to-accent-2 text-destructive-foreground"
+              className="w-full sm:flex-1 sm:min-w-64 whitespace-normal text-center leading-snug bg-gradient-to-r from-destructive to-accent text-destructive-foreground"
               disabled={!deleteTarget || !!isDeletingId}
             >
               {isDeletingId ? "Procesando..." : "Eliminar categoría y productos"}
@@ -617,7 +617,7 @@ function CategoriesContent() {
                       type="button"
                       onClick={removeSelectedProducts}
                       disabled={isRemoving || removeSelectedProductIds.length === 0}
-                      className="bg-gradient-to-r from-destructive to-accent-2 text-destructive-foreground"
+                      className="bg-gradient-to-r from-destructive to-accent text-destructive-foreground"
                     >
                       {isRemoving ? "Quitando..." : "Quitar seleccionados"}
                     </Button>
@@ -674,7 +674,7 @@ function CategoriesContent() {
         <Card className="border-0 shadow-md col-span-2 lg:col-span-1">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-accent-2 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-accent rounded-xl flex items-center justify-center">
                 <Package className="w-5 h-5 text-white" />
               </div>
               <div>

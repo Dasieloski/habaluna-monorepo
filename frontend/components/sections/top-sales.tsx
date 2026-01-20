@@ -142,7 +142,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                   className={`absolute top-3 right-3 p-2 md:p-3 rounded-xl transition-all duration-300 ${
                     favorites.has(featuredProduct.id)
                       ? "bg-red-500 text-white scale-110"
-                      : "bg-white/90 backdrop-blur-sm text-foreground hover:bg-white"
+                      : "bg-card/90 backdrop-blur-sm text-foreground hover:bg-card"
                   }`}
                 >
                   <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={favorites.has(featuredProduct.id)} />
@@ -155,12 +155,12 @@ export function TopSales({ products, className }: TopSalesProps) {
                 >
                   <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
-                <span className="absolute top-3 left-3 px-2 md:px-3 py-1 md:py-1.5 bg-gradient-to-r from-sky-400 to-blue-500 text-white text-[10px] md:text-xs font-bold uppercase rounded-full shadow-lg">
+                <span className="absolute top-3 left-3 px-2 md:px-3 py-1 md:py-1.5 bg-accent text-accent-foreground text-[10px] md:text-xs font-bold uppercase rounded-full shadow-lg">
                   #1 Top
                 </span>
               </div>
               <div className="p-4 md:p-5">
-                <h3 className="text-sm md:text-xl font-semibold text-foreground line-clamp-2 group-hover:text-accent transition-colors">
+                <h3 className="text-sm md:text-xl font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                   {featuredProduct.name}
                 </h3>
                 <p className="text-base md:text-2xl font-bold text-foreground mt-2 md:mt-3">
@@ -194,7 +194,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                     className={`absolute top-2 right-2 p-1.5 md:p-2 rounded-lg md:rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100 ${
                       favorites.has(product.id)
                         ? "bg-red-500 text-white opacity-100 scale-110"
-                        : "bg-white/90 backdrop-blur-sm text-foreground hover:bg-white"
+                        : "bg-card/90 backdrop-blur-sm text-foreground hover:bg-card"
                     }`}
                   >
                     <HeartIcon className="w-4 h-4 md:w-5 md:h-5" filled={favorites.has(product.id)} />
@@ -209,11 +209,11 @@ export function TopSales({ products, className }: TopSalesProps) {
                   </button>
                 </div>
                 <div className="p-3 md:p-4">
-                  <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 group-hover:text-accent transition-colors">
+                  <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-1 md:gap-2 mt-1.5 md:mt-2">
-                    <span className="text-sm md:text-base font-bold text-foreground">
+                    <span className="text-sm md:text-base font-bold text-accent">
                       ${getPrice(product).toFixed(2)}
                     </span>
                     {getComparePrice(product) !== null && getComparePrice(product)! > getPrice(product) && (

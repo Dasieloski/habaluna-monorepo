@@ -91,7 +91,7 @@ export function ContextualToast({ state, progress, showProgressBar, statusLabel,
       <div className="-translate-x-1/2 -translate-y-1/2">
         <motion.div
           className={`rounded-2xl border border-border bg-card px-4 py-3 shadow-xl ${
-            milestoneJustReached ? 'ring-2 ring-accent-2 ring-offset-2' : ''
+            milestoneJustReached ? 'ring-2 ring-accent ring-offset-2' : ''
           }`}
           style={{ minWidth: 280, maxWidth: 360 }}
         >
