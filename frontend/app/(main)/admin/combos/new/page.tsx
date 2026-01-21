@@ -241,6 +241,7 @@ export default function NewComboPage() {
         categoryId: categoryIdRef.current,
         isActive: statusRef.current === "active",
         isFeatured,
+        adultsOnly: adultsOnly,
         isCombo: true,
         comboItems: selected.map((s) => ({ productId: s.productId, quantity: s.quantity })),
         images: uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined,

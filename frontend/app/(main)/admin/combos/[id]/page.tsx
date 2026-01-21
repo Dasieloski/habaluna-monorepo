@@ -243,6 +243,7 @@ export default function EditComboPage() {
         categoryId: categoryIdRef.current,
         isActive: status === "active",
         isFeatured,
+        adultsOnly: adultsOnly,
         isCombo: true,
         comboItems: selected.map((s) => ({ productId: s.productId, quantity: s.quantity })),
         images: allImages.length ? allImages : undefined,

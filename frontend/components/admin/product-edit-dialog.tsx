@@ -242,6 +242,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
         categoryId: categoryIdRef.current,
         isActive: statusRef.current === "active",
         isFeatured: isFeatured,
+        adultsOnly: adultsOnly,
         images: allImages.length > 0 ? allImages : undefined,
       }
 
