@@ -20,6 +20,7 @@ type UIProduct = {
   priceUSD?: number;
   comparePriceUSD?: number;
   images?: string[];
+  adultsOnly?: boolean;
   variants?: Array<{ priceUSD?: number; comparePriceUSD?: number }>;
 };
 
@@ -77,6 +78,7 @@ export default function ProductsClient() {
         priceUSD: p.priceUSD,
         comparePriceUSD: p.comparePriceUSD,
         images: p.images,
+        adultsOnly: p.adultsOnly,
         variants: p.variants,
       }));
 
@@ -199,6 +201,7 @@ export default function ProductsClient() {
                     images: p.images,
                     priceUSD: toNumber(p.variants?.[0]?.priceUSD ?? p.priceUSD) ?? undefined,
                     comparePriceUSD: toNumber(p.variants?.[0]?.comparePriceUSD ?? p.comparePriceUSD) ?? undefined,
+                    adultsOnly: p.adultsOnly,
                     variants: p.variants?.map((v: any) => ({
                       id: v.id,
                       name: v.name,
