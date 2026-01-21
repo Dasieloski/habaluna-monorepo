@@ -36,6 +36,7 @@ export default function EditComboPage() {
   const [error, setError] = useState<string | null>(null)
   const [isOnSale, setIsOnSale] = useState(false)
   const [isFeatured, setIsFeatured] = useState(false)
+  const [adultsOnly, setAdultsOnly] = useState(false)
   const [autoSlug, setAutoSlug] = useState(false) // En edición, por defecto manual
   const [status, setStatus] = useState<"active" | "draft" | "archived">("active")
   const [loadedData, setLoadedData] = useState<any>(null)
@@ -80,6 +81,7 @@ export default function EditComboPage() {
       const compare = (p as any).comparePriceUSD
       setIsOnSale(!!compare)
       setIsFeatured(!!(p as any).isFeatured)
+      setAdultsOnly(!!(p as any).adultsOnly)
 
       const imgs = Array.isArray(p.images) ? p.images : []
       setImages(imgs)
@@ -513,6 +515,14 @@ export default function EditComboPage() {
                     <p className="text-xs text-muted-foreground">Mostrar como producto destacado</p>
                   </div>
                   <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border p-3">
+                  <div>
+                    <p className="text-sm font-medium">Solo mayores de 18 años</p>
+                    <p className="text-xs text-muted-foreground">Entrega restringida a mayores de edad</p>
+                  </div>
+                  <Switch checked={adultsOnly} onCheckedChange={setAdultsOnly} />
                 </div>
               </CardContent>
             </Card>

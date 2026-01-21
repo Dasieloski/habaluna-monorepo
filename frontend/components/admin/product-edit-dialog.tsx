@@ -53,6 +53,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
   const categoryIdRef = useRef<string>("")
   const statusRef = useRef<"active" | "draft" | "archived">("active")
   const [isFeatured, setIsFeatured] = useState(false)
+  const [adultsOnly, setAdultsOnly] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   // Evita que la carga async del producto (loadFullProduct) sobreescriba previews recién seleccionados.
   const hasUserTouchedImagesRef = useRef(false)
@@ -168,6 +169,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
     // Revisar si el producto tiene isFeatured (puede venir en el objeto original del backend)
     const isProductFeatured = (productToLoad as any).isFeatured ?? false
     setIsFeatured(isProductFeatured)
+    setAdultsOnly(!!(productToLoad as any).adultsOnly)
     categoryIdRef.current = productToLoad.categoryId || ""
     
     // Forzar re-render de los selects con los valores correctos
@@ -556,6 +558,13 @@ export function ProductEditDialog({ product, open, onOpenChange, onSuccess }: Pr
                 <p className="text-sm text-muted-foreground">Mostrar en página principal</p>
               </div>
               <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
+            </div>
+            <div className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg">
+              <div>
+                <p className="font-medium text-foreground">Solo mayores de 18 años</p>
+                <p className="text-sm text-muted-foreground">Entrega restringida a mayores de edad</p>
+              </div>
+              <Switch checked={adultsOnly} onCheckedChange={setAdultsOnly} />
             </div>
           </div>
 

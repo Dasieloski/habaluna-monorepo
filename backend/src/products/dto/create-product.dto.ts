@@ -83,6 +83,11 @@ export class CreateProductDto {
   @IsBoolean()
   isCombo?: boolean;
 
+  @ApiProperty({ default: false, required: false })
+  @IsOptional()
+  @IsBoolean()
+  adultsOnly?: boolean;
+
   @ApiProperty({ type: [ComboItemDto], required: false })
   @IsOptional()
   @IsArray()

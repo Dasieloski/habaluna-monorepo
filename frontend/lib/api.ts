@@ -194,6 +194,7 @@ export interface BackendProduct {
   isActive: boolean
   isFeatured: boolean
   isCombo?: boolean
+  adultsOnly?: boolean
   images: string[]
   allergens: string[]
   categoryId: string
@@ -1555,5 +1556,7 @@ export function mapBackendProductToFrontend(backendProduct: BackendProduct): imp
     isFeatured: backendProduct.isFeatured ?? false,
     // Incluir isCombo como propiedad adicional (no está en el tipo Product pero lo necesitamos)
     isCombo: backendProduct.isCombo ?? false,
-  } as import('./mock-data').Product & { isFeatured: boolean }
+    // adultsOnly: producto o combo con al menos un ítem +18
+    adultsOnly: !!(backendProduct.adultsOnly ?? (backendProduct.comboItems || []).some((ci: any) => ci.product?.adultsOnly)),
+  } as import('./mock-data').Product & { isFeatured: boolean; adultsOnly?: boolean }
 }

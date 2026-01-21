@@ -214,6 +214,15 @@
     100% { transform: scale(1); }
   }
 
+  /* Badge +18: pulse de opacidad muy sutil y minimalista */
+  .animate-adults-badge {
+    animation: adultsBadgePulse 2.5s ease-in-out infinite;
+  }
+  @keyframes adultsBadgePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+
   .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }

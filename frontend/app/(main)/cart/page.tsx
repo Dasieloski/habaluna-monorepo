@@ -108,6 +108,7 @@ export default function CartPage() {
           priceUSD: product.priceUSD ?? product.variants?.[0]?.priceUSD ?? null,
           priceMNs: product.priceMNs ?? product.variants?.[0]?.priceMNs ?? null,
           images: product.images || [],
+          adultsOnly: !!(product as any).adultsOnly,
         },
         productVariant: product.variants?.[0]?.id
           ? {
@@ -320,7 +321,7 @@ export default function CartPage() {
             {items.map((item) => {
               const price = Number(item.productVariant?.priceUSD ?? item.product.priceUSD ?? 0)
               const option = item.productVariant?.name || "Producto"
-              const imageSrc = item.product.images?.[0] || "/placeholder.svg"
+              const imageSrc = item.product.images?.[0] || ""
               return (
               <div key={item.id} className="bg-white rounded-xl p-4 md:p-6">
                 <div className="flex gap-4">
@@ -342,6 +343,9 @@ export default function CartPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-bold text-primary">${price.toFixed(2)}</span>
                     </div>
+                    {(item.product as { adultsOnly?: boolean }).adultsOnly && (
+                      <p className="text-xs text-muted-foreground mb-2">El producto {item.product.name} requiere entrega solo a mayores de 18 años.</p>
+                    )}
                     
                     {/* Alerta de stock para este item */}
                     {hasItemIssue(item.id) && (
@@ -445,7 +449,7 @@ export default function CartPage() {
                   <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
                     {suggestedProducts.map((product) => {
                       const price = Number(product.variants?.[0]?.priceUSD ?? product.priceUSD ?? 0)
-                      const image = product.images?.[0] || "/placeholder.svg"
+                      const image = product.images?.[0] || ""
                       return (
                         <div key={product.id} className="shrink-0 w-32 md:w-40">
                           <Link href={`/products/${product.slug}`} className="block mb-2">

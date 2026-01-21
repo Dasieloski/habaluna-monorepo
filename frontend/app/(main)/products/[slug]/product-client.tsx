@@ -7,7 +7,8 @@ import { ProductPrice } from "@/components/product/product-price"
 import { toNumber } from "@/lib/money"
 import { useToast } from "@/hooks/use-toast"
 import { getTriggerRect } from "@/lib/contextual-toast-utils"
-import { api, getApiBaseUrlLazy } from "@/lib/api"
+import { api } from "@/lib/api"
+import { getImageUrl } from "@/lib/image-utils"
 import { useCartStore } from "@/lib/store/cart-store"
 import {
   HeartIcon,
@@ -20,6 +21,7 @@ import {
 import { SmartImage } from "@/components/ui/smart-image"
 
 import { ProductReviews } from "@/components/reviews/product-reviews"
+import { AdultsOnlyModal } from "@/components/ui/adults-only-modal"
 
 interface ProductClientProps {
   product: any
@@ -31,32 +33,6 @@ interface ProductClientProps {
     limit: number
     totalPages: number
   }
-}
-
-function normalizeImageUrl(imagePath: string): string {
-  if (!imagePath) return "/placeholder.svg"
-  
-  // Eliminar referencias a Cloudinary - usar solo imágenes de la BD
-  if (imagePath.includes('cloudinary.com') || imagePath.includes('res.cloudinary')) {
-    console.warn('[normalizeImageUrl] URL de Cloudinary detectada, ignorando:', imagePath)
-    return "/placeholder.svg"
-  }
-  
-  // Si es una URL completa que NO es Cloudinary, retornarla
-  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
-    return imagePath
-  }
-  
-  // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-  const base = getApiBaseUrlLazy()
-  
-  // Priorizar URLs de la BD: /api/media/{id}
-  if (imagePath.startsWith("/api/media/")) {
-    return `${base}${imagePath}`
-  }
-  
-  if (imagePath.startsWith("/")) return `${base}${imagePath}`
-  return `${base}/uploads/${imagePath}`
 }
 
 export function ProductClient({
@@ -83,7 +59,7 @@ export function ProductClient({
 
   const images = useMemo(() => {
     const raw: string[] = Array.isArray(product?.images) ? product.images : []
-    const combined: string[] = raw.map(normalizeImageUrl).filter(Boolean)
+    const combined: string[] = raw.map((i) => getImageUrl(i)).filter(Boolean) as string[]
 
     // Si es combo, meter también imágenes de los productos incluidos para verlas en el carrusel
     if (isCombo) {
@@ -92,14 +68,14 @@ export function ProductClient({
         const p = ci?.product || ci?.item || ci?.includedProduct || null
         const imgs: string[] = Array.isArray(p?.images) ? p.images : []
         for (const img of imgs) {
-          const u = normalizeImageUrl(img || "")
+          const u = getImageUrl(img || "")
           if (u) combined.push(u)
         }
       }
     }
 
     const deduped = Array.from(new Set(combined))
-    return deduped.length > 0 ? deduped : ["/placeholder.svg"]
+    return deduped.length > 0 ? deduped : [""]
   }, [isCombo, product?.comboItems, product?.images])
 
   useEffect(() => {
@@ -112,7 +88,7 @@ export function ProductClient({
       .map((ci: any) => {
         const p = ci?.product || ci?.item || ci?.includedProduct || null
         const rawImages: string[] = Array.isArray(p?.images) ? p.images : []
-        const image = normalizeImageUrl(rawImages[0] || "")
+        const image = getImageUrl(rawImages[0] || "") || ""
         const name = p?.name || "Producto"
         const slug = p?.slug || ""
         const id = ci?.id || `${ci?.comboId || product?.id || "combo"}-${p?.id || slug || name}`
@@ -200,6 +176,39 @@ export function ProductClient({
     })
   }
 
+  const doAddToCart = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e?.currentTarget ? getTriggerRect(e.currentTarget) : null
+    try {
+      await addToCart({
+        product: {
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          priceUSD: product.priceUSD ?? null,
+          priceMNs: product.priceMNs ?? null,
+          images: Array.isArray(product.images) ? product.images : [],
+          adultsOnly: adultsOnly,
+        },
+        productVariant: selectedVariant ? { id: selectedVariant.id, name: selectedVariant.name, priceUSD: selectedVariant.priceUSD ?? null, priceMNs: selectedVariant.priceMNs ?? null } : null,
+        quantity,
+      })
+      setAddedFeedback(true)
+      setTimeout(() => setAddedFeedback(false), 2000)
+      if (rect) showAddToCart({ productName: `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ""}`, triggerRect: rect })
+      else showSuccess("¡Al carrito! 🛒", `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ""} se agregó.`)
+    } catch (err: any) {
+      showError("Ups… no se pudo añadir 😅", err?.response?.data?.message || err?.message || "No se pudo añadir")
+    }
+  }
+
+  const handleAddToCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (adultsOnly) {
+      setShowAdultsModal(true)
+    } else {
+      doAddToCart(e)
+    }
+  }
+
   return (
     <>
       {/* Breadcrumb */}
@@ -247,7 +256,7 @@ export function ProductClient({
                     }`}
                   >
                     <SmartImage
-                      src={img || "/placeholder.svg"}
+                      src={img || ""}
                       alt={`Vista ${idx + 1}`}
                       fill
                       className="object-cover"
@@ -336,6 +345,9 @@ export function ProductClient({
             {product?.sku && (
               <p className="text-xs text-muted-foreground mb-1">Ref. {product.sku}</p>
             )}
+            {adultsOnly && (
+              <p className="text-xs text-muted-foreground mb-2">Entrega solo a mayores de 18 años</p>
+            )}
             {reviewCount > 0 && (
               <a href="#reviews" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-accent transition-colors mb-2">
                 ★ {avgRating || "—"} ({reviewCount} reseña{reviewCount !== 1 ? "s" : ""})
@@ -355,7 +367,7 @@ export function ProductClient({
                       <>
                         <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted shrink-0 relative">
                           <SmartImage
-                            src={item.image || "/placeholder.svg"}
+                            src={item.image || ""}
                             alt={item.name}
                             fill
                             className="object-cover"
@@ -483,29 +495,7 @@ export function ProductClient({
                 </div>
               ) : (
                 <button
-                  onClick={async (e) => {
-                    const rect = getTriggerRect(e.currentTarget)
-                    try {
-                      await addToCart({
-                        product: {
-                          id: product.id,
-                          name: product.name,
-                          slug: product.slug,
-                          priceUSD: product.priceUSD ?? null,
-                          priceMNs: product.priceMNs ?? null,
-                          images: Array.isArray(product.images) ? product.images : [],
-                        },
-                        productVariant: selectedVariant ? { id: selectedVariant.id, name: selectedVariant.name, priceUSD: selectedVariant.priceUSD ?? null, priceMNs: selectedVariant.priceMNs ?? null } : null,
-                        quantity,
-                      })
-                      setAddedFeedback(true)
-                      setTimeout(() => setAddedFeedback(false), 2000)
-                      if (rect) showAddToCart({ productName: `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ""}`, triggerRect: rect })
-                      else showSuccess("¡Al carrito! 🛒", `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ""} se agregó.`)
-                    } catch (err: any) {
-                      showError("Ups… no se pudo añadir 😅", err?.response?.data?.message || err?.message || "No se pudo añadir")
-                    }
-                  }}
+                  onClick={handleAddToCartClick}
                   aria-label={addedFeedback ? `Añadido` : `Añadir ${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ""} al carrito`}
                   className="cart-btn flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-primary/90 transition-all text-sm md:text-base"
                 >
@@ -648,13 +638,14 @@ export function ProductClient({
                       id: p.id,
                       slug: p.slug,
                       name: p.name,
-                      images: p.images?.map(normalizeImageUrl),
+                      images: (p.images || []).map((img: string) => getImageUrl(img)).filter(Boolean) as string[],
                       priceUSD: toNumber(p.priceUSD) ?? undefined,
                       comparePriceUSD: toNumber(p.comparePriceUSD) ?? undefined,
+                      adultsOnly: !!p.adultsOnly,
                       variants: p.variants,
                     }}
                     badge={undefined}
-              />
+                  />
                 </div>
               ))}
             </div>

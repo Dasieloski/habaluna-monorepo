@@ -32,6 +32,7 @@ export default function NewComboPage() {
   const [error, setError] = useState<string | null>(null)
   const [isOnSale, setIsOnSale] = useState(false)
   const [isFeatured, setIsFeatured] = useState(false)
+  const [adultsOnly, setAdultsOnly] = useState(false)
   const [autoSlug, setAutoSlug] = useState(true)
 
   const nameRef = useRef<HTMLInputElement>(null)
@@ -500,6 +501,14 @@ export default function NewComboPage() {
                     <p className="text-xs text-muted-foreground">Mostrar como producto destacado</p>
                   </div>
                   <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border p-3">
+                  <div>
+                    <p className="text-sm font-medium">Solo mayores de 18 años</p>
+                    <p className="text-xs text-muted-foreground">Entrega restringida a mayores de edad</p>
+                  </div>
+                  <Switch checked={adultsOnly} onCheckedChange={setAdultsOnly} />
                 </div>
               </CardContent>
             </Card>

@@ -12,6 +12,7 @@ export interface CartItem {
     priceUSD?: number | string | null;
     priceMNs?: number | string | null;
     images: string[];
+    adultsOnly?: boolean;
   };
   productVariant?: {
     id: string;

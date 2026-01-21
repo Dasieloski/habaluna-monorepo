@@ -72,6 +72,9 @@ export class ProductsService {
       if (rest.nutritionalInfo) {
         productData.nutritionalInfo = rest.nutritionalInfo;
       }
+      if (rest.adultsOnly !== undefined) {
+        productData.adultsOnly = !!rest.adultsOnly;
+      }
 
       this.logger.debug('Datos preparados para Prisma', 'ProductsService', {
         name: productData.name,
@@ -100,6 +103,17 @@ export class ProductsService {
 
           if (normalized.length > 0) {
             await tx.comboItem.createMany({ data: normalized, skipDuplicates: true });
+            const withProducts = await tx.comboItem.findMany({
+              where: { comboId: created.id },
+              include: { product: { select: { adultsOnly: true } } },
+            });
+            const fromItems = withProducts.some((ci: any) => ci.product?.adultsOnly);
+            if (fromItems && !productData.adultsOnly) {
+              await tx.product.update({
+                where: { id: created.id },
+                data: { adultsOnly: true },
+              });
+            }
           }
         }
 
@@ -266,6 +280,7 @@ export class ProductsService {
             isActive: true,
             isFeatured: true,
             isCombo: true,
+            adultsOnly: true,
             images: true,
             allergens: true,
             nutritionalInfo: true,
@@ -278,49 +293,56 @@ export class ProductsService {
               where: { isActive: true },
               orderBy: { order: 'asc' },
             },
+            comboItems: { select: { product: { select: { adultsOnly: true } } } },
             // Campos opcionales (pueden no existir si la migración no se ha aplicado)
             averageRating: true,
             reviewCount: true,
           },
           orderBy,
         })
+        .then((rows: any[]) =>
+          rows.map((p) => ({ ...p, adultsOnly: !!(p.adultsOnly || (p.comboItems || []).some((ci: any) => ci.product?.adultsOnly)) }))
+        )
         .catch(async (error) => {
           // Si falla por campos que no existen, intentar sin ellos
           if (error.message?.includes('does not exist') || error.message?.includes('no existe')) {
-            return this.prisma.product.findMany({
-              where,
-              skip,
-              take: limit,
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-                description: true,
-                shortDescription: true,
-                priceUSD: true,
-                priceMNs: true,
-                comparePriceUSD: true,
-                comparePriceMNs: true,
-                sku: true,
-                stock: true,
-                isActive: true,
-                isFeatured: true,
-                isCombo: true,
-                images: true,
-                allergens: true,
-                nutritionalInfo: true,
-                weight: true,
-                categoryId: true,
-                createdAt: true,
-                updatedAt: true,
-                category: true,
-                variants: {
-                  where: { isActive: true },
-                  orderBy: { order: 'asc' },
+            return this.prisma.product
+              .findMany({
+                where,
+                skip,
+                take: limit,
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  description: true,
+                  shortDescription: true,
+                  priceUSD: true,
+                  priceMNs: true,
+                  comparePriceUSD: true,
+                  comparePriceMNs: true,
+                  sku: true,
+                  stock: true,
+                  isActive: true,
+                  isFeatured: true,
+                  isCombo: true,
+                  adultsOnly: true,
+                  images: true,
+                  allergens: true,
+                  nutritionalInfo: true,
+                  weight: true,
+                  categoryId: true,
+                  createdAt: true,
+                  updatedAt: true,
+                  category: true,
+                  variants: {
+                    where: { isActive: true },
+                    orderBy: { order: 'asc' },
+                  },
                 },
-              },
-              orderBy,
-            });
+                orderBy,
+              })
+              .then((rows: any[]) => rows.map((p) => ({ ...p, adultsOnly: !!p.adultsOnly })));
           }
           throw error;
         }),
@@ -362,6 +384,7 @@ export class ProductsService {
                   comparePriceMNs: true,
                   isActive: true,
                   isCombo: true,
+                  adultsOnly: true,
                 },
               },
             },
@@ -374,7 +397,8 @@ export class ProductsService {
         throw new NotFoundException('Product not found');
       }
 
-      return product;
+      const adultsOnly = !!(product.adultsOnly || (product.comboItems || []).some((ci: any) => ci.product?.adultsOnly));
+      return { ...product, adultsOnly };
     } catch (error: any) {
       // Si falla por campos que no existen (migración no aplicada), intentar sin ellos
       if (
@@ -386,7 +410,7 @@ export class ProductsService {
           SELECT 
             id, name, slug, description, "shortDescription",
             "priceUSD", "priceMNs", "comparePriceUSD", "comparePriceMNs",
-            sku, stock, "isActive", "isFeatured", "isCombo",
+            sku, stock, "isActive", "isFeatured", "isCombo", "adultsOnly",
             images, allergens, "nutritionalInfo", weight, "categoryId",
             "createdAt", "updatedAt"
           FROM products
@@ -419,6 +443,7 @@ export class ProductsService {
                   comparePriceMNs: true,
                   isActive: true,
                   isCombo: true,
+                  adultsOnly: true,
                 },
               },
             },
@@ -426,6 +451,7 @@ export class ProductsService {
           }),
         ]);
 
+        const adultsOnly = !!(product[0]?.adultsOnly || (comboItems || []).some((ci: any) => ci.product?.adultsOnly));
         return {
           ...product[0],
           category,
@@ -433,6 +459,7 @@ export class ProductsService {
           comboItems,
           averageRating: null,
           reviewCount: 0,
+          adultsOnly,
         };
       }
       throw error;
@@ -463,6 +490,7 @@ export class ProductsService {
                   comparePriceMNs: true,
                   isActive: true,
                   isCombo: true,
+                  adultsOnly: true,
                 },
               },
             },
@@ -475,7 +503,8 @@ export class ProductsService {
         throw new NotFoundException('Product not found');
       }
 
-      return product;
+      const adultsOnly = !!(product.adultsOnly || (product.comboItems || []).some((ci: any) => ci.product?.adultsOnly));
+      return { ...product, adultsOnly };
     } catch (error: any) {
       // Si falla por campos que no existen (migración no aplicada), intentar sin ellos
       if (
@@ -487,7 +516,7 @@ export class ProductsService {
           SELECT 
             id, name, slug, description, "shortDescription",
             "priceUSD", "priceMNs", "comparePriceUSD", "comparePriceMNs",
-            sku, stock, "isActive", "isFeatured", "isCombo",
+            sku, stock, "isActive", "isFeatured", "isCombo", "adultsOnly",
             images, allergens, "nutritionalInfo", weight, "categoryId",
             "createdAt", "updatedAt"
           FROM products
@@ -520,6 +549,7 @@ export class ProductsService {
                   comparePriceMNs: true,
                   isActive: true,
                   isCombo: true,
+                  adultsOnly: true,
                 },
               },
             },
@@ -527,6 +557,7 @@ export class ProductsService {
           }),
         ]);
 
+        const adultsOnly = !!(product[0]?.adultsOnly || (comboItems || []).some((ci: any) => ci.product?.adultsOnly));
         return {
           ...product[0],
           category,
@@ -534,6 +565,7 @@ export class ProductsService {
           comboItems,
           averageRating: null,
           reviewCount: 0,
+          adultsOnly,
         };
       }
       throw error;
@@ -583,6 +615,7 @@ export class ProductsService {
             isActive: true,
             isFeatured: true,
             isCombo: true,
+            adultsOnly: true,
             images: true,
             allergens: true,
             nutritionalInfo: true,
@@ -595,10 +628,12 @@ export class ProductsService {
               where: { isActive: true },
               orderBy: { order: 'asc' },
             },
+            comboItems: { select: { product: { select: { adultsOnly: true } } } },
           },
           orderBy: { createdAt: 'desc' },
           take: Math.max(50, take * 5), // buscar suficientes para filtrar
         })
+        .then((rows: any[]) => rows.map((p) => ({ ...p, adultsOnly: !!(p.adultsOnly || (p.comboItems || []).some((ci: any) => ci.product?.adultsOnly)) })))
         .catch(async (error) => {
           // Si falla por campos que no existen, intentar sin ellos
           if (
@@ -606,39 +641,42 @@ export class ProductsService {
             error.message?.includes('no existe') ||
             error.message?.includes('column')
           ) {
-            return this.prisma.product.findMany({
-              where: { isActive: true },
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-                description: true,
-                shortDescription: true,
-                priceUSD: true,
-                priceMNs: true,
-                comparePriceUSD: true,
-                comparePriceMNs: true,
-                sku: true,
-                stock: true,
-                isActive: true,
-                isFeatured: true,
-                isCombo: true,
-                images: true,
-                allergens: true,
-                nutritionalInfo: true,
-                weight: true,
-                categoryId: true,
-                createdAt: true,
-                updatedAt: true,
-                category: true,
-                variants: {
-                  where: { isActive: true },
-                  orderBy: { order: 'asc' },
+            return this.prisma.product
+              .findMany({
+                where: { isActive: true },
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  description: true,
+                  shortDescription: true,
+                  priceUSD: true,
+                  priceMNs: true,
+                  comparePriceUSD: true,
+                  comparePriceMNs: true,
+                  sku: true,
+                  stock: true,
+                  isActive: true,
+                  isFeatured: true,
+                  isCombo: true,
+                  adultsOnly: true,
+                  images: true,
+                  allergens: true,
+                  nutritionalInfo: true,
+                  weight: true,
+                  categoryId: true,
+                  createdAt: true,
+                  updatedAt: true,
+                  category: true,
+                  variants: {
+                    where: { isActive: true },
+                    orderBy: { order: 'asc' },
+                  },
                 },
-              },
-              orderBy: { createdAt: 'desc' },
-              take: Math.max(50, take * 5),
-            });
+                orderBy: { createdAt: 'desc' },
+                take: Math.max(50, take * 5),
+              })
+              .then((rows: any[]) => rows.map((p) => ({ ...p, adultsOnly: !!p.adultsOnly })));
           }
           throw error;
         });
@@ -686,6 +724,7 @@ export class ProductsService {
           isActive: true,
           isFeatured: true,
           isCombo: true,
+          adultsOnly: true,
           images: true,
           allergens: true,
           nutritionalInfo: true,
@@ -698,8 +737,10 @@ export class ProductsService {
             where: { isActive: true },
             orderBy: { order: 'asc' },
           },
+          comboItems: { select: { product: { select: { adultsOnly: true } } } },
         },
       })
+      .then((rows: any[]) => rows.map((p) => ({ ...p, adultsOnly: !!(p.adultsOnly || (p.comboItems || []).some((ci: any) => ci.product?.adultsOnly)) })))
       .catch(async (error) => {
         // Si falla por campos que no existen, intentar sin ellos
         if (
@@ -707,40 +748,43 @@ export class ProductsService {
           error.message?.includes('no existe') ||
           error.message?.includes('column')
         ) {
-          return this.prisma.product.findMany({
-            where: {
-              id: { in: ids },
-              isActive: true,
-            },
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              description: true,
-              shortDescription: true,
-              priceUSD: true,
-              priceMNs: true,
-              comparePriceUSD: true,
-              comparePriceMNs: true,
-              sku: true,
-              stock: true,
-              isActive: true,
-              isFeatured: true,
-              isCombo: true,
-              images: true,
-              allergens: true,
-              nutritionalInfo: true,
-              weight: true,
-              categoryId: true,
-              createdAt: true,
-              updatedAt: true,
-              category: true,
-              variants: {
-                where: { isActive: true },
-                orderBy: { order: 'asc' },
+          return this.prisma.product
+            .findMany({
+              where: {
+                id: { in: ids },
+                isActive: true,
               },
-            },
-          });
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                description: true,
+                shortDescription: true,
+                priceUSD: true,
+                priceMNs: true,
+                comparePriceUSD: true,
+                comparePriceMNs: true,
+                sku: true,
+                stock: true,
+                isActive: true,
+                isFeatured: true,
+                isCombo: true,
+                adultsOnly: true,
+                images: true,
+                allergens: true,
+                nutritionalInfo: true,
+                weight: true,
+                categoryId: true,
+                createdAt: true,
+                updatedAt: true,
+                category: true,
+                variants: {
+                  where: { isActive: true },
+                  orderBy: { order: 'asc' },
+                },
+              },
+            })
+            .then((rows: any[]) => rows.map((p) => ({ ...p, adultsOnly: !!p.adultsOnly })));
         }
         throw error;
       });
@@ -828,6 +872,26 @@ export class ProductsService {
             }));
           if (normalized.length > 0) {
             await tx.comboItem.createMany({ data: normalized, skipDuplicates: true });
+          }
+        }
+
+        // Para combos: si algún ítem es +18, el combo debe ser +18
+        if (nextIsCombo) {
+          const withProducts = await tx.comboItem.findMany({
+            where: { comboId: id },
+            include: { product: { select: { adultsOnly: true } } },
+          });
+          const fromItems = withProducts.some((ci: any) => ci.product?.adultsOnly);
+          const effective = !!((data.adultsOnly !== undefined ? data.adultsOnly : (existing as any).adultsOnly) || fromItems);
+          if (effective !== (updated as any).adultsOnly) {
+            await tx.product.update({
+              where: { id },
+              data: { adultsOnly: effective },
+            });
+            return tx.product.findUnique({
+              where: { id },
+              include: { category: true },
+            }) as Promise<typeof updated>;
           }
         }
 
@@ -976,6 +1040,7 @@ export class ProductsService {
         priceMNs: v.priceMNs ? Number(v.priceMNs) : null,
         stock: v.stock,
       })),
-    }));
+    };
+    });
   }
 }

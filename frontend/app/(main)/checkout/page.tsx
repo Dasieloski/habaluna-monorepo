@@ -543,12 +543,17 @@ export default function CheckoutPage() {
 
               <div className="space-y-2 mb-4">
                 {items.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span>
-                      {item.product.name}
-                      {item.productVariant && ` - ${item.productVariant.name}`} x {item.quantity}
-                    </span>
-                    <span>
+                  <div key={item.id} className="flex justify-between text-sm gap-2">
+                    <div className="min-w-0">
+                      <span>
+                        {item.product.name}
+                        {item.productVariant && ` - ${item.productVariant.name}`} x {item.quantity}
+                      </span>
+                      {(item.product as { adultsOnly?: boolean }).adultsOnly && (
+                        <p className="text-xs text-muted-foreground mt-0.5">Requiere entrega solo a mayores de 18 años.</p>
+                      )}
+                    </div>
+                    <span className="shrink-0">
                       {formatPrice(
                         item.productVariant?.priceUSD || item.product.priceUSD,
                         item.productVariant?.priceMNs || item.product.priceMNs

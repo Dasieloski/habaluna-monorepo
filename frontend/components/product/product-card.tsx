@@ -27,6 +27,7 @@ interface ProductCardProps {
     comparePriceMNs?: number
     averageRating?: number | string | null
     reviewCount?: number
+    adultsOnly?: boolean
     variants?: Array<{
       id?: string
       name?: string
@@ -45,6 +46,7 @@ interface ProductCardProps {
 export function ProductCard({ product, badge, badgeColor = "coral", priority }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [addedFeedback, setAddedFeedback] = useState(false)
+  const [showAdultsModal, setShowAdultsModal] = useState(false)
   const { toast, showAddToCart } = useToast()
   const addToCart = useCartStore((s) => s.addToCart)
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -58,7 +60,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
 
   // Normalizar imágenes usando la función centralizada
   const normalizedImages = (product.images || []).map(img => getImageUrl(img)).filter(Boolean) as string[]
-  const firstImage = normalizedImages[0] || "/placeholder.svg"
+  const firstImage = normalizedImages[0] || ''
   const secondImage = normalizedImages[1] || firstImage
   const currentImage = isHovered && normalizedImages[1] ? secondImage : firstImage
 
@@ -66,6 +68,52 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
     coral: "bg-red-500/90 text-white",
     blue: "bg-primary text-primary-foreground",
     mint: "bg-accent text-accent-foreground",
+  }
+
+  const doAddToCart = async (ev?: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = ev?.currentTarget ? getTriggerRect(ev.currentTarget) : null
+    try {
+      await addToCart({
+        product: {
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          priceUSD: product.priceUSD ?? product.variants?.[0]?.priceUSD ?? null,
+          priceMNs: product.priceMNs ?? product.variants?.[0]?.priceMNs ?? null,
+          images: product.images || [],
+          adultsOnly: product.adultsOnly ?? false,
+        },
+        productVariant: product.variants?.[0]?.id
+          ? {
+              id: product.variants?.[0]?.id as string,
+              name: (product.variants?.[0] as any)?.name || "Variante",
+              priceUSD: (product.variants?.[0] as any)?.priceUSD ?? null,
+              priceMNs: (product.variants?.[0] as any)?.priceMNs ?? null,
+            }
+          : null,
+        quantity: 1,
+      })
+      setAddedFeedback(true)
+      setTimeout(() => setAddedFeedback(false), 2000)
+      if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
+      else toast({ title: "¡Al carrito! 🛒" })
+    } catch (err: any) {
+      toast({
+        title: "Ups… no se pudo añadir 😅",
+        description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleAddToCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (product.adultsOnly) {
+      setShowAdultsModal(true)
+    } else {
+      doAddToCart(e)
+    }
   }
 
   if (prefersReducedMotion) {
@@ -89,13 +137,25 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                 objectFit="cover"
               />
 
-              {badge && (
-                <span
-                  className={`absolute top-2 left-2 md:top-3 md:left-3 px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-[10px] font-bold uppercase rounded-full shadow-lg ${badgeColors[badgeColor]}`}
-                >
-                  {badge}
-                </span>
-              )}
+              <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-wrap gap-1.5 z-[1]">
+                {badge && (
+                  <span className={`px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-[10px] font-bold uppercase rounded-full shadow-lg ${badgeColors[badgeColor]}`}>
+                    {badge}
+                  </span>
+                )}
+                {product.adultsOnly && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="animate-adults-badge px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-[10px] font-bold rounded-full shadow-lg bg-foreground/90 text-background cursor-help">
+                        +18
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-[260px]">
+                      Producto restringido a mayores de edad según la ley cubana.
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
 
               <button
                 onClick={(e) => {
@@ -127,42 +187,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
 
               {/* Desktop only */}
               <button
-                onClick={async (e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  const rect = getTriggerRect(e.currentTarget)
-                  try {
-                    await addToCart({
-                      product: {
-                        id: product.id,
-                        name: product.name,
-                        slug: product.slug,
-                        priceUSD: product.priceUSD ?? product.variants?.[0]?.priceUSD ?? null,
-                        priceMNs: product.priceMNs ?? product.variants?.[0]?.priceMNs ?? null,
-                        images: product.images || [],
-                      },
-                      productVariant: product.variants?.[0]?.id
-                        ? {
-                            id: product.variants?.[0]?.id as string,
-                            name: (product.variants?.[0] as any)?.name || "Variante",
-                            priceUSD: (product.variants?.[0] as any)?.priceUSD ?? null,
-                            priceMNs: (product.variants?.[0] as any)?.priceMNs ?? null,
-                          }
-                        : null,
-                      quantity: 1,
-                    })
-                    setAddedFeedback(true)
-                    setTimeout(() => setAddedFeedback(false), 2000)
-                    if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-                    else toast({ title: "¡Al carrito! 🛒" })
-                  } catch (err: any) {
-                    toast({
-                      title: "Ups… no se pudo añadir 😅",
-                      description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
-                      variant: "destructive",
-                    })
-                  }
-                }}
+                onClick={handleAddToCartClick}
                 className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90 active:scale-95"
                 type="button"
               >
@@ -197,42 +222,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
               {/* Mobile actions (no hover) */}
               <div className="mt-3 grid grid-cols-1 gap-2 md:hidden">
                 <button
-                  onClick={async (e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    const rect = getTriggerRect(e.currentTarget)
-                    try {
-                      await addToCart({
-                        product: {
-                          id: product.id,
-                          name: product.name,
-                          slug: product.slug,
-                          priceUSD: product.priceUSD ?? product.variants?.[0]?.priceUSD ?? null,
-                          priceMNs: product.priceMNs ?? product.variants?.[0]?.priceMNs ?? null,
-                          images: product.images || [],
-                        },
-                        productVariant: product.variants?.[0]?.id
-                          ? {
-                              id: product.variants?.[0]?.id as string,
-                              name: (product.variants?.[0] as any)?.name || "Variante",
-                              priceUSD: (product.variants?.[0] as any)?.priceUSD ?? null,
-                              priceMNs: (product.variants?.[0] as any)?.priceMNs ?? null,
-                            }
-                          : null,
-                        quantity: 1,
-                      })
-                      setAddedFeedback(true)
-                      setTimeout(() => setAddedFeedback(false), 2000)
-                      if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-                      else toast({ title: "¡Al carrito! 🛒" })
-                    } catch (err: any) {
-                      toast({
-                        title: "Ups… no se pudo añadir 😅",
-                        description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
-                        variant: "destructive",
-                      })
-                    }
-                  }}
+                  onClick={handleAddToCartClick}
                   className="cart-btn w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl transition-transform duration-200"
                   type="button"
                 >
@@ -242,6 +232,12 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
             </div>
           </div>
         </Link>
+        <AdultsOnlyModal
+          open={showAdultsModal}
+          onOpenChange={setShowAdultsModal}
+          onConfirm={() => doAddToCart()}
+          productName={product.name}
+        />
       </div>
     )
   }
@@ -272,13 +268,25 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
             objectFit="cover"
           />
 
-          {badge && (
-            <span
-              className={`absolute top-2 left-2 md:top-3 md:left-3 px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-[10px] font-bold uppercase rounded-full shadow-lg ${badgeColors[badgeColor]}`}
-            >
-              {badge}
-            </span>
-          )}
+          <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-wrap gap-1.5 z-[1]">
+            {badge && (
+              <span className={`px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-[10px] font-bold uppercase rounded-full shadow-lg ${badgeColors[badgeColor]}`}>
+                {badge}
+              </span>
+            )}
+            {product.adultsOnly && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="animate-adults-badge px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-[10px] font-bold rounded-full shadow-lg bg-foreground/90 text-background cursor-help">
+                    +18
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-[260px]">
+                  Producto restringido a mayores de edad según la ley cubana.
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
 
           <button
             onClick={(e) => {
@@ -307,42 +315,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
 
           {/* Add to cart quick action */}
           <button
-            onClick={async (e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              const rect = getTriggerRect(e.currentTarget)
-              try {
-                await addToCart({
-                  product: {
-                    id: product.id,
-                    name: product.name,
-                    slug: product.slug,
-                    priceUSD: product.priceUSD ?? product.variants?.[0]?.priceUSD ?? null,
-                    priceMNs: product.priceMNs ?? product.variants?.[0]?.priceMNs ?? null,
-                    images: product.images || [],
-                  },
-                  productVariant: product.variants?.[0]?.id
-                    ? {
-                        id: product.variants?.[0]?.id as string,
-                        name: (product.variants?.[0] as any)?.name || "Variante",
-                        priceUSD: (product.variants?.[0] as any)?.priceUSD ?? null,
-                        priceMNs: (product.variants?.[0] as any)?.priceMNs ?? null,
-                      }
-                    : null,
-                  quantity: 1,
-                })
-                setAddedFeedback(true)
-                setTimeout(() => setAddedFeedback(false), 2000)
-                if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-                else toast({ title: "¡Al carrito! 🛒" })
-              } catch (err: any) {
-                toast({
-                  title: "Ups… no se pudo añadir 😅",
-                  description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
-                  variant: "destructive",
-                })
-              }
-            }}
+            onClick={handleAddToCartClick}
             aria-label={addedFeedback ? "Añadido" : `Añadir ${product.name} al carrito`}
             className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90 active:scale-95"
             type="button"
@@ -380,42 +353,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
           {/* Mobile actions (no hover) */}
           <div className="mt-3 grid grid-cols-1 gap-2 md:hidden">
             <button
-              onClick={async (e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                const rect = getTriggerRect(e.currentTarget)
-                try {
-                  await addToCart({
-                    product: {
-                      id: product.id,
-                      name: product.name,
-                      slug: product.slug,
-                      priceUSD: product.priceUSD ?? product.variants?.[0]?.priceUSD ?? null,
-                      priceMNs: product.priceMNs ?? product.variants?.[0]?.priceMNs ?? null,
-                      images: product.images || [],
-                    },
-                    productVariant: product.variants?.[0]?.id
-                      ? {
-                          id: product.variants?.[0]?.id as string,
-                          name: (product.variants?.[0] as any)?.name || "Variante",
-                          priceUSD: (product.variants?.[0] as any)?.priceUSD ?? null,
-                          priceMNs: (product.variants?.[0] as any)?.priceMNs ?? null,
-                        }
-                      : null,
-                    quantity: 1,
-                  })
-                  setAddedFeedback(true)
-                  setTimeout(() => setAddedFeedback(false), 2000)
-                  if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
-                  else toast({ title: "¡Al carrito! 🛒" })
-                } catch (err: any) {
-                  toast({
-                    title: "Ups… no se pudo añadir 😅",
-                    description: err?.response?.data?.message || err?.message || "Intenta de nuevo.",
-                    variant: "destructive",
-                  })
-                }
-              }}
+              onClick={handleAddToCartClick}
               aria-label={addedFeedback ? "Añadido" : `Añadir ${product.name} al carrito`}
               className="cart-btn w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl transition-transform duration-200"
               type="button"
@@ -426,6 +364,12 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
         </div>
       </div>
     </Link>
+    <AdultsOnlyModal
+      open={showAdultsModal}
+      onOpenChange={setShowAdultsModal}
+      onConfirm={() => doAddToCart()}
+      productName={product.name}
+    />
     </motion.div>
   )
 }

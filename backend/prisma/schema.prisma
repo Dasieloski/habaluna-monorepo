@@ -256,6 +256,7 @@ model Product {
   isActive         Boolean  @default(true)
   isFeatured       Boolean  @default(false)
   isCombo          Boolean  @default(false)
+  adultsOnly       Boolean  @default(false)
   images           String[] @default([])
   allergens        String[]
   nutritionalInfo  Json?

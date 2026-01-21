@@ -42,6 +42,7 @@ export default function NewProductPage() {
   // Por defecto, los productos nuevos deben quedar activos
   const statusRef = useRef<"active" | "draft" | "archived">("active")
   const [isFeatured, setIsFeatured] = useState(false)
+  const [adultsOnly, setAdultsOnly] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Cargar categorías al montar el componente
@@ -123,6 +124,7 @@ export default function NewProductPage() {
         categoryId: categoryIdRef.current,
         isActive: statusRef.current === "active",
         isFeatured: isFeatured,
+        adultsOnly: adultsOnly,
         images: uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined,
       }
 
@@ -463,6 +465,25 @@ export default function NewProductPage() {
                   <Switch
                     checked={isFeatured}
                     onCheckedChange={setIsFeatured}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-md">
+              <CardHeader>
+                <CardTitle className="text-foreground">Solo mayores de 18 años</CardTitle>
+                <CardDescription>Entrega restringida a mayores de edad según la ley cubana</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-secondary/50 rounded-xl">
+                  <div>
+                    <p className="font-medium text-foreground">Solo mayores de 18 años</p>
+                    <p className="text-sm text-muted-foreground">Marcar si el producto es +18</p>
+                  </div>
+                  <Switch
+                    checked={adultsOnly}
+                    onCheckedChange={setAdultsOnly}
                   />
                 </div>
               </CardContent>
