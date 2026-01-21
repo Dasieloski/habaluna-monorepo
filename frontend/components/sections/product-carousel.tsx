@@ -81,7 +81,7 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
 
   const getBadge = (index: number) => {
     if (badgeType === "bestseller" && index < 3) return { text: "TOP VENTA", color: "blue" as const }
-    if (badgeType === "new") return { text: "NUEVO", color: "coral" as const }
+    if (badgeType === "new") return { text: "NUEVO", color: "blue" as const }
     if (badgeType === "sale") return { text: "OFERTA", color: "coral" as const }
     if (badgeType === "personalized") return { text: "DESTACADO", color: "mint" as const }
     return null

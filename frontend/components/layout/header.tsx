@@ -10,7 +10,6 @@ import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { api } from "@/lib/api"
 import { SearchAutocomplete } from "@/components/product/search-autocomplete"
 import {
-  SearchIcon,
   UserIcon,
   HeartIcon,
   CartIcon,
@@ -34,7 +33,6 @@ export function Header() {
   const fetchWishlist = useWishlistStore((s) => s.fetchWishlist)
   const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const userMenuRef = useRef<HTMLDivElement>(null)
@@ -95,10 +93,18 @@ export function Header() {
     let cancelled = false
     ;(async () => {
       try {
-        const [res, cats] = await Promise.all([api.getUiSettings?.(), api.getCategories?.()])
+        const [res, cats, reviewStats] = await Promise.all([
+          api.getUiSettings?.().catch(() => null),
+          api.getCategories?.(),
+          api.getReviewsGlobalStats?.().catch(() => null),
+        ])
         if (cancelled) return
 
         const highlights = Array.isArray((res as any)?.headerHighlights) ? (res as any).headerHighlights : []
+        let h3 = String(highlights[3] || ui.highlights[3])
+        if (reviewStats && reviewStats.totalReviews > 0) {
+          h3 = `${Number(reviewStats.averageRating).toFixed(1)}/5 (${reviewStats.totalReviews})`
+        }
         setUi({
           announcement: (res as any)?.headerAnnouncement || ui.announcement,
           announcementVariant: (res as any)?.headerAnnouncementVariant === "promo" ? "promo" : "default",
@@ -106,7 +112,7 @@ export function Header() {
             String(highlights[0] || ui.highlights[0]),
             String(highlights[1] || ui.highlights[1]),
             String(highlights[2] || ui.highlights[2]),
-            String(highlights[3] || ui.highlights[3]),
+            h3,
           ],
         })
 
@@ -172,12 +178,7 @@ export function Header() {
   const handleNavbarSearch = (searchValue: string) => {
     const value = searchValue.trim()
     if (!value) return
-
-    // Cerrar menús móviles
-    setSearchOpen(false)
     setMobileMenuOpen(false)
-
-    // Navegar a /products con el término de búsqueda - siempre tiene prioridad
     router.push(`/products?search=${encodeURIComponent(value)}`)
   }
 
@@ -234,8 +235,8 @@ export function Header() {
               </span>
             </Link>
 
-            {/* Desktop Search */}
-            <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            {/* Búsqueda: siempre visible (móvil compacta, desktop centrada) */}
+            <div className="flex flex-1 min-w-0 mx-2 md:mx-8 md:max-w-lg">
               <SearchAutocomplete
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -247,14 +248,8 @@ export function Header() {
             </div>
 
             {/* Right icons */}
-            <div className="flex items-center gap-1 md:gap-3">
+            <div className="flex items-center gap-1 md:gap-3 shrink-0">
               <ThemeToggle className="shrink-0" />
-              <button
-                className="md:hidden p-2.5 hover:bg-secondary rounded-xl transition-colors duration-300"
-                onClick={() => setSearchOpen(!searchOpen)}
-              >
-                <SearchIcon className="w-5 h-5" />
-              </button>
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -431,19 +426,6 @@ export function Header() {
             </div>
           </div>
 
-          {/* Mobile search */}
-          {searchOpen && (
-            <div className="md:hidden pb-4 animate-fade-in-up">
-              <SearchAutocomplete
-                value={searchQuery}
-                onChange={setSearchQuery}
-                onSelect={handleNavbarSearch}
-                placeholder="Buscar productos..."
-                className="w-full"
-                animatedPlaceholder
-              />
-            </div>
-          )}
         </div>
 
         {/* Desktop Navigation */}

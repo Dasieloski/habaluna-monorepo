@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -747,6 +747,27 @@ export class ProductsService {
 
     const byId = new Map(products.map((p) => [p.id, p]));
     return ids.map((id) => byId.get(id)).filter(Boolean);
+  }
+
+  /** Registra un email para recibir aviso cuando el producto tenga stock (solo si stock === 0). */
+  async stockNotify(productId: string, email: string): Promise<{ message: string }> {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+      select: { id: true, stock: true, name: true },
+    });
+    if (!product) throw new NotFoundException('Producto no encontrado');
+    const totalStock = product.stock ?? 0;
+    if (totalStock > 0) {
+      throw new BadRequestException('Este producto ya tiene stock. Puedes añadirlo al carrito.');
+    }
+    await this.prisma.stockNotify.upsert({
+      where: {
+        productId_email: { productId, email: email.trim().toLowerCase() },
+      },
+      create: { productId, email: email.trim().toLowerCase() },
+      update: { notifiedAt: null },
+    });
+    return { message: 'Te avisaremos por email cuando haya stock.' };
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {

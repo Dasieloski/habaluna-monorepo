@@ -266,14 +266,15 @@ model Product {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  category      Category         @relation(fields: [categoryId], references: [id])
-  variants      ProductVariant[]
-  reviews       Review[]
-  comboItems    ComboItem[]      @relation("ComboProducts")
-  comboProducts ComboItem[]      @relation("ComboItems")
-  wishlistItems WishlistItem[]
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
+  category       Category         @relation(fields: [categoryId], references: [id])
+  variants       ProductVariant[]
+  reviews        Review[]
+  comboItems     ComboItem[]      @relation("ComboProducts")
+  comboProducts  ComboItem[]      @relation("ComboItems")
+  wishlistItems  WishlistItem[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  stockNotifies  StockNotify[]
 
   @@index([categoryId])
   @@index([slug])
@@ -484,15 +485,32 @@ model UiSettings {
 /// Configuración de transporte: costo base y descuentos por cantidad de productos.
 /// Reglas en JSON: [{ minProducts, discountType: "percent"|"fixed", discountValue }]
 model TransportConfig {
-  id                String   @id @default(uuid())
-  baseCost          Decimal  @db.Decimal(10, 2)
-  discountsEnabled  Boolean  @default(false)
-  rules             Json?    // [{ minProducts: number, discountType: "percent"|"fixed", discountValue: number }]
-  noDiscountMessage String?  @db.Text // Mensaje cuando no hay descuento: ej. "Transporte al costo justo"
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                      String    @id @default(uuid())
+  baseCost                Decimal   @db.Decimal(10, 2)
+  discountsEnabled        Boolean   @default(false)
+  rules                   Json?     // [{ minProducts: number, discountType: "percent"|"fixed", discountValue: number }]
+  noDiscountMessage       String?   @db.Text // Mensaje cuando no hay descuento: ej. "Transporte al costo justo"
+  freeShippingThresholdUSD Decimal? @db.Decimal(10, 2) // Envío gratis si subtotal >= este valor (USD). Null = no aplicar.
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
   @@map("transport_config")
+}
+
+/// Notificaciones "Avísame cuando haya stock" para productos agotados.
+model StockNotify {
+  id         String    @id @default(uuid())
+  productId  String
+  email      String
+  notifiedAt DateTime? // Cuando se envió la notificación (null = pendiente)
+  createdAt  DateTime  @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, email])
+  @@index([productId])
+  @@index([email])
+  @@map("stock_notify")
 }
 
 /// Media binario almacenado en BD (Postgres bytea) para servir imágenes sin Cloudinary.

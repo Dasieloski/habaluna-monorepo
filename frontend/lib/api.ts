@@ -249,6 +249,7 @@ export interface BackendTransportConfig {
   discountsEnabled: boolean
   rules: BackendTransportRule[]
   noDiscountMessage: string | null
+  freeShippingThresholdUSD?: number | null
 }
 
 export interface BackendTransportEstimate {
@@ -606,6 +607,11 @@ export const api = {
     return response.data as BackendProduct
   },
 
+  stockNotify: async (productId: string, email: string): Promise<{ message: string }> => {
+    const response = await api.post(`/products/${productId}/stock-notify`, { email })
+    return response.data as { message: string }
+  },
+
   // Productos relacionados
   getRelatedProducts: async (productId: string, limit?: number): Promise<BackendProduct[]> => {
     const queryParams = limit ? `?limit=${limit}` : ''
@@ -722,8 +728,10 @@ export const api = {
     return response.data as BackendTransportConfig
   },
 
-  getTransportEstimate: async (itemCount: number): Promise<BackendTransportEstimate> => {
-    const response = await api.get(`/transport/estimate?itemCount=${itemCount}`)
+  getTransportEstimate: async (itemCount: number, subtotal?: number): Promise<BackendTransportEstimate> => {
+    const params = new URLSearchParams({ itemCount: String(itemCount) })
+    if (subtotal != null && !Number.isNaN(subtotal)) params.append('subtotal', String(subtotal))
+    const response = await api.get(`/transport/estimate?${params.toString()}`)
     return response.data as BackendTransportEstimate
   },
 
@@ -896,6 +904,11 @@ export const api = {
   deleteProductReview: async (reviewId: string): Promise<{ message: string }> => {
     const response = await api.delete(`/reviews/${reviewId}`)
     return response.data as { message: string }
+  },
+
+  getReviewsGlobalStats: async (): Promise<{ averageRating: number; totalReviews: number }> => {
+    const response = await api.get('/reviews/global-stats')
+    return response.data as { averageRating: number; totalReviews: number }
   },
 
   // Reseñas (Admin)

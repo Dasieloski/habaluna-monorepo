@@ -20,9 +20,11 @@ export class TransportConfigController {
   @Get('estimate')
   @ApiOperation({ summary: 'Estimar costo de transporte por cantidad de unidades' })
   @ApiQuery({ name: 'itemCount', required: true, type: Number, description: 'Suma de cantidades en el carrito' })
-  async estimate(@Query('itemCount') itemCount: string) {
+  @ApiQuery({ name: 'subtotal', required: false, type: Number, description: 'Subtotal en USD. Si >= freeShippingThresholdUSD, envío gratis.' })
+  async estimate(@Query('itemCount') itemCount: string, @Query('subtotal') subtotal?: string) {
     const n = Math.max(0, parseInt(String(itemCount || '0'), 10) || 0);
-    return this.transport.estimate(n);
+    const sub = subtotal != null && subtotal !== '' ? parseFloat(String(subtotal)) : undefined;
+    return this.transport.estimate(n, sub);
   }
 
   @Get('admin')

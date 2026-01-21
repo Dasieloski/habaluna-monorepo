@@ -44,6 +44,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, badge, badgeColor = "coral", priority }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [addedFeedback, setAddedFeedback] = useState(false)
   const { toast, showAddToCart } = useToast()
   const addToCart = useCartStore((s) => s.addToCart)
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -62,9 +63,9 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
   const currentImage = isHovered && normalizedImages[1] ? secondImage : firstImage
 
   const badgeColors = {
-    coral: "bg-highlight text-highlight-foreground",
-    blue: "bg-highlight text-highlight-foreground",
-    mint: "bg-highlight text-highlight-foreground",
+    coral: "bg-red-500/90 text-white",
+    blue: "bg-primary text-primary-foreground",
+    mint: "bg-accent text-accent-foreground",
   }
 
   if (prefersReducedMotion) {
@@ -150,6 +151,8 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                         : null,
                       quantity: 1,
                     })
+                    setAddedFeedback(true)
+                    setTimeout(() => setAddedFeedback(false), 2000)
                     if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
                     else toast({ title: "¡Al carrito! 🛒" })
                   } catch (err: any) {
@@ -163,12 +166,12 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                 className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90 active:scale-95"
                 type="button"
               >
-                Añadir al carrito
+                {addedFeedback ? "✓ Añadido" : "Añadir al carrito"}
               </button>
             </div>
 
             <div className="p-3 md:p-4">
-              <h3 className="text-[11px] md:text-[13px] dark:md:text-[12px] font-medium text-foreground line-clamp-2 min-h-[2.25rem] md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
+              <h3 className="text-[11px] md:text-[13px] dark:md:text-[12px] font-medium text-foreground line-clamp-2 min-h-9 md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
                 {product.name}
               </h3>
               {product.averageRating && product.reviewCount && product.reviewCount > 0 && (
@@ -218,6 +221,8 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                           : null,
                         quantity: 1,
                       })
+                      setAddedFeedback(true)
+                      setTimeout(() => setAddedFeedback(false), 2000)
                       if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
                       else toast({ title: "¡Al carrito! 🛒" })
                     } catch (err: any) {
@@ -231,7 +236,7 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                   className="cart-btn w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl transition-transform duration-200"
                   type="button"
                 >
-                  Añadir al carrito
+                  {addedFeedback ? "✓ Añadido" : "Añadir al carrito"}
                 </button>
               </div>
             </div>
@@ -326,6 +331,8 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                     : null,
                   quantity: 1,
                 })
+                setAddedFeedback(true)
+                setTimeout(() => setAddedFeedback(false), 2000)
                 if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
                 else toast({ title: "¡Al carrito! 🛒" })
               } catch (err: any) {
@@ -336,16 +343,16 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                 })
               }
             }}
-            aria-label={`Añadir ${product.name} al carrito`}
+            aria-label={addedFeedback ? "Añadido" : `Añadir ${product.name} al carrito`}
             className="hidden md:block absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-primary-foreground text-xs md:text-sm font-semibold py-2.5 rounded-xl hover:bg-primary/90 active:scale-95"
             type="button"
           >
-            Añadir al carrito
+            {addedFeedback ? "✓ Añadido" : "Añadir al carrito"}
           </button>
         </div>
 
         <div className="p-3 md:p-4">
-          <h3 className="text-[11px] md:text-[13px] dark:md:text-[12px] font-medium text-foreground line-clamp-2 min-h-[2.25rem] md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
+          <h3 className="text-[11px] md:text-[13px] dark:md:text-[12px] font-medium text-foreground line-clamp-2 min-h-9 md:min-h-9 leading-relaxed group-hover:text-accent transition-colors">
             {product.name}
           </h3>
           {product.averageRating && product.reviewCount && product.reviewCount > 0 && (
@@ -397,6 +404,8 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                       : null,
                     quantity: 1,
                   })
+                  setAddedFeedback(true)
+                  setTimeout(() => setAddedFeedback(false), 2000)
                   if (rect) showAddToCart({ productName: product.name, triggerRect: rect })
                   else toast({ title: "¡Al carrito! 🛒" })
                 } catch (err: any) {
@@ -407,11 +416,11 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
                   })
                 }
               }}
-              aria-label={`Añadir ${product.name} al carrito`}
+              aria-label={addedFeedback ? "Añadido" : `Añadir ${product.name} al carrito`}
               className="cart-btn w-full bg-primary text-primary-foreground text-xs font-semibold py-2.5 rounded-xl transition-transform duration-200"
               type="button"
             >
-              Añadir al carrito
+              {addedFeedback ? "✓ Añadido" : "Añadir al carrito"}
             </button>
           </div>
         </div>

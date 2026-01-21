@@ -89,7 +89,7 @@ export default function CheckoutPage() {
     if (!isBootstrapped) return;
 
     if (!isAuthenticated()) {
-      router.push('/auth/login');
+      router.push('/auth/login?returnUrl=' + encodeURIComponent('/checkout'));
       return;
     }
 
@@ -232,11 +232,11 @@ export default function CheckoutPage() {
       return;
     }
     let cancelled = false;
-    api.getTransportEstimate(itemCount).then((r) => {
+    api.getTransportEstimate(itemCount, subtotal).then((r) => {
       if (!cancelled) setTransportEstimate({ shipping: r.shipping });
     }).catch(() => { if (!cancelled) setTransportEstimate(null); });
     return () => { cancelled = true; };
-  }, [itemCount, items.length]);
+  }, [itemCount, items.length, subtotal]);
 
   const subtotalWithDiscount = subtotal - (appliedCoupon?.discount || 0);
   const shipping = transportEstimate?.shipping ?? 0;
@@ -244,7 +244,20 @@ export default function CheckoutPage() {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8 text-center leading-tight">Finalizar compra</h1>
+      <h1 className="text-4xl font-bold mb-4 text-center leading-tight">Finalizar compra</h1>
+
+      {/* Stepper */}
+      <div className="flex justify-center gap-4 mb-8" aria-label="Progreso">
+        <div className="flex items-center gap-2">
+          <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${!showPayment ? 'bg-primary text-primary-foreground' : 'bg-primary/20 text-primary'}`}>1</span>
+          <span className={!showPayment ? 'font-medium' : 'text-muted-foreground'}>Envío</span>
+        </div>
+        <div className="h-px w-8 bg-border self-center" />
+        <div className="flex items-center gap-2">
+          <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${showPayment ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>2</span>
+          <span className={showPayment ? 'font-medium' : 'text-muted-foreground'}>Pago</span>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <div className="lg:col-span-2">
@@ -253,7 +266,12 @@ export default function CheckoutPage() {
               <CardHeader>
                 <CardTitle>Información de Envío</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="relative">
+                {loading && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-background/80 backdrop-blur-[1px]" aria-live="polite">
+                    <span className="text-sm font-medium text-muted-foreground">Creando pedido...</span>
+                  </div>
+                )}
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   {/* Alertas de validación de stock */}
                   {validation && hasIssues && (
@@ -302,124 +320,122 @@ export default function CheckoutPage() {
                   
                   {error && <FormError message={error} />}
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Nombre</Label>
-                    <Input id="firstName" {...register('firstName')} />
-                    {errors.firstName && (
-                      <FormError message={errors.firstName.message} />
-                    )}
+                  {/* Contacto */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-semibold text-foreground border-b pb-2">Contacto</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName">Nombre</Label>
+                        <Input id="firstName" {...register('firstName')} />
+                        {errors.firstName && (
+                          <FormError message={errors.firstName.message} />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">Apellidos</Label>
+                        <Input id="lastName" {...register('lastName')} />
+                        {errors.lastName && (
+                          <FormError message={errors.lastName.message} />
+                        )}
+                      </div>
+                      <div className="space-y-2 col-span-2">
+                        <Label htmlFor="phone">Teléfono *</Label>
+                        <Input 
+                          id="phone" 
+                          {...register('phone')} 
+                          placeholder="Ej: +53 5XXXXXXXX"
+                        />
+                        {errors.phone && (
+                          <FormError message={errors.phone.message} />
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Apellidos</Label>
-                    <Input id="lastName" {...register('lastName')} />
-                    {errors.lastName && (
-                      <FormError message={errors.lastName.message} />
-                    )}
+                  {/* Dirección */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-semibold text-foreground border-b pb-2">Dirección</h3>
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Dirección completa *</Label>
+                      <Input 
+                        id="address" 
+                        {...register('address')} 
+                        placeholder="Calle, número, entre calles"
+                      />
+                      {errors.address && (
+                        <FormError message={errors.address.message} />
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="country">País *</Label>
+                        <Select
+                          value={selectedCountry}
+                          onValueChange={(value) => {
+                            const prev = selectedCountry;
+                            setValue('country', value, { shouldValidate: true });
+                            if (value !== prev) {
+                              setValue('municipality', '', { shouldValidate: true });
+                              if (value === 'Cuba') setValue('city', 'La Habana', { shouldValidate: true });
+                              else setValue('city', '', { shouldValidate: true });
+                            }
+                          }}
+                        >
+                          <SelectTrigger id="country">
+                            <SelectValue placeholder="Selecciona un país" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {COUNTRIES.map((c) => (
+                              <SelectItem key={c} value={c}>
+                                {c}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {errors.country && <FormError message={errors.country.message} />}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="municipality">Municipio *</Label>
+                        <Select
+                          value={watch('municipality') || ''}
+                          onValueChange={(value) => setValue('municipality', value, { shouldValidate: true })}
+                        >
+                          <SelectTrigger id="municipality">
+                            <SelectValue placeholder="Selecciona un municipio" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {municipalities.map((m) => (
+                              <SelectItem key={m} value={m}>
+                                {m}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {errors.municipality && (
+                          <FormError message={errors.municipality.message} />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="city">Ciudad *</Label>
+                        <Input 
+                          id="city" 
+                          {...register('city')} 
+                          placeholder="Ciudad / Provincia"
+                        />
+                        {errors.city && (
+                          <FormError message={errors.city.message} />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="reference">Referencia (opcional)</Label>
+                        <Input 
+                          id="reference" 
+                          {...register('reference')} 
+                          placeholder="Puntos de referencia para la entrega"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="address">Dirección completa *</Label>
-                  <Input 
-                    id="address" 
-                    {...register('address')} 
-                    placeholder="Calle, número, entre calles"
-                  />
-                  {errors.address && (
-                    <FormError message={errors.address.message} />
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="country">País *</Label>
-                    <Select
-                      value={selectedCountry}
-                      onValueChange={(value) => {
-                        const prev = selectedCountry;
-                        setValue('country', value, { shouldValidate: true });
-                        // Reset de municipio al cambiar país
-                        if (value !== prev) {
-                          setValue('municipality', '', { shouldValidate: true });
-                          // Ajuste opcional de ciudad por defecto
-                          if (value === 'Cuba') setValue('city', 'La Habana', { shouldValidate: true });
-                          else setValue('city', '', { shouldValidate: true });
-                        }
-                      }}
-                    >
-                      <SelectTrigger id="country">
-                        <SelectValue placeholder="Selecciona un país" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {COUNTRIES.map((c) => (
-                          <SelectItem key={c} value={c}>
-                            {c}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.country && <FormError message={errors.country.message} />}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="municipality">Municipio *</Label>
-                    <Select
-                      value={watch('municipality') || ''}
-                      onValueChange={(value) => setValue('municipality', value, { shouldValidate: true })}
-                    >
-                      <SelectTrigger id="municipality">
-                        <SelectValue placeholder="Selecciona un municipio" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {municipalities.map((m) => (
-                          <SelectItem key={m} value={m}>
-                            {m}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.municipality && (
-                      <FormError message={errors.municipality.message} />
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="city">Ciudad *</Label>
-                    <Input 
-                      id="city" 
-                      {...register('city')} 
-                      placeholder="Ciudad / Provincia"
-                    />
-                    {errors.city && (
-                      <FormError message={errors.city.message} />
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Teléfono *</Label>
-                    <Input 
-                      id="phone" 
-                      {...register('phone')} 
-                      placeholder="Ej: +53 5XXXXXXXX"
-                    />
-                    {errors.phone && (
-                      <FormError message={errors.phone.message} />
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="reference">Referencia (opcional)</Label>
-                    <Input 
-                      id="reference" 
-                      {...register('reference')} 
-                      placeholder="Puntos de referencia para la entrega"
-                    />
-                  </div>
-                </div>
 
                   <Button 
                     type="submit" 
@@ -567,6 +583,9 @@ export default function CheckoutPage() {
                   <span>{formatPrice(total)}</span>
                 </div>
               </div>
+              <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1.5">
+                <span aria-hidden>🔒</span> Pago 100% seguro
+              </p>
             </CardContent>
           </Card>
         </div>

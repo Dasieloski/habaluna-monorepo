@@ -14,6 +14,7 @@ export interface TransportConfigModel {
   discountsEnabled: boolean;
   rules: TransportRule[];
   noDiscountMessage: string | null;
+  freeShippingThresholdUSD: number | null;
 }
 
 export interface ComputeResult {
@@ -44,7 +45,7 @@ export class TransportConfigService {
     };
   }
 
-  private async getOrCreate(): Promise<{ id: string; baseCost: any; discountsEnabled: boolean; rules: any; noDiscountMessage: string | null }> {
+  private async getOrCreate(): Promise<{ id: string; baseCost: any; discountsEnabled: boolean; rules: any; noDiscountMessage: string | null; freeShippingThresholdUSD: any }> {
     const existing = await this.prisma.transportConfig.findFirst();
     if (existing) {
       return {
@@ -53,6 +54,7 @@ export class TransportConfigService {
         discountsEnabled: existing.discountsEnabled,
         rules: (existing.rules as unknown as TransportRule[]) ?? [],
         noDiscountMessage: existing.noDiscountMessage,
+        freeShippingThresholdUSD: (existing as any).freeShippingThresholdUSD ?? null,
       };
     }
     const d = this.defaults();
@@ -70,6 +72,7 @@ export class TransportConfigService {
       discountsEnabled: created.discountsEnabled,
       rules: (created.rules as unknown as TransportRule[]) ?? [],
       noDiscountMessage: created.noDiscountMessage,
+      freeShippingThresholdUSD: (created as any).freeShippingThresholdUSD ?? null,
     };
   }
 
@@ -82,6 +85,7 @@ export class TransportConfigService {
       discountsEnabled: row.discountsEnabled,
       rules: Array.isArray(row.rules) ? row.rules : [],
       noDiscountMessage: row.noDiscountMessage,
+      freeShippingThresholdUSD: row.freeShippingThresholdUSD != null ? Number(row.freeShippingThresholdUSD) : null,
     };
   }
 
@@ -96,6 +100,7 @@ export class TransportConfigService {
     if (dto.discountsEnabled !== undefined) data.discountsEnabled = dto.discountsEnabled;
     if (dto.rules !== undefined) data.rules = dto.rules;
     if (dto.noDiscountMessage !== undefined) data.noDiscountMessage = dto.noDiscountMessage || null;
+    if (dto.freeShippingThresholdUSD !== undefined) data.freeShippingThresholdUSD = dto.freeShippingThresholdUSD;
     await this.prisma.transportConfig.update({
       where: { id: current.id },
       data,
@@ -141,9 +146,22 @@ export class TransportConfigService {
     return { shipping, baseCost, appliedRule, amountOff, messageKey };
   }
 
-  /** Para el endpoint de estimado: usa la config actual. */
-  async estimate(itemCount: number): Promise<ComputeResult & { positiveMessage: string; config: TransportConfigModel }> {
+  /** Para el endpoint de estimado: usa la config actual. Si subtotal >= freeShippingThresholdUSD, envío gratis. */
+  async estimate(itemCount: number, subtotal?: number): Promise<ComputeResult & { positiveMessage: string; config: TransportConfigModel }> {
     const config = await this.getPublic();
+    const threshold = config.freeShippingThresholdUSD != null ? Number(config.freeShippingThresholdUSD) : null;
+    if (subtotal != null && threshold != null && subtotal >= threshold) {
+      const baseCost = Number(config.baseCost);
+      return {
+        shipping: 0,
+        baseCost,
+        appliedRule: null,
+        amountOff: baseCost,
+        messageKey: 'fair',
+        positiveMessage: '¡Envío gratis!',
+        config,
+      };
+    }
     const result = this.computeShipping(itemCount, config);
     const positiveMessage =
       config.noDiscountMessage?.trim() || POSITIVE_MESSAGES[result.messageKey];

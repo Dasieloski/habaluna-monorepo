@@ -70,10 +70,15 @@ export function ProductClient({
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [isFavorite, setIsFavorite] = useState(false)
-  const [openAccordion, setOpenAccordion] = useState<string | null>(null)
+  const [openAccordion, setOpenAccordion] = useState<string | null>("desc")
   const [selectedVariantId, setSelectedVariantId] = useState<string>(() => product?.variants?.[0]?.id || "")
+  const [stockNotifyEmail, setStockNotifyEmail] = useState("")
+  const [stockNotifyLoading, setStockNotifyLoading] = useState(false)
+  const [stockNotifyDone, setStockNotifyDone] = useState(false)
+  const [addedFeedback, setAddedFeedback] = useState(false)
   const relatedScrollRef = useRef<HTMLDivElement>(null)
   const isCombo = Boolean(product?.isCombo)
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(null)
 
 
   const images = useMemo(() => {
@@ -130,6 +135,27 @@ export function ProductClient({
       : null
 
   const stock = selectedVariant ? Number(selectedVariant.stock ?? 0) : Number(product?.stock ?? 0)
+  const stockLabel = stock <= 0 ? "Agotado" : stock < 5 ? `Quedan ${stock}` : "En stock"
+  const reviewCount = initialReviewsMeta?.total ?? product?.reviewCount ?? 0
+  const avgRating = product?.averageRating != null ? Number(product.averageRating).toFixed(1) : null
+
+  const handleStockNotify = async () => {
+    const email = stockNotifyEmail.trim()
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({ title: "Email inválido", description: "Escribe un correo válido.", variant: "destructive" })
+      return
+    }
+    setStockNotifyLoading(true)
+    try {
+      await api.stockNotify(product.id, email)
+      setStockNotifyDone(true)
+      showSuccess("¡Listo! 📧", "Te avisaremos cuando haya stock.")
+    } catch (e: any) {
+      showError("Error", e?.response?.data?.message || "No se pudo registrar. Intenta de nuevo.")
+    } finally {
+      setStockNotifyLoading(false)
+    }
+  }
 
   const shareProduct = async () => {
     try {
@@ -144,10 +170,7 @@ export function ProductClient({
 
       if (navigator.clipboard && url) {
         await navigator.clipboard.writeText(url)
-        toast({
-          title: "¡Listo! 📋",
-          description: "Enlace copiado al portapapeles.",
-        })
+        toast({ title: "Enlace copiado 📋", description: "¡Compártelo!" })
         return
       }
 
@@ -230,24 +253,27 @@ export function ProductClient({
                       className="object-cover"
                       sizes="80px"
                       objectFit="cover"
-                      loading="lazy"
                     />
                   </button>
                 ))}
               </div>
 
               {/* Main Image */}
-              <div className="relative w-full aspect-square bg-muted rounded-xl md:rounded-2xl overflow-hidden">
+              <div className="relative w-full aspect-square bg-muted rounded-xl md:rounded-2xl overflow-hidden group">
                 <SmartImage
                   src={images[selectedImage] || "/placeholder.svg"}
                   alt={product?.name || "Producto"}
                   fill
-                  className="p-4 md:p-8"
+                  className="p-4 md:p-8 object-contain group-hover:scale-110 transition-transform duration-300"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   objectFit="contain"
-                  loading="eager"
                   priority
                 />
+                {images.length > 1 && (
+                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-1 rounded-full bg-background/80 text-xs text-muted-foreground">
+                    {selectedImage + 1} / {images.length}
+                  </span>
+                )}
                 {/* Navigation arrows */}
                 {images.length > 1 && (
                   <>
@@ -299,14 +325,22 @@ export function ProductClient({
             )}
 
             {/* Price */}
-            <div className="flex items-center gap-3 mb-4 md:mb-6">
+            <div className="flex items-center gap-3 mb-2 md:mb-3">
               <ProductPrice priceUSD={priceUSD} comparePriceUSD={comparePriceUSD ?? undefined} variant="large" />
               {salePercentage !== null && (
-<span className="text-xs md:text-sm font-semibold text-highlight-foreground bg-highlight px-3 py-1 rounded-full">
-                -{salePercentage}%
+                <span className="text-xs md:text-sm font-semibold text-highlight-foreground bg-highlight px-3 py-1 rounded-full">
+                  -{salePercentage}%
                 </span>
               )}
             </div>
+            {product?.sku && (
+              <p className="text-xs text-muted-foreground mb-1">Ref. {product.sku}</p>
+            )}
+            {reviewCount > 0 && (
+              <a href="#reviews" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-accent transition-colors mb-2">
+                ★ {avgRating || "—"} ({reviewCount} reseña{reviewCount !== 1 ? "s" : ""})
+              </a>
+            )}
 
             {/* Combo contents */}
             {isCombo && comboItems.length > 0 && (
@@ -327,7 +361,6 @@ export function ProductClient({
                             className="object-cover"
                             sizes="56px"
                             objectFit="cover"
-                            loading="lazy"
                           />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -362,91 +395,142 @@ export function ProductClient({
               </div>
             )}
 
-            {/* Variants */}
+            {/* Variants: chips si ≤4, sino select */}
             {variants.length > 0 && (
               <div className="mb-4 md:mb-6">
-                <label htmlFor="product-variant-select" className="block text-sm font-medium text-foreground mb-2">Elige una opción</label>
-                <select
-                  id="product-variant-select"
-                  value={selectedVariantId}
-                  onChange={(e) => setSelectedVariantId(e.target.value)}
-                  className="w-full md:w-auto px-4 py-3 border border-border rounded-xl text-sm focus:ring-2 focus:ring-ring bg-background dark:bg-input"
-                  aria-label="Seleccionar variante del producto"
-                >
-                  {variants.map((v: any) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name}
-                    </option>
-                  ))}
-                </select>
+                <span className="block text-sm font-medium text-foreground mb-2">Elige una opción</span>
+                {variants.length <= 4 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {variants.map((v: any) => (
+                      <button
+                        key={v.id}
+                        type="button"
+                        onClick={() => setSelectedVariantId(v.id)}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
+                          selectedVariantId === v.id
+                            ? "border-accent bg-accent/10 text-accent"
+                            : "border-border hover:border-accent/50 text-foreground"
+                        }`}
+                      >
+                        {v.name}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <select
+                    id="product-variant-select"
+                    value={selectedVariantId}
+                    onChange={(e) => setSelectedVariantId(e.target.value)}
+                    className="w-full md:w-auto px-4 py-3 border border-border rounded-xl text-sm focus:ring-2 focus:ring-ring bg-background dark:bg-input"
+                    aria-label="Seleccionar variante del producto"
+                  >
+                    {variants.map((v: any) => (
+                      <option key={v.id} value={v.id}>{v.name}</option>
+                    ))}
+                  </select>
+                )}
               </div>
             )}
 
-            {/* Quantity */}
-            <div className="flex items-center gap-3 mb-4 md:mb-6">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
-              >
-                -
-              </button>
-              <span className="w-8 text-center font-medium">{quantity}</span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
-              >
-                +
-              </button>
-            </div>
+            {stock > 0 && (
+              <>
+                <div className="flex items-center gap-3 mb-2">
+                  <p className="text-xs text-muted-foreground">{stockLabel}</p>
+                </div>
+                <div className="flex items-center gap-3 mb-4 md:mb-6">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors active:scale-95"
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center font-medium">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors active:scale-95"
+                  >
+                    +
+                  </button>
+                </div>
+              </>
+            )}
 
-            {/* Add to cart (UI) */}
+            {/* Add to cart (UI) o Agotado + Avísame */}
             <div className="flex items-center gap-3 mb-4 md:mb-6">
+              {stock <= 0 ? (
+                <div className="flex-1 space-y-3">
+                  <p className="text-muted-foreground font-medium">Agotado</p>
+                  {!stockNotifyDone ? (
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="email"
+                        value={stockNotifyEmail}
+                        onChange={(e) => setStockNotifyEmail(e.target.value)}
+                        placeholder="Tu email"
+                        className="flex-1 px-3 py-2 border border-border rounded-xl text-sm bg-background"
+                      />
+                      <button
+                        onClick={handleStockNotify}
+                        disabled={stockNotifyLoading}
+                        className="px-4 py-2 rounded-xl bg-accent text-accent-foreground text-sm font-medium hover:bg-accent/90 disabled:opacity-50"
+                      >
+                        {stockNotifyLoading ? "..." : "Avísame cuando haya stock"}
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-accent">Te avisaremos por email.</p>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={async (e) => {
+                    const rect = getTriggerRect(e.currentTarget)
+                    try {
+                      await addToCart({
+                        product: {
+                          id: product.id,
+                          name: product.name,
+                          slug: product.slug,
+                          priceUSD: product.priceUSD ?? null,
+                          priceMNs: product.priceMNs ?? null,
+                          images: Array.isArray(product.images) ? product.images : [],
+                        },
+                        productVariant: selectedVariant ? { id: selectedVariant.id, name: selectedVariant.name, priceUSD: selectedVariant.priceUSD ?? null, priceMNs: selectedVariant.priceMNs ?? null } : null,
+                        quantity,
+                      })
+                      setAddedFeedback(true)
+                      setTimeout(() => setAddedFeedback(false), 2000)
+                      if (rect) showAddToCart({ productName: `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ""}`, triggerRect: rect })
+                      else showSuccess("¡Al carrito! 🛒", `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ""} se agregó.`)
+                    } catch (err: any) {
+                      showError("Ups… no se pudo añadir 😅", err?.response?.data?.message || err?.message || "No se pudo añadir")
+                    }
+                  }}
+                  aria-label={addedFeedback ? `Añadido` : `Añadir ${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ""} al carrito`}
+                  className="cart-btn flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-primary/90 transition-all text-sm md:text-base"
+                >
+                  {addedFeedback ? (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      ✓ Añadido
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                      </svg>
+                      Añadir al carrito
+                    </>
+                  )}
+                </button>
+              )}
               <button
-                disabled={stock <= 0}
-                onClick={async (e) => {
-                  const rect = getTriggerRect(e.currentTarget)
-                  try {
-                    await addToCart({
-                      product: {
-                        id: product.id,
-                        name: product.name,
-                        slug: product.slug,
-                        priceUSD: product.priceUSD ?? null,
-                        priceMNs: product.priceMNs ?? null,
-                        images: Array.isArray(product.images) ? product.images : [],
-                      },
-                      productVariant: selectedVariant
-                        ? {
-                            id: selectedVariant.id,
-                            name: selectedVariant.name,
-                            priceUSD: selectedVariant.priceUSD ?? null,
-                            priceMNs: selectedVariant.priceMNs ?? null,
-                          }
-                        : null,
-                      quantity,
-                    })
-                    if (rect) showAddToCart({ productName: `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''}`, triggerRect: rect })
-                    else showSuccess("¡Al carrito! 🛒", `${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} se agregó.`)
-                  } catch (err: any) {
-                    const errorMessage = err.response?.data?.message || err.message || "No se pudo añadir"
-                    showError("Ups… no se pudo añadir 😅", errorMessage)
-                  }
+                onClick={() => {
+                  setIsFavorite(!isFavorite)
+                  if (!isFavorite) toast({ title: "Añadido a favoritos", description: "En tu lista de deseos" })
                 }}
-                aria-label={`Añadir ${product.name}${selectedVariant ? ` - ${selectedVariant.name}` : ''} al carrito`}
-                className="cart-btn flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3.5 md:py-4 px-6 rounded-xl font-semibold hover:bg-primary/90 transition-all text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                  />
-                </svg>
-                Añadir al carrito
-              </button>
-              <button
-                onClick={() => setIsFavorite(!isFavorite)}
                 aria-label={isFavorite ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
                 className={`heart-btn p-3.5 md:p-4 rounded-xl border transition-all ${
                   isFavorite ? "bg-red-500/10 border-red-400 text-red-500" : "border-border hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -454,26 +538,21 @@ export function ProductClient({
               >
                 <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={isFavorite} />
               </button>
-              <button
-                onClick={shareProduct}
-                className="p-3.5 md:p-4 rounded-xl border border-border hover:bg-muted transition-all"
-                aria-label={`Compartir ${product.name}`}
-                type="button"
-              >
+              <button onClick={shareProduct} className="p-3.5 md:p-4 rounded-xl border border-border hover:bg-muted transition-all" aria-label={`Compartir ${product.name}`} type="button">
                 <ShareIcon className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
             {/* Benefits */}
             <div className="flex flex-wrap items-center gap-4 md:gap-6 text-xs md:text-sm text-muted-foreground mb-4 md:mb-6">
-              <span className="flex items-center gap-1.5">
+              <Link href="/returns" className="flex items-center gap-1.5 hover:text-accent transition-colors">
                 <ReturnIcon className="w-4 h-4 md:w-5 md:h-5" />
-                Devoluciones gratuitas
-              </span>
-              <span className="flex items-center gap-1.5">
+                Devoluciones en 30 días
+              </Link>
+              <Link href="/shipping" className="flex items-center gap-1.5 hover:text-accent transition-colors">
                 <TruckIcon className="w-4 h-4 md:w-5 md:h-5" />
-                Entrega rápida
-              </span>
+                Envío en 24–72h
+              </Link>
             </div>
 
             {/* Delivery info */}
@@ -488,10 +567,10 @@ export function ProductClient({
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-accent font-medium">Envío gratis desde $100</p>
-                <Link href="/shipping" className="text-xs text-amber-600 hover:text-amber-700 hover:underline font-medium">
-                  Saber más
-                </Link>
+                <p className="text-sm text-accent font-medium">
+                  {freeShippingThreshold != null ? `Envío gratis desde $${freeShippingThreshold}` : "Envío en 24–72h"}
+                </p>
+                <Link href="/shipping" className="text-xs text-accent/80 hover:underline font-medium">Saber más</Link>
               </div>
             </div>
 
@@ -591,7 +670,7 @@ export function ProductClient({
               productId={product?.id}
               productName={product?.name || "Producto"}
               initialReviews={initialReviews}
-              initialReviewsMeta={initialReviewsMeta}
+              initialMeta={initialReviewsMeta}
             />
           </div>
         </div>

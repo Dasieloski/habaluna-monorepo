@@ -92,8 +92,10 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
     const params = new URLSearchParams(searchParams.toString());
     if (value) {
       params.set(key, value);
+      if (key !== 'sortBy') params.delete('page');
     } else {
       params.delete(key);
+      if (key !== 'sortBy') params.delete('page');
     }
     router.replace(`?${params.toString()}`, { scroll: false });
   };
@@ -115,48 +117,63 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
 
   return (
     <div className="mb-6">
-      {/* Barra de búsqueda y filtros principales */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        {/* Búsqueda con autocompletado */}
-        <div data-product-search="true">
+      {/* Búsqueda + Categoría + Orden siempre visibles */}
+      <div className="flex flex-col gap-3 mb-4">
+        <div data-product-search="true" className="w-full">
           <SearchAutocomplete
             value={searchTerm}
             onChange={setSearchTerm}
             placeholder="Buscar productos..."
           />
         </div>
-
-        {/* Botón de filtros avanzados */}
-        <Button
-          variant="outline"
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2"
-        >
-          <SlidersHorizontal className="w-4 h-4" />
-          Filtros
-          {hasActiveFilters && (
-            <span className="ml-1 px-2 py-0.5 text-xs bg-accent text-accent-foreground rounded-full">
-              {Array.from(searchParams.entries()).filter(([k]) => k !== 'page').length}
-            </span>
-          )}
-        </Button>
-
-        {/* Ordenar */}
-        <Select
-          value={searchParams.get('sortBy') || 'created-desc'}
-          onValueChange={(value) => updateFilter('sortBy', value)}
-        >
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Ordenar por" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="created-desc">Novedades</SelectItem>
-            <SelectItem value="price-asc">Precio: menor a mayor</SelectItem>
-            <SelectItem value="price-desc">Precio: mayor a menor</SelectItem>
-            <SelectItem value="name-asc">Nombre: A-Z</SelectItem>
-            <SelectItem value="name-desc">Nombre: Z-A</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+          {/* Categoría siempre visible */}
+          <Select
+            value={searchParams.get('categoryId') || 'all'}
+            onValueChange={(v) => updateFilter('categoryId', v === 'all' ? null : v)}
+          >
+            <SelectTrigger id="category" className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Categoría" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas las categorías</SelectItem>
+              {categories.map((c) => (
+                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {/* Ordenar siempre visible */}
+          <Select
+            value={searchParams.get('sortBy') || 'created-desc'}
+            onValueChange={(v) => updateFilter('sortBy', v)}
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="created-desc">Novedades</SelectItem>
+              <SelectItem value="price-asc">Precio: menor a mayor</SelectItem>
+              <SelectItem value="price-desc">Precio: mayor a menor</SelectItem>
+              <SelectItem value="name-asc">Nombre: A-Z</SelectItem>
+              <SelectItem value="name-desc">Nombre: Z-A</SelectItem>
+            </SelectContent>
+          </Select>
+          {/* Filtros avanzados (precio, stock, destacados) */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex items-center gap-2"
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            Más filtros
+            {hasActiveFilters && (
+              <span className="ml-1 px-2 py-0.5 text-xs bg-accent text-accent-foreground rounded-full">
+                {Array.from(searchParams.entries()).filter(([k]) => !['page','categoryId','sortBy','search'].includes(k)).length}
+              </span>
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Panel de filtros avanzados */}
@@ -173,27 +190,6 @@ export function ProductFilters({ categories = [] }: ProductFiltersProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Categoría */}
-            <div>
-              <Label htmlFor="category">Categoría</Label>
-              <Select
-                value={searchParams.get('categoryId') || 'all'}
-                onValueChange={(value) => updateFilter('categoryId', value === 'all' ? null : value)}
-              >
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Todas las categorías" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas las categorías</SelectItem>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Precio mínimo */}
             <div>
               <Label htmlFor="minPrice">Precio mínimo (USD)</Label>

@@ -242,10 +242,14 @@ export function SearchAutocomplete({
             }
           }}
           onKeyDown={(e) => {
-            // No hacer nada con Enter - solo permitir navegación al seleccionar sugerencias
             if (e.key === 'Escape') {
               setShowSuggestions(false);
               inputRef.current?.blur();
+            } else if (e.key === 'Enter' && value.trim()) {
+              e.preventDefault();
+              if (onSelect) onSelect(value.trim());
+              else onChange(value.trim());
+              setShowSuggestions(false);
             }
           }}
           className={cn(
@@ -269,7 +273,14 @@ export function SearchAutocomplete({
       {showSuggestions && (suggestions.length > 0 || historySuggestions.length > 0 || loading) && (
         <div className="absolute left-0 right-0 z-80 mt-2 overflow-hidden rounded-2xl border border-border bg-background shadow-2xl max-h-72 overflow-y-auto">
           {loading ? (
-            <div className="p-3 text-sm text-muted-foreground text-center">Buscando...</div>
+            <div className="p-4 space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="h-4 w-4 rounded bg-muted animate-pulse" />
+                  <div className="h-4 flex-1 max-w-[70%] rounded bg-muted animate-pulse" />
+                </div>
+              ))}
+            </div>
           ) : (
             <>
               {/* Mostrar historial de búsquedas si el input está vacío */}

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -20,10 +20,12 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>
 
-export default function LoginPage() {
+function LoginContent() {
   const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const returnUrl = searchParams.get("returnUrl") || "/"
   const { setAuth } = useAuthStore()
   const { showSuccess, showError } = useToast()
 
@@ -54,7 +56,7 @@ export default function LoginPage() {
         "¡Qué bien verte de nuevo! 🎉",
         `Hola ${user.firstName || user.email}, ya estás dentro.`
       )
-      router.push("/")
+      router.push(returnUrl)
     } catch (err: any) {
       console.error("Error en login:", err)
       const raw = (err.response?.data?.message || err.message || "").toLowerCase()
@@ -182,7 +184,20 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <p className="text-muted-foreground">Cargando…</p>
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   )
 }

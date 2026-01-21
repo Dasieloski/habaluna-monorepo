@@ -79,6 +79,18 @@ export class ReviewsService {
     });
   }
 
+  /** Estadísticas globales de reseñas (para header, footer, etc.). */
+  async getGlobalStats(): Promise<{ averageRating: number; totalReviews: number }> {
+    const approved = await this.prisma.review.aggregate({
+      where: { isApproved: true },
+      _count: { id: true },
+      _avg: { rating: true },
+    });
+    const totalReviews = approved._count.id || 0;
+    const averageRating = approved._avg.rating != null ? Math.round(Number(approved._avg.rating) * 10) / 10 : 0;
+    return { averageRating, totalReviews };
+  }
+
   async getApprovedByProduct(productId: string, dto?: ListReviewsDto) {
     const page = dto?.page ?? 1;
     const limit = dto?.limit ?? 5;

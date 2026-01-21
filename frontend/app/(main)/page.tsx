@@ -64,9 +64,23 @@ async function getCategories() {
 }
 
 export default async function Home() {
-  const [banners, productsData, categories] = await Promise.all([getBanners(), getAllProducts(), getCategories()])
+  const [banners, productsData, categories, bestSellersRaw] = await Promise.all([
+    getBanners(),
+    getAllProducts(),
+    getCategories(),
+    (async () => {
+      try {
+        return await api.getBestSellers(5)
+      } catch {
+        return []
+      }
+    })(),
+  ])
 
   const products = productsData.data || []
+  const bestSellers = (Array.isArray(bestSellersRaw) && bestSellersRaw.length > 0)
+    ? bestSellersRaw.map((p: any) => ({ ...p, images: p.images || [] }))
+    : products.slice(0, 5)
 
   // Normalizar categorías desde BD (mantener diseño actual: solo cambia fuente de datos)
   const homeCategories = (Array.isArray(categories) ? categories : []).map((c: any) => ({
@@ -112,8 +126,8 @@ export default async function Home() {
       {/* Category Cards */}
       <CategoryGrid categories={displayCategories} variant="cards" />
 
-      {/* Top Sales */}
-      <TopSales products={allProducts.slice(0, 5)} className="pb-16 md:pb-24" />
+      {/* Top Sales (mejores vendidos desde backend o destacados como fallback) */}
+      <TopSales products={bestSellers} className="pb-16 md:pb-24" />
 
       {/* More Products */}
       <ProductCarousel

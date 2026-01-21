@@ -11,6 +11,7 @@ import {
   UseInterceptors,
   Request,
 } from '@nestjs/common';
+import { StockNotifyDto } from './dto/stock-notify.dto';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ProductsService } from './products.service';
@@ -132,6 +133,12 @@ export class ProductsController {
   async getLowStockProducts(@Query('threshold') threshold?: string) {
     const thresholdNum = threshold ? parseInt(threshold, 10) : 10;
     return this.productsService.getLowStockProducts(thresholdNum);
+  }
+
+  @Post(':id/stock-notify')
+  @ApiOperation({ summary: 'Registrar email para aviso cuando haya stock (producto agotado)' })
+  async stockNotify(@Param('id') id: string, @Body() dto: StockNotifyDto) {
+    return this.productsService.stockNotify(id, dto.email);
   }
 
   @Get(':id/related')

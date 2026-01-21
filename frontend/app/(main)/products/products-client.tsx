@@ -2,13 +2,11 @@
 
 import Link from 'next/link';
 import { useEffect, useState, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { HeartIcon } from '@/components/icons/streamline-icons';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { ChevronRight, Home } from 'lucide-react';
 import { api, mapBackendProductToFrontend } from '@/lib/api';
 import { toNumber } from '@/lib/money';
-import { ProductFilters, SearchFilters } from '@/components/product/product-filters';
-import { SmartImage } from '@/components/ui/smart-image';
+import { ProductFilters } from '@/components/product/product-filters';
 import { AnimatedList } from '@/components/ui/animated-list';
 import { ProductCard } from '@/components/product/product-card';
 import { ProductCardSkeleton } from '@/components/product/product-card-skeleton';
@@ -31,9 +29,15 @@ export default function ProductsClient() {
   const [loading, setLoading] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
   const [categories, setCategories] = useState<Array<{ id: string; name: string; slug: string }>>([]);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
+  const router = useRouter();
+  const currentPage = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1);
+
+  const setPage = (p: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (p <= 1) params.delete('page'); else params.set('page', String(p));
+    router.replace(params.toString() ? `?${params.toString()}` : '/products', { scroll: false });
+  };
 
   // Cargar categorías
   useEffect(() => {
@@ -51,10 +55,7 @@ export default function ProductsClient() {
     try {
       setLoading(true);
 
-      const filters: any = {
-        page: currentPage,
-        limit: productsPerPage,
-      };
+      const filters: any = { page: currentPage, limit: productsPerPage };
 
       // Aplicar filtros de la URL
       if (searchParams.get('search')) filters.search = searchParams.get('search');
@@ -94,39 +95,7 @@ export default function ProductsClient() {
     }
   }, [searchParams.toString(), currentPage]);
 
-  // Resetear página cuando cambian los filtros (pero no la página misma)
-  useEffect(() => {
-    const pageParam = searchParams.get('page');
-    if (!pageParam || pageParam === '1') {
-      setCurrentPage(1);
-    }
-  }, [
-    searchParams.get('search'),
-    searchParams.get('categoryId'),
-    searchParams.get('minPrice'),
-    searchParams.get('maxPrice'),
-    searchParams.get('inStock'),
-    searchParams.get('isFeatured'),
-    searchParams.get('sortBy'),
-    searchParams.get('filter'),
-  ]);
-
-  // Cargar productos cuando cambian los filtros o la página
-  useEffect(() => {
-    loadProducts();
-  }, [loadProducts]);
-
-  const toggleFavorite = (id: string) => {
-    setFavorites((prev) => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(id)) {
-        newFavorites.delete(id);
-      } else {
-        newFavorites.add(id);
-      }
-      return newFavorites;
-    });
-  };
+  useEffect(() => { loadProducts(); }, [loadProducts]);
 
   const totalPages = Math.ceil(totalResults / productsPerPage);
   const pagedProducts = products;
@@ -134,21 +103,27 @@ export default function ProductsClient() {
   return (
     <div className="min-h-screen bg-background">
       {/* Breadcrumbs */}
-      <div className="border-b border-gray-100">
+      <div className="border-b border-border">
         <div className="container mx-auto px-4 py-3">
-          <nav className="flex items-center gap-2 text-sm text-gray-500">
-            <Link
-              href="/"
-              className="hover:text-primary transition-colors flex items-center gap-1"
-            >
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
+            <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1">
               <Home className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Página de inicio</span>
+              <span className="hidden sm:inline">Inicio</span>
             </Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-gray-400">Productos</span>
+            <Link href="/products" className="hover:text-primary transition-colors">Productos</Link>
+            {searchParams.get('categoryId') && (() => {
+              const cat = categories.find((c) => c.id === searchParams.get('categoryId'));
+              return cat ? (
+                <>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                  <Link href={`/products?categoryId=${searchParams.get('categoryId')}`} className="hover:text-primary transition-colors">{cat.name}</Link>
+                </>
+              ) : null;
+            })()}
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-foreground font-medium">
-              {searchParams.get('filter') === 'combos' ? 'Combos' : 'Todos los productos'}
+              {searchParams.get('filter') === 'combos' ? 'Combos' : searchParams.get('categoryId') ? 'Productos' : 'Todos'}
             </span>
           </nav>
         </div>
@@ -190,33 +165,31 @@ export default function ProductsClient() {
           <EmptyState
             variant="search"
             icon={
-              <svg
-                className="w-16 h-16"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
+              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             }
             title="No se encontraron productos"
-            description="Intenta ajustar los filtros o realizar una búsqueda diferente."
+            description={searchParams.get('search')
+              ? `No hay resultados para «${searchParams.get('search')}». Prueba con otra palabra o revisa los filtros.`
+              : 'Intenta ajustar los filtros o realizar una búsqueda diferente.'}
+            action={
+              <Button variant="outline" asChild>
+                <Link href="/products">Limpiar y ver todos</Link>
+              </Button>
+            }
             className="py-16"
           />
         ) : (
           <>
-            <AnimatedList
-              staggerDelay={0.05}
-              enableAnimations={true}
-              animateOnViewport={true}
-              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
-            >
-              {pagedProducts.map((p) => (
+            <div aria-live="polite" aria-label="Listado de productos">
+              <AnimatedList
+                staggerDelay={0.05}
+                enableAnimations={true}
+                animateOnViewport={true}
+                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+              >
+                {pagedProducts.map((p) => (
                 <ProductCard
                   key={p.id}
                   product={{
@@ -235,31 +208,22 @@ export default function ProductsClient() {
                   }}
                 />
               ))}
-            </AnimatedList>
+              </AnimatedList>
+            </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-10">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                >
+              <nav className="flex items-center justify-center gap-2 mt-10" aria-label="Paginación" aria-live="polite">
+                <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)} aria-label="Página anterior">
                   Anterior
                 </Button>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-muted-foreground" aria-current="page">
                   Página {currentPage} de {totalPages}
                 </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                >
+                <Button variant="outline" size="sm" disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)} aria-label="Página siguiente">
                   Siguiente
                 </Button>
-              </div>
+              </nav>
             )}
           </>
         )}

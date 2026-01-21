@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import type { MouseEvent } from "react"
 import Link from "next/link"
-import { Minus, Plus, Trash2, ChevronDown, ChevronUp, Truck, Gift, ShoppingBag, AlertTriangle } from "lucide-react"
+import { Minus, Plus, Trash2, ChevronDown, ChevronUp, Truck, Gift, ShoppingBag, AlertTriangle, Tag, X } from "lucide-react"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { useCartValidation } from "@/hooks/use-cart-validation"
@@ -18,6 +18,9 @@ import { CartItemSkeleton } from "@/components/cart/cart-item-skeleton"
 export default function CartPage() {
   const [showCoupon, setShowCoupon] = useState(false)
   const [couponCode, setCouponCode] = useState("")
+  const [appliedCoupon, setAppliedCoupon] = useState<{ id: string; code: string; discount: number; name: string } | null>(null)
+  const [validatingCoupon, setValidatingCoupon] = useState(false)
+  const [couponError, setCouponError] = useState("")
   const [suggestedProducts, setSuggestedProducts] = useState<any[]>([])
   const [loadingSuggestions, setLoadingSuggestions] = useState(true)
   const [isLoadingCart, setIsLoadingCart] = useState(true)
@@ -132,6 +135,7 @@ export default function CartPage() {
     shipping: number
     positiveMessage: string
     appliedRule: { discountType: string; discountValue: number } | null
+    config?: { freeShippingThresholdUSD?: number | null }
   } | null>(null)
 
   useEffect(() => {
@@ -140,24 +144,81 @@ export default function CartPage() {
       return
     }
     let cancelled = false
-    api.getTransportEstimate(itemCount).then((r) => {
-      if (!cancelled) setTransportEstimate({ shipping: r.shipping, positiveMessage: r.positiveMessage, appliedRule: r.appliedRule })
+    api.getTransportEstimate(itemCount, subtotal).then((r) => {
+      if (!cancelled) setTransportEstimate({ shipping: r.shipping, positiveMessage: r.positiveMessage, appliedRule: r.appliedRule, config: r.config })
     }).catch(() => { if (!cancelled) setTransportEstimate(null) })
     return () => { cancelled = true }
-  }, [itemCount, items.length])
+  }, [itemCount, items.length, subtotal])
 
   const shipping = transportEstimate?.shipping ?? 0
-  const total = subtotal + shipping
+  const discount = appliedCoupon?.discount ?? 0
+  const total = subtotal - discount + shipping
+
+  const handleApplyCoupon = async () => {
+    const code = couponCode.trim()
+    if (!code) {
+      setCouponError("Ingresa un código")
+      return
+    }
+    setValidatingCoupon(true)
+    setCouponError("")
+    try {
+      const result = await api.validateOffer(code, subtotal)
+      if (result.valid && result.offer) {
+        setAppliedCoupon({
+          id: result.offer.id,
+          code: result.offer.code,
+          discount: result.discount,
+          name: result.offer.name,
+        })
+        setCouponCode("")
+        toast({ title: "Cupón aplicado 🎟️", description: `Descuento: $${Number(result.discount).toFixed(2)}` })
+      } else {
+        setCouponError(result.message || "Cupón no válido")
+        toast({ title: "Cupón no válido", description: result.message || "Revisa el código", variant: "destructive" })
+      }
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || "No se pudo validar"
+      setCouponError(msg)
+      toast({ title: "Error", description: msg, variant: "destructive" })
+    } finally {
+      setValidatingCoupon(false)
+    }
+  }
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponError("")
+  }
 
   // Mostrar skeleton mientras carga el carrito
   if (isLoadingCart) {
     return (
       <div className="bg-muted/50 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
-          <div className="space-y-4">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <CartItemSkeleton key={index} />
-            ))}
+          <nav className="text-sm text-gray-500 mb-4 md:mb-6">
+            <span className="animate-pulse">Home &gt; Carrito</span>
+          </nav>
+          <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-4 md:mb-6 h-9 w-64 bg-muted rounded animate-pulse" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <CartItemSkeleton key={i} />
+              ))}
+            </div>
+            <div className="lg:col-span-1">
+              <div className="bg-muted/80 rounded-xl p-4 md:p-6 border border-border animate-pulse">
+                <div className="h-6 w-32 bg-muted-foreground/20 rounded mb-4" />
+                <div className="space-y-3 mb-4">
+                  <div className="h-4 bg-muted-foreground/20 rounded w-full" />
+                  <div className="h-4 bg-muted-foreground/20 rounded w-3/4" />
+                  <div className="h-4 bg-muted-foreground/20 rounded w-full" />
+                </div>
+                <div className="border-t border-border pt-4">
+                  <div className="h-5 bg-muted-foreground/20 rounded w-24" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -202,7 +263,7 @@ export default function CartPage() {
         {validation && validation.hasIssues && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
               <div className="flex-1">
                 <h3 className="font-semibold text-red-900 mb-2">Problemas de disponibilidad</h3>
                 <ul className="space-y-1 text-sm text-red-800">
@@ -210,10 +271,17 @@ export default function CartPage() {
                     .filter((item) => item.issue !== null)
                     .map((item) => {
                       const errorMsg = getItemErrorMessage(item.itemId)
+                      const slug = items.find((i) => i.id === item.itemId)?.product?.slug
                       return errorMsg ? (
                         <li key={item.itemId} className="flex items-start gap-2">
                           <span className="text-red-600 mt-1">•</span>
-                          <span>{errorMsg}</span>
+                          {slug ? (
+                            <Link href={`/products/${slug}`} className="text-red-800 underline hover:text-red-900">
+                              {errorMsg}
+                            </Link>
+                          ) : (
+                            <span>{errorMsg}</span>
+                          )}
                         </li>
                       ) : null
                     })}
@@ -241,7 +309,7 @@ export default function CartPage() {
               </p>
             )}
           </div>
-          <div className="flex-shrink-0 text-sky-500">
+          <div className="shrink-0 text-sky-500">
             <Truck className="h-10 w-10" />
           </div>
         </div>
@@ -257,7 +325,7 @@ export default function CartPage() {
               <div key={item.id} className="bg-white rounded-xl p-4 md:p-6">
                 <div className="flex gap-4">
                   {/* Imagen: SmartImage resuelve IDs de Media a /api/media/{id} */}
-                  <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-muted relative">
+                  <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-lg overflow-hidden bg-muted relative">
                     <SmartImage
                       src={imageSrc}
                       alt={item.product.name}
@@ -365,7 +433,7 @@ export default function CartPage() {
                 {loadingSuggestions ? (
                   <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
                     {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="flex-shrink-0 w-32 md:w-40 animate-pulse">
+                      <div key={i} className="shrink-0 w-32 md:w-40 animate-pulse">
                         <div className="aspect-square rounded-lg bg-gray-200 mb-2" />
                         <div className="h-4 bg-gray-200 rounded mb-2" />
                         <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
@@ -379,7 +447,7 @@ export default function CartPage() {
                       const price = Number(product.variants?.[0]?.priceUSD ?? product.priceUSD ?? 0)
                       const image = product.images?.[0] || "/placeholder.svg"
                       return (
-                        <div key={product.id} className="flex-shrink-0 w-32 md:w-40">
+                        <div key={product.id} className="shrink-0 w-32 md:w-40">
                           <Link href={`/products/${product.slug}`} className="block mb-2">
                             <div className="aspect-square rounded-lg overflow-hidden bg-muted relative">
                               <SmartImage
@@ -423,13 +491,31 @@ export default function CartPage() {
 
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between text-sm md:text-base">
-                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">${subtotal.toFixed(2)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-sm text-accent">
+                    <span>Descuento ({appliedCoupon.code})</span>
+                    <span>-${appliedCoupon.discount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm md:text-base">
-                  <span className="text-gray-600">Envío</span>
+                  <span className="text-muted-foreground">Envío</span>
                   <span className="font-medium">${shipping.toFixed(2)}</span>
                 </div>
+                {(() => {
+                  const th = transportEstimate?.config?.freeShippingThresholdUSD
+                  if (th != null && shipping > 0 && subtotal < Number(th)) {
+                    const add = (Number(th) - subtotal).toFixed(2)
+                    return (
+                      <p className="text-xs text-accent">
+                        Añade ${add} más para envío gratis
+                      </p>
+                    )
+                  }
+                  return null
+                })()}
               </div>
 
               <div className="border-t border-border pt-4 mb-4">
@@ -440,69 +526,112 @@ export default function CartPage() {
               </div>
 
               {/* Cupón de descuento */}
-              <button
-                onClick={() => setShowCoupon(!showCoupon)}
-                aria-label={showCoupon ? "Ocultar cupón de descuento" : "Mostrar cupón de descuento"}
-                className="flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700 mb-4"
-              >
-                <span className="underline">Cupón de descuento</span>
-                {showCoupon ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </button>
-
-              {showCoupon && (
-                <div className="flex gap-2 mb-4">
-                  <input
-                    type="text"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="Código de descuento"
-                    className="flex-1 border border-input rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent bg-background"
-                  />
-                  <button 
-                    aria-label="Aplicar código de descuento"
-                    className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition-colors"
-                  >
-                    Aplicar
-                  </button>
-                </div>
-              )}
-
-              {/* Fecha estimada de entrega */}
-              <div className="bg-accent/10 rounded-lg p-3 mb-4 flex items-center gap-3">
-                <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Truck className="h-5 w-5 text-accent-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Fecha estimada de entrega:</p>
-                  <p className="text-sm font-medium text-foreground">Lun. 05.01 - Mié. 07.01</p>
-                </div>
+              <div className="mb-4">
+                {appliedCoupon ? (
+                  <div className="bg-accent/10 border border-accent rounded-lg p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Tag className="h-4 w-4 text-accent" />
+                      <span className="text-sm font-medium">{appliedCoupon.code}</span>
+                      <span className="text-xs text-muted-foreground">-${appliedCoupon.discount.toFixed(2)}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      aria-label="Quitar cupón"
+                      className="p-1 hover:bg-accent/20 rounded"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setShowCoupon(!showCoupon)}
+                      aria-label={showCoupon ? "Ocultar cupón" : "Mostrar cupón"}
+                      className="flex items-center gap-2 text-sm text-accent hover:text-accent/80 mb-2"
+                    >
+                      <Tag className="h-4 w-4" />
+                      <span className="underline">Cupón de descuento</span>
+                      {showCoupon ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </button>
+                    {showCoupon && (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={couponCode}
+                          onChange={(e) => { setCouponCode(e.target.value); setCouponError("") }}
+                          placeholder="Código"
+                          className="flex-1 border border-input rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent bg-background"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleApplyCoupon}
+                          disabled={validatingCoupon || !couponCode.trim()}
+                          aria-label="Aplicar cupón"
+                          className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm hover:bg-primary/90 disabled:opacity-50"
+                        >
+                          {validatingCoupon ? "..." : "Aplicar"}
+                        </button>
+                      </div>
+                    )}
+                    {couponError && <p className="text-xs text-destructive mt-1">{couponError}</p>}
+                  </>
+                )}
               </div>
+
+              {/* Fecha estimada de entrega (2–3 días laborables) */}
+              {(() => {
+                const start = new Date()
+                let days = 0
+                for (let i = 1; days < 2; i++) {
+                  start.setDate(start.getDate() + 1)
+                  if (start.getDay() !== 0 && start.getDay() !== 6) days++
+                  if (i > 10) break
+                }
+                const end = new Date(start)
+                end.setDate(end.getDate() + 1)
+                const fmt = (d: Date) => d.toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: '2-digit' })
+                return (
+                  <div className="bg-accent/10 rounded-lg p-3 mb-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center shrink-0">
+                      <Truck className="h-5 w-5 text-accent-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Fecha estimada de entrega:</p>
+                      <p className="text-sm font-medium text-foreground">{fmt(start)} – {fmt(end)}</p>
+                    </div>
+                  </div>
+                )
+              })()}
 
               {/* Botón finalizar compra */}
               <Link
                 href="/checkout"
                 className={`w-full ${
                   validation && validation.hasIssues
-                    ? 'bg-gray-400 cursor-not-allowed pointer-events-none'
-                    : 'bg-gray-900 hover:bg-gray-800'
-                } text-white py-3 md:py-4 rounded-full font-medium transition-colors block text-center`}
+                    ? 'bg-muted cursor-not-allowed pointer-events-none text-muted-foreground'
+                    : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                } py-3 md:py-4 rounded-full font-medium transition-colors block text-center`}
               >
                 {validation && validation.hasIssues
                   ? 'Resuelve los problemas de stock'
                   : 'Finalizar compra'}
+              </Link>
+              <Link href="/products" className="block text-center text-sm text-accent hover:underline mt-3">
+                Seguir comprando
               </Link>
             </div>
           </div>
         </div>
 
         {/* Sección de beneficios */}
-        <div className="bg-gray-100 rounded-xl mt-8 p-6 md:p-8">
+        <div className="bg-muted/50 rounded-xl mt-8 p-6 md:p-8 border border-border">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             <div>
-              <ul className="space-y-3 text-sm md:text-base text-gray-700">
+              <ul className="space-y-3 text-sm md:text-base text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-1">•</span>
-                  Dispones de 100 días para devolver los productos sin coste
+                  Devoluciones en 30 días sin coste
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-1">•</span>
@@ -510,28 +639,12 @@ export default function CartPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-primary mt-1">•</span>
-                  Pago seguro SSL
+                  Pago seguro
                 </li>
               </ul>
             </div>
             <div className="text-center md:text-right">
-              <p className="text-sm text-gray-600 mb-2">Qué opinan nuestros clientes</p>
-              <div className="inline-block bg-card rounded-lg p-4 shadow-sm border border-border">
-                <p className="text-xs text-gray-500 mb-1">CLIENTES SATISFECHOS</p>
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  {[1, 2, 3, 4].map((i) => (
-                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                      <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                    </svg>
-                  ))}
-                  <svg className="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                  </svg>
-                </div>
-                <p className="text-lg font-bold text-foreground">
-                  4.00 <span className="text-sm font-normal text-gray-500">/ 5.00</span>
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground">Pago 100% seguro</p>
             </div>
           </div>
         </div>

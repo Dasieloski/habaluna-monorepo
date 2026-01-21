@@ -27,6 +27,12 @@ import { UpdateUserReviewDto } from './dto/update-user-review.dto';
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
+  @Get('global-stats')
+  @ApiOperation({ summary: 'Estadísticas globales de reseñas (media y total)' })
+  async getGlobalStats() {
+    return this.reviewsService.getGlobalStats();
+  }
+
   // Admin
   @Get('admin/settings')
   @UseGuards(JwtAuthGuard, RolesGuard)

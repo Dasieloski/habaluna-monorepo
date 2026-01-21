@@ -33,4 +33,12 @@ export class UpdateTransportConfigDto {
   @IsString()
   @MaxLength(200)
   noDiscountMessage?: string;
+
+  @ApiPropertyOptional({
+    description: 'Envío gratis si el subtotal (USD) >= este valor. null = no aplicar.',
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  freeShippingThresholdUSD?: number | null;
 }
