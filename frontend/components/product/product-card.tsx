@@ -56,6 +56,11 @@ export function ProductCard({ product, badge, badgeColor = "coral", priority }: 
   const isInWishlist = useWishlistStore((s) => s.isInWishlist(product.id))
   const prefersReducedMotion = useReducedMotion()
 
+  // Debug: verificar que adultsOnly llegue correctamente
+  if (process.env.NODE_ENV === 'development' && product.adultsOnly) {
+    console.log('[ProductCard] Producto +18:', product.name, 'adultsOnly:', product.adultsOnly)
+  }
+
   const price = toNumber(product.variants?.[0]?.priceUSD ?? product.priceUSD) ?? 0
   const comparePrice = toNumber(product.variants?.[0]?.comparePriceUSD ?? product.comparePriceUSD)
   const hasDiscount = comparePrice !== null && comparePrice > price
