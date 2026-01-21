@@ -143,21 +143,41 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                     priority
                   />
                 )}
-                {/* Overlay con gradiente sutil para mejorar legibilidad */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent pointer-events-none" />
+                {/* Overlay sutil directamente sobre la imagen - degradado suave, opacidad baja */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-black/8 to-transparent pointer-events-none" />
                 
                 <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12">
                   <div className="max-w-xl relative z-10">
-                    {/* Fondo con blur detrás del texto (glassmorphism minimalista) */}
-                    <div className="absolute -inset-4 md:-inset-6 bg-black/20 backdrop-blur-sm rounded-2xl -z-10" />
-                    
                     <h1
-                      className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-4 tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+                      className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-4 tracking-tight leading-tight"
+                      style={{
+                        textShadow: `
+                          0 1px 2px rgba(0, 0, 0, 0.4),
+                          0 2px 4px rgba(0, 0, 0, 0.3),
+                          0 4px 8px rgba(0, 0, 0, 0.25),
+                          0 8px 16px rgba(0, 0, 0, 0.15),
+                          0 0 0 0.5px rgba(0, 0, 0, 0.2)
+                        `,
+                        WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.15)',
+                        paintOrder: 'stroke fill'
+                      }}
                     >
                       {banner.title}
                     </h1>
                     {banner.subtitle && (
-                      <p className="text-base md:text-xl text-white/95 mb-4 md:mb-6 font-light drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
+                      <p 
+                        className="text-base md:text-xl text-white mb-4 md:mb-6 font-light"
+                        style={{
+                          textShadow: `
+                            0 1px 2px rgba(0, 0, 0, 0.35),
+                            0 2px 4px rgba(0, 0, 0, 0.25),
+                            0 4px 8px rgba(0, 0, 0, 0.2),
+                            0 0 0 0.5px rgba(0, 0, 0, 0.15)
+                          `,
+                          WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.12)',
+                          paintOrder: 'stroke fill'
+                        }}
+                      >
                         {banner.subtitle}
                       </p>
                     )}
