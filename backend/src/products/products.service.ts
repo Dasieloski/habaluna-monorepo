@@ -1016,31 +1016,35 @@ export class ProductsService {
           },
           take: 1,
         },
+        comboItems: { select: { product: { select: { adultsOnly: true } } } },
       },
     });
 
-    return relatedProducts.map((product) => ({
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      description: product.description,
-      shortDescription: product.shortDescription,
-      priceUSD: product.priceUSD ? Number(product.priceUSD) : null,
-      priceMNs: product.priceMNs ? Number(product.priceMNs) : null,
-      comparePriceUSD: product.comparePriceUSD ? Number(product.comparePriceUSD) : null,
-      comparePriceMNs: product.comparePriceMNs ? Number(product.comparePriceMNs) : null,
-      stock: product.stock,
-      images: product.images,
-      isFeatured: product.isFeatured,
-      category: product.category,
-      variants: product.variants.map((v) => ({
-        id: v.id,
-        name: v.name,
-        priceUSD: v.priceUSD ? Number(v.priceUSD) : null,
-        priceMNs: v.priceMNs ? Number(v.priceMNs) : null,
-        stock: v.stock,
-      })),
-    };
+    return relatedProducts.map((product) => {
+      const adultsOnly = !!(product.adultsOnly || (product.comboItems || []).some((ci: any) => ci.product?.adultsOnly));
+      return {
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        description: product.description,
+        shortDescription: product.shortDescription,
+        priceUSD: product.priceUSD ? Number(product.priceUSD) : null,
+        priceMNs: product.priceMNs ? Number(product.priceMNs) : null,
+        comparePriceUSD: product.comparePriceUSD ? Number(product.comparePriceUSD) : null,
+        comparePriceMNs: product.comparePriceMNs ? Number(product.comparePriceMNs) : null,
+        stock: product.stock,
+        images: product.images,
+        isFeatured: product.isFeatured,
+        adultsOnly,
+        category: product.category,
+        variants: product.variants.map((v) => ({
+          id: v.id,
+          name: v.name,
+          priceUSD: v.priceUSD ? Number(v.priceUSD) : null,
+          priceMNs: v.priceMNs ? Number(v.priceMNs) : null,
+          stock: v.stock,
+        })),
+      };
     });
   }
 }
