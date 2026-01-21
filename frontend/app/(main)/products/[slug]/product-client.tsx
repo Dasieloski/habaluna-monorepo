@@ -52,6 +52,7 @@ export function ProductClient({
   const [stockNotifyLoading, setStockNotifyLoading] = useState(false)
   const [stockNotifyDone, setStockNotifyDone] = useState(false)
   const [addedFeedback, setAddedFeedback] = useState(false)
+  const [showAdultsModal, setShowAdultsModal] = useState(false)
   const relatedScrollRef = useRef<HTMLDivElement>(null)
   const isCombo = Boolean(product?.isCombo)
   const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(null)
@@ -666,6 +667,14 @@ export function ProductClient({
           </div>
         </div>
       </section>
+
+      {/* Modal de confirmación de edad */}
+      <AdultsOnlyModal
+        open={showAdultsModal}
+        onOpenChange={setShowAdultsModal}
+        onConfirm={doAddToCart}
+        productName={product?.name}
+      />
     </>
   )
 }
