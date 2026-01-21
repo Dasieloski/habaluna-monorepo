@@ -14,6 +14,8 @@ import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { SmartImage } from "@/components/ui/smart-image"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { getImageUrl } from "@/lib/image-utils"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { AdultsOnlyModal } from "@/components/ui/adults-only-modal"
 
 interface ProductCardProps {
   product: {
