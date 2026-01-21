@@ -82,6 +82,14 @@ export default async function Home() {
     ? bestSellersRaw.map((p: any) => mapBackendProductToFrontend(p))
     : products.slice(0, 5)
 
+  // Debug: verificar productos +18
+  if (process.env.NODE_ENV === 'development') {
+    const adultsOnlyProducts = products.filter((p: any) => p.adultsOnly)
+    if (adultsOnlyProducts.length > 0) {
+      console.log('[Home] Productos +18 encontrados:', adultsOnlyProducts.length, adultsOnlyProducts.map((p: any) => ({ name: p.name, adultsOnly: p.adultsOnly })))
+    }
+  }
+
   // Normalizar categorías desde BD (mantener diseño actual: solo cambia fuente de datos)
   const homeCategories = (Array.isArray(categories) ? categories : []).map((c: any) => ({
     id: String(c.id),
