@@ -15,7 +15,7 @@ async function getBanners() {
     const raw = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").trim()
     const apiBase = (raw && !/^https?:\/\//i.test(raw) ? `https://${raw}` : raw).replace(/\/api\/?$/, "")
     const normalize = (img: string) => {
-      if (!img) return "/placeholder.svg"
+      if (!img) return ""
       if (img.startsWith("http://") || img.startsWith("https://")) return img
       if (img.startsWith("/")) return `${apiBase}${img}`
       return `${apiBase}/uploads/${img}`
@@ -79,7 +79,7 @@ export default async function Home() {
 
   const products = productsData.data || []
   const bestSellers = (Array.isArray(bestSellersRaw) && bestSellersRaw.length > 0)
-    ? bestSellersRaw.map((p: any) => ({ ...p, images: p.images || [] }))
+    ? bestSellersRaw.map((p: any) => mapBackendProductToFrontend(p))
     : products.slice(0, 5)
 
   // Normalizar categorías desde BD (mantener diseño actual: solo cambia fuente de datos)

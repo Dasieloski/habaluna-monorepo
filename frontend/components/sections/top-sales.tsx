@@ -10,6 +10,7 @@ import { ShoppingCart } from "lucide-react"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useToast } from "@/hooks/use-toast"
 import { getTriggerRect } from "@/lib/contextual-toast-utils"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface Product {
   id: string
@@ -18,6 +19,7 @@ interface Product {
   images?: string[]
   priceUSD?: number
   comparePriceUSD?: number
+  adultsOnly?: boolean
   variants?: Array<{
     priceUSD?: number
     comparePriceUSD?: number
@@ -128,7 +130,7 @@ export function TopSales({ products, className }: TopSalesProps) {
             <div className="relative h-full bg-card rounded-xl md:rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-border">
               <div className="aspect-[4/3] lg:aspect-auto lg:h-full relative overflow-hidden">
                 <SmartImage
-                  src={featuredProduct.images?.[0] || "/placeholder.svg"}
+                  src={featuredProduct.images?.[0] || ''}
                   alt={featuredProduct.name}
                   fill
                   className="p-4 md:p-8 group-hover:scale-110 transition-transform duration-700 lg:object-contain"
@@ -155,9 +157,23 @@ export function TopSales({ products, className }: TopSalesProps) {
                 >
                   <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
-                <span className="absolute top-3 left-3 px-2 md:px-3 py-1 md:py-1.5 bg-highlight text-highlight-foreground text-[10px] md:text-xs font-bold uppercase rounded-full shadow-lg">
-                  #1 Top
-                </span>
+                <div className="absolute top-3 left-3 flex flex-wrap gap-1.5 z-[1]">
+                  <span className="px-2 md:px-3 py-1 md:py-1.5 bg-highlight text-highlight-foreground text-[10px] md:text-xs font-bold uppercase rounded-full shadow-lg">
+                    #1 Top
+                  </span>
+                  {featuredProduct.adultsOnly && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="animate-adults-badge px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-[10px] font-bold rounded-full shadow-lg bg-foreground/90 text-background cursor-help">
+                          +18
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-[260px]">
+                        Producto con entrega restringida a mayores de 18 años
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
               </div>
               <div className="p-4 md:p-5">
                 <h3 className="text-xs md:text-lg font-medium text-foreground line-clamp-2 group-hover:text-accent transition-colors">
@@ -181,13 +197,27 @@ export function TopSales({ products, className }: TopSalesProps) {
               <div className="relative bg-card rounded-xl md:rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full border border-border">
                 <div className="aspect-square relative overflow-hidden">
                   <SmartImage
-                    src={product.images?.[0] || "/placeholder.svg"}
+                    src={product.images?.[0] || ''}
                     alt={product.name}
                     fill
                     className="p-3 md:p-4 group-hover:scale-110 transition-transform duration-500"
                     sizes="(max-width: 1024px) 33vw, 20vw"
                     objectFit="cover"
                   />
+                  <div className="absolute top-2 left-2 flex flex-wrap gap-1.5 z-[1]">
+                    {product.adultsOnly && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="animate-adults-badge px-2 md:px-3 py-1 md:py-1.5 text-[9px] md:text-[10px] font-bold rounded-full shadow-lg bg-foreground/90 text-background cursor-help">
+                            +18
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-[260px]">
+                          Producto con entrega restringida a mayores de 18 años
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
                   <button
                     onClick={(e) => toggleFavorite(product.id, e)}
                     aria-label={favorites.has(product.id) ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}

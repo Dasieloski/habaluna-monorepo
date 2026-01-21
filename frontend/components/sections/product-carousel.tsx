@@ -13,6 +13,7 @@ interface Product {
   images?: string[]
   priceUSD?: number
   comparePriceUSD?: number
+  adultsOnly?: boolean
   variants?: Array<{
     priceUSD?: number
     comparePriceUSD?: number
@@ -89,12 +90,6 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
 
   if (!products || products.length === 0) return null
 
-  // Usar solo imágenes de la BD - si no hay, el ProductCard usará placeholder
-  const productsWithImages = products.map((product) => ({
-    ...product,
-    images: product.images?.length ? product.images : ['/placeholder.svg'],
-  }))
-
   return (
     <motion.section
       initial={{ opacity: 0, y: 28 }}
@@ -136,7 +131,7 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
             ref={scrollRef}
             className="flex gap-4 md:gap-6 dark:gap-5 dark:md:gap-8 overflow-x-auto scrollbar-hide scroll-smooth pb-4 -mx-2 px-2"
           >
-            {productsWithImages.map((product, index) => {
+            {products.map((product, index) => {
               const badge = getBadge(index)
               return (
                 <div
