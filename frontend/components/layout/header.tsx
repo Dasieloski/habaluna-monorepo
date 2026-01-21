@@ -235,8 +235,8 @@ export function Header() {
               </span>
             </Link>
 
-            {/* Búsqueda: siempre visible (móvil compacta, desktop centrada) */}
-            <div className="flex flex-1 min-w-0 mx-2 md:mx-8 md:max-w-lg">
+            {/* Búsqueda desktop: centrada en la fila principal */}
+            <div className="hidden md:flex flex-1 min-w-0 mx-2 md:mx-8 md:max-w-lg">
               <SearchAutocomplete
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -426,6 +426,17 @@ export function Header() {
             </div>
           </div>
 
+          {/* Móvil: barra de búsqueda en fila propia debajo (mejor jerarquía y área táctil) */}
+          <div className="md:hidden pt-2 pb-3 border-t border-border/30">
+            <SearchAutocomplete
+              value={searchQuery}
+              onChange={setSearchQuery}
+              onSelect={handleNavbarSearch}
+              placeholder="¿Qué estás buscando?"
+              className="w-full"
+              animatedPlaceholder
+            />
+          </div>
         </div>
 
         {/* Desktop Navigation */}
@@ -492,8 +503,8 @@ export function Header() {
     {/* Mobile menu (fuera del header para evitar bugs de `fixed` dentro de elementos con `transform`) */}
     {mobileMenuOpen && (
       <div className="md:hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-sm animate-fade-in">
-        {/* Spacer para no tapar el header sticky (altura aproximada del header en mobile) */}
-        <div className="h-[140px]" />
+        {/* Spacer para no tapar el header sticky (announcement + fila principal + fila búsqueda + highlights) */}
+        <div className="h-[200px]" />
         <nav className="container mx-auto px-4 pb-6">
           <ul className="space-y-2">
             {navItems.map((item, index) => (
