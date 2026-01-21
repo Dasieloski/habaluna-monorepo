@@ -115,6 +115,11 @@ export function ProductClient({
   const stockLabel = stock <= 0 ? "Agotado" : stock < 5 ? `Quedan ${stock}` : "En stock"
   const reviewCount = initialReviewsMeta?.total ?? product?.reviewCount ?? 0
   const avgRating = product?.averageRating != null ? Number(product.averageRating).toFixed(1) : null
+  
+  // Calcular adultsOnly: producto o combo con al menos un ítem +18
+  const adultsOnly = useMemo(() => {
+    return !!(product?.adultsOnly ?? (product?.comboItems || []).some((ci: any) => ci.product?.adultsOnly))
+  }, [product?.adultsOnly, product?.comboItems])
 
   const handleStockNotify = async () => {
     const email = stockNotifyEmail.trim()
