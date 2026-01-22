@@ -17,7 +17,6 @@ import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { BulkStockUpdateDto } from './dto/bulk-stock-update.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { SearchProductsDto } from './dto/search-products.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -134,15 +133,6 @@ export class ProductsController {
   async getLowStockProducts(@Query('threshold') threshold?: string) {
     const thresholdNum = threshold ? parseInt(threshold, 10) : 10;
     return this.productsService.getLowStockProducts(thresholdNum);
-  }
-
-  @Patch('bulk-stock')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update stock for multiple products (Admin only)' })
-  async bulkStockUpdate(@Body() dto: BulkStockUpdateDto) {
-    return this.productsService.bulkStockUpdate(dto.items);
   }
 
   @Post(':id/stock-notify')

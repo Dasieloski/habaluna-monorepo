@@ -73,40 +73,21 @@ async function bootstrap() {
         const originDomain = getBaseDomain(normalizedOrigin);
         const normalizedAllowed = allowedOriginsList.map((o) => o.replace(/\/$/, '').toLowerCase());
 
-        // En producción, solo permitir www.habaluna.com
-        const isProduction = process.env.NODE_ENV === 'production';
-        let isAllowed = false;
-        
-        if (isProduction) {
-          // En producción: solo www.habaluna.com
-          const productionDomain = 'www.habaluna.com';
-          isAllowed = originDomain === productionDomain || 
-                      normalizedOrigin === `https://${productionDomain}` ||
-                      normalizedOrigin === `http://${productionDomain}`;
-          
-          if (!isAllowed) {
-            logger.warn(`CORS: Origen bloqueado en producción: ${origin} (solo se permite ${productionDomain})`, 'CORS');
-            return res.status(403).json({ message: 'Origin not allowed in production' });
-          }
-        } else {
-          // En desarrollo: permitir más orígenes
-          isAllowed =
-            normalizedAllowed.includes(normalizedOrigin) ||
-            // mismo dominio base (con/sin www)
-            normalizedAllowed.some((o) => getBaseDomain(o) === originDomain) ||
-            // dominios del proyecto (desarrollo)
-            originDomain === 'habaluna.com' ||
-            originDomain === 'www.habaluna.com' ||
-            originDomain.endsWith('.habaluna.com') ||
-            originDomain === 'habanaluna.com' ||
-            originDomain === 'www.habanaluna.com' ||
-            originDomain.endsWith('.habanaluna.com') ||
-            // hosts de plataformas (solo desarrollo)
-            normalizedOrigin.includes('.vercel.app') ||
-            normalizedOrigin.includes('.railway.app') ||
-            // desarrollo
-            (normalizedOrigin.includes('localhost') || normalizedOrigin.includes('127.0.0.1'));
-        }
+        const isAllowed =
+          normalizedAllowed.includes(normalizedOrigin) ||
+          // mismo dominio base (con/sin www)
+          normalizedAllowed.some((o) => getBaseDomain(o) === originDomain) ||
+          // dominios del proyecto
+          originDomain === 'habaluna.com' ||
+          originDomain.endsWith('.habaluna.com') ||
+          originDomain === 'habanaluna.com' ||
+          originDomain.endsWith('.habanaluna.com') ||
+          // hosts de plataformas
+          normalizedOrigin.includes('.vercel.app') ||
+          normalizedOrigin.includes('.railway.app') ||
+          // desarrollo
+          (process.env.NODE_ENV !== 'production' &&
+            (normalizedOrigin.includes('localhost') || normalizedOrigin.includes('127.0.0.1')));
 
         if (isAllowed) {
           res.header('Vary', 'Origin');
@@ -167,52 +148,49 @@ async function bootstrap() {
         }
       }
 
-      // En producción, solo permitir el dominio exacto del frontend
-      const isProduction = process.env.NODE_ENV === 'production';
-      
-      if (isProduction) {
-        // En producción: solo permitir www.habaluna.com (sin subdominios adicionales)
-        const productionDomain = 'www.habaluna.com';
-        if (originDomain === productionDomain) {
-          logger.log(`CORS: Origen permitido (producción): ${origin}`, 'CORS');
-          return callback(null, true);
-        }
-        // Bloquear cualquier otro dominio en producción
-        logger.warn(`CORS: Origen bloqueado en producción: ${origin} (solo se permite ${productionDomain})`, 'CORS');
-        return callback(new Error('Origin not allowed in production'));
-      }
-
-      // En desarrollo: permitir dominios de desarrollo y testing
-      // Permitir dominios custom del proyecto para desarrollo/testing
-      if (originDomain === 'habaluna.com' || originDomain === 'www.habaluna.com' || originDomain.endsWith('.habaluna.com')) {
-        logger.log(`CORS: Origen permitido (desarrollo - dominio habaluna): ${origin}`, 'CORS');
+      // Permitir dominios custom del proyecto (si el frontend está en habaluna.com / habanaluna.com)
+      // Esto evita que el deploy quede bloqueado por CORS si FRONTEND_URL no está seteado correctamente.
+      if (originDomain === 'habaluna.com' || originDomain.endsWith('.habaluna.com')) {
+        logger.log(`CORS: Origen permitido (dominio habaluna): ${origin}`, 'CORS');
         return callback(null, true);
       }
-      if (originDomain === 'habanaluna.com' || originDomain === 'www.habanaluna.com' || originDomain.endsWith('.habanaluna.com')) {
-        logger.log(`CORS: Origen permitido (desarrollo - dominio habanaluna): ${origin}`, 'CORS');
+      if (originDomain === 'habanaluna.com' || originDomain.endsWith('.habanaluna.com')) {
+        logger.log(`CORS: Origen permitido (dominio habanaluna): ${origin}`, 'CORS');
         return callback(null, true);
       }
 
-      // Whitelist específica de dominios Vercel permitidos (solo desarrollo)
+      // Whitelist específica de dominios Vercel permitidos
       const allowedVercelDomains = [
         'habaluna.vercel.app',
         'habanaluna.vercel.app',
+        // Agregar más dominios específicos del proyecto aquí
       ];
 
-      // Permitir dominios de Railway solo en desarrollo
+      // Permitir dominios de Railway solo si están en la whitelist específica
       if (normalizedOrigin.includes('.railway.app')) {
-        logger.log(`CORS: Origen Railway permitido (desarrollo): ${origin}`, 'CORS');
-        return callback(null, true);
+        // En desarrollo, permitir cualquier Railway; en producción, solo whitelist
+        if (process.env.NODE_ENV !== 'production') {
+          logger.log(`CORS: Origen Railway permitido (desarrollo): ${origin}`, 'CORS');
+          return callback(null, true);
+        }
+        // En producción, solo permitir si está en la whitelist
+        const isAllowedRailway = allowedOriginsList.some(allowed => 
+          normalizedOrigin.includes(allowed.toLowerCase())
+        );
+        if (isAllowedRailway) {
+          logger.log(`CORS: Origen Railway permitido: ${origin}`, 'CORS');
+          return callback(null, true);
+        }
       }
 
-      // Permitir dominios de Vercel solo si están en la whitelist (solo desarrollo)
+      // Permitir dominios de Vercel solo si están en la whitelist específica
       if (normalizedOrigin.includes('.vercel.app') || normalizedOrigin.includes('vercel.app')) {
         const isAllowed = allowedVercelDomains.some(domain => 
           normalizedOrigin === domain || normalizedOrigin.endsWith(`.${domain}`)
         );
         
         if (isAllowed) {
-          logger.log(`CORS: Origen Vercel permitido (desarrollo): ${origin}`, 'CORS');
+          logger.log(`CORS: Origen Vercel permitido: ${origin}`, 'CORS');
           return callback(null, true);
         } else {
           logger.warn(`CORS: Origen Vercel bloqueado (no en whitelist): ${origin}`, 'CORS');

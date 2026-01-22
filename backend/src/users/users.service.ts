@@ -118,9 +118,9 @@ export class UsersService {
           phone: u.phone,
           createdAt: u.createdAt,
           isActive: u.isActive,
-          totalOrders: (agg as any).totalOrders,
-          totalSpent: (agg as any).totalSpent,
-          lastOrderAt: (agg as any).lastOrderAt,
+          totalOrders: agg.totalOrders,
+          totalSpent: agg.totalSpent,
+          lastOrderAt: agg.lastOrderAt,
         };
       }),
       meta: {
@@ -162,15 +162,6 @@ export class UsersService {
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
-    });
-  }
-
-  async updateRole(id: string, role: 'USER' | 'ADMIN' | 'OPERATOR' | 'LOGISTICS' | 'SUPPORT') {
-    await this.findOne(id);
-    return this.prisma.user.update({
-      where: { id },
-      data: { role },
-      select: { id: true, email: true, role: true },
     });
   }
 

@@ -11,31 +11,6 @@ export class ProductsService {
 
   constructor(private prisma: PrismaService) {}
 
-  async bulkStockUpdate(items: { productId: string; variantId?: string; stock: number }[]) {
-    const results = [];
-    
-    // Ejecutar en transacción para integridad
-    await this.prisma.$transaction(async (tx) => {
-      for (const item of items) {
-        if (item.variantId) {
-          const updated = await tx.productVariant.update({
-            where: { id: item.variantId },
-            data: { stock: item.stock },
-          });
-          results.push(updated);
-        } else {
-          const updated = await tx.product.update({
-            where: { id: item.productId },
-            data: { stock: item.stock },
-          });
-          results.push(updated);
-        }
-      }
-    });
-
-    return { count: results.length, message: 'Stock updated successfully' };
-  }
-
   async create(createProductDto: CreateProductDto) {
     try {
       this.logger.log('Creando producto', 'ProductsService', {

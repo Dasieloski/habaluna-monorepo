@@ -69,17 +69,6 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id/role')
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
-  @ApiOperation({ summary: 'Update user role (Admin only)' })
-  async updateRole(
-    @Param('id') id: string,
-    @Body('role') role: 'USER' | 'ADMIN' | 'OPERATOR' | 'LOGISTICS' | 'SUPPORT',
-  ) {
-    return this.usersService.updateRole(id, role);
-  }
-
   @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles('ADMIN')

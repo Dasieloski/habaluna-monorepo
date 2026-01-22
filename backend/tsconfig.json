@@ -17,10 +17,6 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "strict": false,
-    "noImplicitReturns": false,
-    "noImplicitThis": false,
-    "alwaysStrict": false,
     "paths": {
       "@/*": ["src/*"]
     }

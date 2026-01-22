@@ -5,8 +5,6 @@ import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('cart')
 @Controller('cart')
@@ -14,14 +12,6 @@ import { Roles } from '../common/decorators/roles.decorator';
 @ApiBearerAuth()
 export class CartController {
   constructor(private readonly cartService: CartService) {}
-
-  @Get('abandoned')
-  @UseGuards(RolesGuard)
-  @Roles('ADMIN')
-  @ApiOperation({ summary: 'Get abandoned carts (Admin only)' })
-  async getAbandonedCarts() {
-    return this.cartService.getAbandonedCarts();
-  }
 
   @Get()
   @ApiOperation({ summary: 'Get user cart' })
