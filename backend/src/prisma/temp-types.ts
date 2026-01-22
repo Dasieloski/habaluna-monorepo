@@ -1,11 +1,4 @@
 // Temporary types for Prisma models until proper generation works
-export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-  OPERATOR = 'OPERATOR',
-  LOGISTICS = 'LOGISTICS',
-  SUPPORT = 'SUPPORT'
-}
 
 export enum ReturnStatus {
   REQUESTED = 'REQUESTED',
