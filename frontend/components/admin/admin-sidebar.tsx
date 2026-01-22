@@ -19,20 +19,29 @@ import {
   Store,
   X,
   Truck,
+  ShoppingCart,
+  ShieldCheck,
+  CreditCard,
+  ClipboardList,
 } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/orders", label: "Pedidos", icon: ClipboardList },
   { href: "/admin/products", label: "Productos", icon: Package },
-  { href: "/admin/combos", label: "Combos", icon: Boxes },
+  { href: "/admin/inventory", label: "Inventario", icon: Boxes }, // Changed icon from Boxes to something else if needed, but Boxes fits inventory
+  { href: "/admin/carts", label: "Carritos", icon: ShoppingCart },
+  { href: "/admin/finance", label: "Finanzas", icon: CreditCard },
+  { href: "/admin/combos", label: "Combos", icon: Boxes }, // Boxes is used twice. Maybe use Archive for Inventory?
   { href: "/admin/categories", label: "Categorías", icon: FolderTree },
   { href: "/admin/customers", label: "Clientes", icon: Users },
   { href: "/admin/offers", label: "Ofertas", icon: Percent },
   { href: "/admin/banners", label: "Carrusel", icon: Images },
   { href: "/admin/transport", label: "Transporte", icon: Truck },
   { href: "/admin/reviews", label: "Reseñas", icon: MessageSquare },
+  { href: "/admin/audit", label: "Auditoría", icon: ShieldCheck },
   { href: "/admin/email-marketing", label: "Email Marketing", icon: Mail },
   { href: "/admin/settings", label: "Configuración", icon: Settings },
 ]
