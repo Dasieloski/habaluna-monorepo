@@ -102,7 +102,7 @@ async function main() {
   const products = await prisma.product.findMany({ select: { id: true, images: true } });
 
   console.log(`🖼️  Banners: ${banners.length}`);
-  await mapWithConcurrency(banners, async (b) => {
+  await mapWithConcurrency(banners, async (b: any) => {
     try {
       const r = await migrateBannerImage(b.id, b.image);
       if (r) console.log(`✅ Banner ${b.id}: ${r.from} -> ${r.to}`);
@@ -112,7 +112,7 @@ async function main() {
   });
 
   console.log(`🛍️  Productos: ${products.length}`);
-  await mapWithConcurrency(products, async (p) => {
+  await mapWithConcurrency(products, async (p: any) => {
     try {
       const r = await migrateProductImages(p.id, (p.images as any) || []);
       if (r?.changed) console.log(`✅ Product ${p.id}: images -> /api/media/*`);

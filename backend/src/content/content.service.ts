@@ -30,7 +30,7 @@ export class ContentService {
       },
     });
 
-    await this.auditService.log(userId, 'UPSERT_CONTENT', 'content_block', content.id, { slug: dto.slug });
+    await this.auditService.log(userId, 'UPSERT_CONTENT', 'content_block', content.id, { after: { slug: dto.slug } });
     return content;
   }
 
@@ -56,7 +56,7 @@ export class ContentService {
     const content = await this.prisma.contentBlock.delete({
       where: { slug },
     });
-    await this.auditService.log(userId, 'DELETE_CONTENT', 'content_block', content.id, { slug });
+    await this.auditService.log(userId, 'DELETE_CONTENT', 'content_block', content.id, { before: { slug } });
     return content;
   }
 }

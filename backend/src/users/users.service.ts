@@ -118,9 +118,9 @@ export class UsersService {
           phone: u.phone,
           createdAt: u.createdAt,
           isActive: u.isActive,
-          totalOrders: agg.totalOrders,
-          totalSpent: agg.totalSpent,
-          lastOrderAt: agg.lastOrderAt,
+          totalOrders: (agg as any).totalOrders,
+          totalSpent: (agg as any).totalSpent,
+          lastOrderAt: (agg as any).lastOrderAt,
         };
       }),
       meta: {

@@ -89,7 +89,7 @@ export class ReturnsService {
       where: { id },
       data: { status },
     });
-    await this.auditService.log(adminId, 'UPDATE_RETURN_STATUS', 'return_request', id, { status });
+    await this.auditService.log(adminId, 'UPDATE_RETURN_STATUS', 'return_request', id, { after: { status } });
     return request;
   }
 
@@ -124,7 +124,7 @@ export class ReturnsService {
 
     // Update order payment status to REFUNDED if full refund?
     // Logic can be complex. For now, just log.
-    await this.auditService.log(adminId, 'PROCESS_REFUND', 'refund', refund.id, { amount: dto.amount });
+    await this.auditService.log(adminId, 'PROCESS_REFUND', 'refund', refund.id, { after: { amount: dto.amount } });
 
     return refund;
   }
