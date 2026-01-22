@@ -22,7 +22,6 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node --project tsconfig.json prisma/seed.ts",
-    "postinstall": "prisma generate",
     "prestart": "prisma generate && prisma migrate deploy",
     "prestart:prod": "prisma generate && prisma migrate deploy",
     "seed:if": "node -e \"process.exit(['true','1','yes'].includes(String(process.env.RUN_SEED||'').toLowerCase())?0:1)\" && npx prisma db seed || echo \"Skipping seed (set RUN_SEED=true to run)\"",
