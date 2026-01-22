@@ -29,8 +29,11 @@ export class CsrfGuard implements CanActivate {
     const method = request.method;
     const path = request.path;
 
-    // Verificar si CSRF está habilitado (por defecto deshabilitado para APIs REST)
-    const csrfEnabled = this.configService.get<string>('ENABLE_CSRF') === 'true';
+    // Habilitar CSRF por defecto en producción, o si está explícitamente habilitado
+    // Solo deshabilitar si está explícitamente configurado como 'false'
+    const csrfExplicitlyDisabled = this.configService.get<string>('ENABLE_CSRF') === 'false';
+    const isProduction = process.env.NODE_ENV === 'production';
+    const csrfEnabled = !csrfExplicitlyDisabled && (isProduction || this.configService.get<string>('ENABLE_CSRF') === 'true');
 
     if (!csrfEnabled) {
       return true; // CSRF deshabilitado, permitir todas las requests

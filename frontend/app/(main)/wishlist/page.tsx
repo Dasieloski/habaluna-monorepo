@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
+import { SmartImage } from "@/components/ui/smart-image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { HeartIcon, CartIcon } from "@/components/icons/streamline-icons"
 import { useAuthStore } from "@/lib/store/auth-store"
@@ -10,7 +10,8 @@ import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { useCartStore } from "@/lib/store/cart-store"
 import { useToast } from "@/hooks/use-toast"
 import { getTriggerRect } from "@/lib/contextual-toast-utils"
-import { api, type BackendProduct, getApiBaseUrlLazy } from "@/lib/api"
+import { api, type BackendProduct } from "@/lib/api"
+import { getImageUrl } from "@/lib/image-utils"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Button } from "@/components/ui/button"
 import { Heart } from "lucide-react"
@@ -44,7 +45,7 @@ function normalizeImageUrl(imagePath: string): string {
 
 
 export default function WishlistPage() {
-  const { toast } = useToast()
+  const { toast, showAddToCart } = useToast()
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const isBootstrapped = useAuthStore((s) => s.isBootstrapped)
   const { items, fetchWishlist, remove } = useWishlistStore()
@@ -162,7 +163,7 @@ export default function WishlistPage() {
               const price = typeof p.priceUSD === "number" ? p.priceUSD : Number(p.priceUSD || 0)
               const compare = p.comparePriceUSD !== null && p.comparePriceUSD !== undefined ? Number(p.comparePriceUSD) : null
               const hasDiscount = compare !== null && compare > price
-              const img = Array.isArray(p.images) && p.images.length ? normalizeImageUrl(p.images[0]) : "/placeholder.svg"
+              const img = (Array.isArray(p.images) && p.images.length ? getImageUrl(p.images[0]) : null) || ""
               return (
               <div key={wi.id} className="group">
                 {/* Product Image */}
@@ -282,10 +283,10 @@ export default function WishlistPage() {
             className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 sm:mx-0 sm:px-0"
           >
             {bestSellers.map((product) => {
-              const img = Array.isArray(product.images) && product.images.length ? normalizeImageUrl(product.images[0]) : "/placeholder.svg"
+              const img = (Array.isArray(product.images) && product.images.length ? getImageUrl(product.images[0]) : null) || ""
               const price = typeof product.priceUSD === "number" ? product.priceUSD : Number(product.priceUSD || 0)
               return (
-              <div key={product.id} className="flex-shrink-0 w-[160px] sm:w-[220px] group">
+              <div key={product.id} className="shrink-0 w-[160px] sm:w-[220px] group">
                 <Link
                   href={`/products/${product.slug}`}
                   className="block relative aspect-square rounded-lg overflow-hidden mb-3"

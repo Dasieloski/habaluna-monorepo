@@ -10,6 +10,7 @@ import { api } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { getFirstImage, getImageUrl } from '@/lib/image-utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SmartImage } from '@/components/ui/smart-image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, Package, MapPin, CreditCard } from 'lucide-react';
@@ -154,18 +155,14 @@ export default function OrderDetailPage() {
           <div className="space-y-4">
             {order.items?.map((item: any) => (
               <div key={item.id} className="flex items-center gap-4 pb-4 border-b last:border-0">
-                <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center">
-                  {getFirstImage(item.product.images) ? (
-                    <img
-                      src={getImageUrl(getFirstImage(item.product.images))!}
-                      alt={item.product.name}
-                      className="w-full h-full object-contain rounded-lg"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                      Sin imagen
-                    </div>
-                  )}
+                <div className="w-16 h-16 rounded-lg flex-shrink-0 overflow-hidden bg-muted relative">
+                  <SmartImage
+                    src={getImageUrl(getFirstImage(item.product.images)) || ''}
+                    alt={item.product.name}
+                    fill
+                    sizes="64px"
+                    objectFit="contain"
+                  />
                 </div>
                 <div className="flex-1">
                   <Link href={`/products/${item.product.slug}`}>

@@ -94,13 +94,16 @@ export async function middleware(req: NextRequest) {
   }
   // #endregion
 
-  // DEBUG: Log para rutas de reset-password
-  if (isResetPassword) {
+  // DEBUG: Log para rutas de reset-password (solo en desarrollo)
+  if (isResetPassword && process.env.NODE_ENV === 'development') {
     console.log('[Middleware] ========== PROCESANDO RESET-PASSWORD ==========')
     console.log('[Middleware] Pathname:', pathname)
     console.log('[Middleware] URL completa:', req.url)
     console.log('[Middleware] Method:', req.method)
-    console.log('[Middleware] Headers:', Object.fromEntries(req.headers.entries()))
+    // No loguear headers completos en producción (pueden contener información sensible)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Middleware] Headers:', Object.fromEntries(req.headers.entries()))
+    }
   }
 
   // CRÍTICO: Bypass inmediato y absoluto para todas las rutas de auth
@@ -123,7 +126,7 @@ export async function middleware(req: NextRequest) {
 
   // También verificar isBypassedPath por si acaso
   if (isBypassedPath(pathname)) {
-    if (isResetPassword) {
+    if (isResetPassword && process.env.NODE_ENV === 'development') {
       console.log('[Middleware] Ruta en isBypassedPath - Bypass (NO debería llegar aquí)')
     }
     return NextResponse.next()

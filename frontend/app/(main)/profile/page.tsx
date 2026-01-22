@@ -7,7 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
 import Image from 'next/image';
-import { api, getApiBaseUrlLazy } from '@/lib/api';
+import { SmartImage } from '@/components/ui/smart-image';
+import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { useWishlistStore } from '@/lib/store/wishlist-store';
 import { Button } from '@/components/ui/button';
@@ -47,30 +48,6 @@ const profileSchema = z.object({
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
-
-function normalizeImageUrl(imagePath: string): string {
-  if (!imagePath) return "/placeholder.svg";
-  
-  // Eliminar referencias a Cloudinary - usar solo imágenes de la BD
-  if (imagePath.includes('cloudinary.com') || imagePath.includes('res.cloudinary')) {
-    console.warn('[normalizeImageUrl] URL de Cloudinary detectada, ignorando:', imagePath);
-    return "/placeholder.svg";
-  }
-  
-  // Si es una URL completa que NO es Cloudinary, retornarla
-  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) return imagePath;
-  
-  // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-  const base = getApiBaseUrlLazy();
-  
-  // Priorizar URLs de la BD: /api/media/{id}
-  if (imagePath.startsWith("/api/media/")) {
-    return `${base}${imagePath}`;
-  }
-  
-  if (imagePath.startsWith("/")) return `${base}${imagePath}`;
-  return `${base}/uploads/${imagePath}`;
-}
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -601,18 +578,17 @@ export default function ProfilePage() {
                             <div className="flex gap-2 overflow-x-auto">
                               {order.items.slice(0, 5).map((item: any, idx: number) => {
                                 const product = item.product || {};
-                                const img =
-                                  Array.isArray(product.images) && product.images.length
-                                    ? normalizeImageUrl(product.images[0])
-                                    : '/placeholder.svg';
+                                const img = (Array.isArray(product.images) && product.images.length
+                                  ? getImageUrl(product.images[0])
+                                  : null) || '';
                                 return (
-                                  <div key={idx} className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border">
-                                    <Image
+                                  <div key={idx} className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border relative">
+                                    <SmartImage
                                       src={img}
                                       alt={product.name || 'Producto'}
-                                      width={64}
-                                      height={64}
-                                      className="w-full h-full object-cover"
+                                      fill
+                                      sizes="64px"
+                                      objectFit="cover"
                                     />
                                   </div>
                                 );
@@ -659,10 +635,9 @@ export default function ProfilePage() {
                           ? Number(p.comparePriceUSD)
                           : null;
                       const hasDiscount = compare !== null && compare > price;
-                      const img =
-                        Array.isArray(p.images) && p.images.length
-                          ? normalizeImageUrl(p.images[0])
-                          : '/placeholder.svg';
+                      const img = (Array.isArray(p.images) && p.images.length
+                        ? getImageUrl(p.images[0])
+                        : null) || '';
                       return (
                         <Link
                           key={wi.id}
@@ -670,12 +645,13 @@ export default function ProfilePage() {
                           className="group block"
                         >
                           <div className="relative aspect-square rounded-lg overflow-hidden mb-3 border">
-                            <Image
+                            <SmartImage
                               src={img}
                               alt={p.name || 'Producto'}
                               fill
                               sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                               className="object-cover transition-transform duration-300 group-hover:scale-105"
+                              objectFit="cover"
                             />
                           </div>
                           <h3 className="text-sm font-medium text-foreground mb-2 line-clamp-2 group-hover:text-accent transition-colors">

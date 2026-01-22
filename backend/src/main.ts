@@ -159,28 +159,43 @@ async function bootstrap() {
         return callback(null, true);
       }
 
-      // Permitir dominios de Railway (para desarrollo/testing)
+      // Whitelist específica de dominios Vercel permitidos
+      const allowedVercelDomains = [
+        'habaluna.vercel.app',
+        'habanaluna.vercel.app',
+        // Agregar más dominios específicos del proyecto aquí
+      ];
+
+      // Permitir dominios de Railway solo si están en la whitelist específica
       if (normalizedOrigin.includes('.railway.app')) {
-        logger.log(`CORS: Origen Railway permitido: ${origin}`, 'CORS');
-        return callback(null, true);
+        // En desarrollo, permitir cualquier Railway; en producción, solo whitelist
+        if (process.env.NODE_ENV !== 'production') {
+          logger.log(`CORS: Origen Railway permitido (desarrollo): ${origin}`, 'CORS');
+          return callback(null, true);
+        }
+        // En producción, solo permitir si está en la whitelist
+        const isAllowedRailway = allowedOriginsList.some(allowed => 
+          normalizedOrigin.includes(allowed.toLowerCase())
+        );
+        if (isAllowedRailway) {
+          logger.log(`CORS: Origen Railway permitido: ${origin}`, 'CORS');
+          return callback(null, true);
+        }
       }
 
-      // Permitir dominios de Vercel (para frontend en producción)
-      // Verificar múltiples variantes para asegurar que funcione
-      if (
-        normalizedOrigin.includes('.vercel.app') ||
-        normalizedOrigin.includes('vercel.app') ||
-        normalizedOrigin.endsWith('vercel.app')
-      ) {
-        logger.log(`CORS: Origen Vercel permitido: ${origin}`, 'CORS');
-        return callback(null, true);
-      }
-
-      // TEMPORAL: En producción, permitir cualquier origen que contenga 'vercel' para debugging
-      // TODO: Remover después de verificar que funciona
-      if (process.env.NODE_ENV === 'production' && normalizedOrigin.includes('vercel')) {
-        logger.warn(`CORS: Origen Vercel permitido (modo debug): ${origin}`, 'CORS');
-        return callback(null, true);
+      // Permitir dominios de Vercel solo si están en la whitelist específica
+      if (normalizedOrigin.includes('.vercel.app') || normalizedOrigin.includes('vercel.app')) {
+        const isAllowed = allowedVercelDomains.some(domain => 
+          normalizedOrigin === domain || normalizedOrigin.endsWith(`.${domain}`)
+        );
+        
+        if (isAllowed) {
+          logger.log(`CORS: Origen Vercel permitido: ${origin}`, 'CORS');
+          return callback(null, true);
+        } else {
+          logger.warn(`CORS: Origen Vercel bloqueado (no en whitelist): ${origin}`, 'CORS');
+          return callback(new Error('Origin not allowed'));
+        }
       }
 
       // Log para debugging

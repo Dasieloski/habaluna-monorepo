@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Loader2, MailPlus, Send, Users, FileText, Eye, Sparkles } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { sanitizeHtml } from "@/lib/utils/sanitize-html"
 
 type TemplateCategory = "welcome" | "password-reset" | "campaign" | "promotion" | "newsletter" | "all"
 
@@ -610,7 +611,7 @@ export default function AdminEmailMarketingPage() {
                       <div
                         className="rounded-lg border bg-white p-4"
                         style={{ minHeight: "200px" }}
-                        dangerouslySetInnerHTML={{ __html: basicPreviewHtml }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(basicPreviewHtml) }}
                       />
                     ) : (
                       <div className="rounded-lg border bg-muted/50 p-8 text-center text-sm text-muted-foreground">
@@ -641,7 +642,7 @@ export default function AdminEmailMarketingPage() {
           ) : fullPreviewHtml ? (
             <div
               className="border rounded-lg bg-white"
-              dangerouslySetInnerHTML={{ __html: fullPreviewHtml }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(fullPreviewHtml) }}
             />
           ) : (
             <div className="text-center py-8 text-muted-foreground">

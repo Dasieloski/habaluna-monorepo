@@ -24,6 +24,9 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.login(loginDto);
     this.authService.setRefreshCookie(res, result.refreshToken);
+    // Enviar access token en cookie HttpOnly (protección XSS)
+    this.authService.setAccessCookie(res, result.accessToken);
+    // También enviar en body para compatibilidad con frontend actual
     return { user: result.user, accessToken: result.accessToken };
   }
 
@@ -35,6 +38,9 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.register(registerDto);
     this.authService.setRefreshCookie(res, result.refreshToken);
+    // Enviar access token en cookie HttpOnly (protección XSS)
+    this.authService.setAccessCookie(res, result.accessToken);
+    // También enviar en body para compatibilidad con frontend actual
     return { user: result.user, accessToken: result.accessToken };
   }
 
@@ -53,6 +59,9 @@ export class AuthController {
     const rawRefreshToken = tokenFromCookie || tokenFromBody;
     const tokens = await this.authService.refreshToken(rawRefreshToken);
     this.authService.setRefreshCookie(res, tokens.refreshToken);
+    // Enviar access token en cookie HttpOnly (protección XSS)
+    this.authService.setAccessCookie(res, tokens.accessToken);
+    // También enviar en body para compatibilidad con frontend actual
     return { accessToken: tokens.accessToken };
   }
 
@@ -69,6 +78,8 @@ export class AuthController {
     const rawRefreshToken = tokenFromCookie || tokenFromBody;
     const result = await this.authService.logout(rawRefreshToken);
     this.authService.clearRefreshCookie(res);
+    // Limpiar también access token cookie
+    this.authService.clearAccessCookie(res);
     return result;
   }
 

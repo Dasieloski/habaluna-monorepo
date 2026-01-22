@@ -71,6 +71,7 @@ model User {
   wishlistItems WishlistItem[]
   searchHistory SearchHistory[]
   marketingEmailLogs MarketingEmailLog[]
+  auditLogs AuditLog[]
 
   @@map("users")
 }
@@ -525,4 +526,24 @@ model Media {
 
   @@index([createdAt])
   @@map("media")
+}
+
+/// Auditoría de acciones administrativas para trazabilidad y seguridad
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String   // 'CREATE_PRODUCT', 'UPDATE_ORDER', 'DELETE_USER', etc.
+  resource   String   // 'product', 'order', 'user', etc.
+  resourceId String?  // ID del recurso afectado
+  changes    Json?    // Valores antes/después (opcional)
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([resource, resourceId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
 }

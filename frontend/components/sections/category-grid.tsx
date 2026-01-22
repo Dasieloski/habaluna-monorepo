@@ -69,13 +69,12 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               >
                 <div className="w-16 h-16 md:w-28 md:h-28 rounded-full overflow-hidden bg-card mb-2 md:mb-4 ring-2 md:ring-4 ring-transparent group-hover:ring-accent transition-all duration-300 group-hover:scale-110 shadow-lg relative">
                   <SmartImage
-                    src={getImageUrl(category.image) || "/placeholder.svg"}
+                    src={getImageUrl(category.image) || ''}
                     alt={category.name}
                     fill
                     className="transition-transform duration-500 group-hover:scale-110"
                     sizes="(max-width: 768px) 33vw, 200px"
                     objectFit="cover"
-                    loading="lazy"
                   />
                 </div>
                 <span className="text-xs md:text-sm font-semibold text-foreground text-center group-hover:text-accent transition-colors line-clamp-1">
@@ -107,13 +106,12 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
                 }}
               >
                 <SmartImage
-                  src={getImageUrl(category.image) || "/placeholder.svg"}
+                  src={getImageUrl(category.image) || ''}
                   alt={category.name}
                   fill
                   className="transition-transform duration-700 group-hover:scale-110"
                   sizes="(max-width: 768px) 50vw, 25vw"
                   objectFit="cover"
-                  loading="lazy"
                 />
                 <div className="absolute bottom-3 md:bottom-5 left-3 md:left-5 right-3 md:right-5 z-10">
                   <h3 className="text-white text-sm md:text-xl font-bold mb-0.5 md:mb-1 drop-shadow-lg">{category.name}</h3>
@@ -143,13 +141,12 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
               style={{ transitionDelay: `${index < 5 ? index * 0.08 : 0.35 + (index - 5) * 0.02}s` }}
             >
               <SmartImage
-                src={getImageUrl(category.image) || "/placeholder.svg"}
+                src={getImageUrl(category.image) || ''}
                 alt={category.name}
                 fill
                 className="transition-transform duration-700 group-hover:scale-110"
                 sizes="(max-width: 768px) 50vw, 25vw"
                 objectFit="cover"
-                loading="lazy"
               />
               <div className="absolute bottom-3 md:bottom-5 left-3 md:left-5 right-3 md:right-5 z-10">
                 <h3 className="text-white text-base md:text-2xl font-bold mb-0.5 md:mb-1 drop-shadow-lg">{category.name}</h3>

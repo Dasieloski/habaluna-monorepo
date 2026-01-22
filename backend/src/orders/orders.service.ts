@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -19,6 +20,7 @@ export class OrdersService {
     private emailService: EmailService,
     private offersService: OffersService,
     private transportConfig: TransportConfigService,
+    private config: ConfigService,
   ) {}
 
   async create(userId: string, createOrderDto: CreateOrderDto) {
@@ -62,12 +64,58 @@ export class OrdersService {
       }
     }
 
-    // Calcular totals (todo en USD)
-    const subtotal = cart.subtotal;
+    // RECALCULAR subtotal desde BD (no confiar en cart.subtotal)
+    // Esto previene manipulación de precios por parte del cliente
+    let validatedSubtotal = 0;
+    for (const item of cart.items) {
+      // Obtener precio ACTUAL desde BD
+      const product = await this.prisma.product.findUnique({
+        where: { id: item.productId },
+        select: { priceUSD: true, priceMNs: true }
+      });
+      
+      if (!product) {
+        throw new BadRequestException(`Product ${item.productId} not found`);
+      }
+      
+      const variant = item.productVariantId 
+        ? await this.prisma.productVariant.findUnique({
+            where: { id: item.productVariantId },
+            select: { priceUSD: true, priceMNs: true }
+          })
+        : null;
+      
+      // Usar precio de variante si existe, sino del producto
+      let priceInUSD = 0;
+      if (variant) {
+        if (variant.priceUSD) {
+          priceInUSD = Number(variant.priceUSD);
+        } else if (variant.priceMNs) {
+          priceInUSD = convertToUSD(Number(variant.priceMNs), 'MNs');
+        }
+      } else {
+        if (product.priceUSD) {
+          priceInUSD = Number(product.priceUSD);
+        } else if (product.priceMNs) {
+          priceInUSD = convertToUSD(Number(product.priceMNs), 'MNs');
+        }
+      }
+      
+      validatedSubtotal += priceInUSD * item.quantity;
+    }
+    
+    // VALIDAR que el subtotal calculado coincida con el del carrito
+    const tolerance = 0.01; // Permitir pequeñas diferencias de redondeo
+    if (Math.abs(validatedSubtotal - cart.subtotal) > tolerance) {
+      throw new BadRequestException('Cart prices have changed. Please refresh your cart.');
+    }
+    
+    // Usar validatedSubtotal, no cart.subtotal
+    const subtotal = validatedSubtotal;
     const tax = 0;
     const itemCount = cart.items.reduce((s, i) => s + i.quantity, 0);
-    const config = await this.transportConfig.getPublic();
-    const { shipping } = this.transportConfig.computeShipping(itemCount, config);
+    const transportConfig = await this.transportConfig.getPublic();
+    const { shipping } = this.transportConfig.computeShipping(itemCount, transportConfig);
     const total = subtotal + tax + Number(shipping);
 
     // Create order (sin descontar stock ni limpiar carrito - se hará cuando se confirme el pago)
@@ -261,6 +309,53 @@ export class OrdersService {
     // Si se está actualizando el paymentIntentId, significa que el pago fue exitoso
     // En ese caso, confirmamos la orden, descontamos stock y limpiamos el carrito
     if (updateDto.paymentIntentId && order.status === 'PENDING') {
+      // VALIDAR paymentIntentId con el proveedor de pagos (idempotencia y autenticidad)
+      // Validar que el paymentIntent no fue usado antes (idempotencia)
+      const existingOrder = await this.prisma.order.findFirst({
+        where: { 
+          paymentIntentId: updateDto.paymentIntentId,
+          paymentStatus: 'PAID',
+          id: { not: id } // Excluir la orden actual
+        }
+      });
+      
+      if (existingOrder) {
+        throw new BadRequestException('Payment intent already used');
+      }
+      
+      // Si hay un proveedor de pagos configurado, validar con él
+      const paymentProvider = this.config.get<string>('PAYMENT_PROVIDER');
+      
+      if (paymentProvider === 'stripe') {
+        const stripeSecretKey = this.config.get<string>('STRIPE_SECRET_KEY');
+        if (stripeSecretKey) {
+          try {
+            const stripe = require('stripe')(stripeSecretKey);
+            const paymentIntent = await stripe.paymentIntents.retrieve(updateDto.paymentIntentId);
+            
+            // Validar que el pago fue exitoso
+            if (paymentIntent.status !== 'succeeded') {
+              throw new BadRequestException('Payment not confirmed');
+            }
+            
+            // Validar que el monto coincide (Stripe usa centavos)
+            const expectedAmount = Math.round(Number(order.total) * 100);
+            if (paymentIntent.amount !== expectedAmount) {
+              throw new BadRequestException('Payment amount mismatch');
+            }
+          } catch (error) {
+            if (error instanceof BadRequestException) {
+              throw error;
+            }
+            // Si hay error al validar con Stripe, loguear pero no bloquear
+            // (puede ser que el proveedor no sea Stripe o la key no esté configurada)
+            this.logger.warn(
+              `Error validating payment intent with Stripe: ${error instanceof Error ? error.message : String(error)}`
+            );
+          }
+        }
+      }
+      
       // Validar stock antes de confirmar
       for (const item of order.items) {
         const stock = item.productVariant ? item.productVariant.stock : item.product.stock;

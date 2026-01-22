@@ -406,6 +406,13 @@ export class ProductsService {
         error.message?.includes('no existe') ||
         error.message?.includes('column')
       ) {
+        // SEGURIDAD: Uso seguro de $queryRaw con template literals de Prisma
+        // Los parámetros (${id}) son automáticamente escapados por Prisma, previniendo SQL injection
+        // NUNCA usar concatenación de strings con $queryRaw - siempre usar template literals
+        // Este uso es seguro porque:
+        // 1. ${id} viene de parámetros validados del endpoint
+        // 2. Prisma escapa automáticamente los valores en template literals
+        // 3. No hay concatenación de strings que pueda ser manipulada
         const product = (await this.prisma.$queryRaw`
           SELECT 
             id, name, slug, description, "shortDescription",
@@ -512,6 +519,13 @@ export class ProductsService {
         error.message?.includes('no existe') ||
         error.message?.includes('column')
       ) {
+        // SEGURIDAD: Uso seguro de $queryRaw con template literals de Prisma
+        // Los parámetros (${slug}) son automáticamente escapados por Prisma, previniendo SQL injection
+        // NUNCA usar concatenación de strings con $queryRaw - siempre usar template literals
+        // Este uso es seguro porque:
+        // 1. ${slug} viene de parámetros validados del endpoint
+        // 2. Prisma escapa automáticamente los valores en template literals
+        // 3. No hay concatenación de strings que pueda ser manipulada
         const product = (await this.prisma.$queryRaw`
           SELECT 
             id, name, slug, description, "shortDescription",

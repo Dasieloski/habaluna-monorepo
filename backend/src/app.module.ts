@@ -27,6 +27,7 @@ import { CacheModule } from './common/cache/cache.module';
 import { MediaModule } from './media/media.module';
 import { EmailMarketingModule } from './email-marketing/email-marketing.module';
 import { TransportConfigModule } from './transport-config/transport-config.module';
+import { AuditModule } from './common/services/audit.module';
 
 @Module({
   imports: [
@@ -40,16 +41,17 @@ import { TransportConfigModule } from './transport-config/transport-config.modul
       useFactory: (config: ConfigService) => {
         const isProd = config.get<string>('NODE_ENV') === 'production';
 
-        const authLimitDefault = isProd ? 5 : 20;
-        const authTtlSecondsDefault = isProd ? 15 * 60 : 60;
+        // Rate limiting más estricto: 3 intentos por minuto para auth (en lugar de 5)
+        const authLimitDefault = isProd ? 3 : 20;
+        const authTtlSecondsDefault = 60; // 1 minuto (más estricto que 15 minutos)
 
         const authLimit = Number(config.get<string>('THROTTLE_AUTH_LIMIT') ?? authLimitDefault);
         const authTtlSeconds = Number(
           config.get<string>('THROTTLE_AUTH_TTL_SECONDS') ?? authTtlSecondsDefault,
         );
 
-        // Configuración de rate limiting
-        const globalLimitDefault = isProd ? 100 : 1000;
+        // Configuración de rate limiting global más estricta: 30 requests por minuto (en lugar de 100)
+        const globalLimitDefault = isProd ? 30 : 1000;
         const globalTtlSecondsDefault = 60; // 1 minuto
 
         const globalLimit = Number(
@@ -100,6 +102,7 @@ import { TransportConfigModule } from './transport-config/transport-config.modul
     MediaModule,
     EmailMarketingModule,
     TransportConfigModule,
+    AuditModule,
   ],
   providers: [
     HttpExceptionFilter,

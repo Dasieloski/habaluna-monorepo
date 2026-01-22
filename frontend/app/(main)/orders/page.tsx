@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { api, getApiBaseUrlLazy } from '@/lib/api';
+import { SmartImage } from '@/components/ui/smart-image';
+import { api } from '@/lib/api';
+import { getImageUrl } from '@/lib/image-utils';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,30 +28,6 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-function normalizeImageUrl(imagePath: string): string {
-  if (!imagePath) return '/placeholder.svg';
-  
-  // Eliminar referencias a Cloudinary - usar solo imágenes de la BD
-  if (imagePath.includes('cloudinary.com') || imagePath.includes('res.cloudinary')) {
-    console.warn('[normalizeImageUrl] URL de Cloudinary detectada, ignorando:', imagePath);
-    return '/placeholder.svg';
-  }
-  
-  // Si es una URL completa que NO es Cloudinary, retornarla
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) return imagePath;
-  
-  // Usar getApiBaseUrlLazy() en lugar de localhost hardcodeado
-  const base = getApiBaseUrlLazy();
-  
-  // Priorizar URLs de la BD: /api/media/{id}
-  if (imagePath.startsWith('/api/media/')) {
-    return `${base}${imagePath}`;
-  }
-  
-  if (imagePath.startsWith('/')) return `${base}${imagePath}`;
-  return `${base}/uploads/${imagePath}`;
-}
 
 const getStatusBadge = (status: string) => {
   const statusMap: Record<
@@ -412,21 +389,21 @@ export default function OrdersPage() {
                             <div className="flex gap-3 overflow-x-auto pb-2">
                               {order.items.slice(0, 6).map((item: any, idx: number) => {
                                 const product = item.product || {};
-                                const img =
-                                  Array.isArray(product.images) && product.images.length
-                                    ? normalizeImageUrl(product.images[0])
-                                    : '/placeholder.svg';
+                                const img = (Array.isArray(product.images) && product.images.length
+                                  ? getImageUrl(product.images[0])
+                                  : null) || '';
                                 return (
                                   <div
                                     key={idx}
-                                    className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-transparent group-hover:border-sky-300 transition-colors"
+                                    className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-transparent group-hover:border-sky-300 transition-colors relative"
                                   >
-                                    <Image
+                                    <SmartImage
                                       src={img}
                                       alt={product.name || 'Producto'}
-                                      width={80}
-                                      height={80}
-                                      className="w-full h-full object-cover"
+                                      fill
+                                      sizes="80px"
+                                      objectFit="cover"
+                                      className="object-cover"
                                     />
                                   </div>
                                 );

@@ -40,6 +40,10 @@ export class AuthService {
     return (this.config.get<string>('REFRESH_COOKIE_NAME') || 'refreshToken').trim();
   }
 
+  private getAccessCookieName(): string {
+    return (this.config.get<string>('ACCESS_COOKIE_NAME') || 'accessToken').trim();
+  }
+
   /**
    * Determinar si debemos comportarnos "production-like" para cookies.
    * En Railway es común que NODE_ENV no esté seteado, pero el frontend es HTTPS y necesita SameSite=None+Secure.
@@ -84,6 +88,52 @@ export class AuthService {
       path: '/api',
       ...(cookieDomain ? { domain: cookieDomain } : {}),
     });
+  }
+
+  /**
+   * Cookie HttpOnly para access token (protección contra XSS)
+   */
+  setAccessCookie(res: Response, accessToken: string) {
+    const name = this.getAccessCookieName();
+    const isProd = this.isProdLike();
+    const cookieDomain = (this.config.get<string>('COOKIE_DOMAIN') || '').trim();
+    const expiration = this.config.get<string>('JWT_EXPIRATION') || '15m';
+    
+    // Convertir expiration string a milisegundos
+    let maxAge = 15 * 60 * 1000; // 15 minutos por defecto
+    if (expiration.endsWith('m')) {
+      maxAge = parseInt(expiration) * 60 * 1000;
+    } else if (expiration.endsWith('h')) {
+      maxAge = parseInt(expiration) * 60 * 60 * 1000;
+    }
+
+    res.cookie(name, accessToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: (isProd ? 'none' : 'lax') as any,
+      path: '/api',
+      maxAge,
+      ...(cookieDomain ? { domain: cookieDomain } : {}),
+    });
+  }
+
+  clearAccessCookie(res: Response) {
+    const name = this.getAccessCookieName();
+    const isProd = this.isProdLike();
+    const cookieDomain = (this.config.get<string>('COOKIE_DOMAIN') || '').trim();
+    res.clearCookie(name, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: (isProd ? 'none' : 'lax') as any,
+      path: '/api',
+      ...(cookieDomain ? { domain: cookieDomain } : {}),
+    });
+  }
+
+  getAccessCookie(req: Request): string | undefined {
+    const name = this.getAccessCookieName();
+    const v = (req as any)?.cookies?.[name];
+    return typeof v === 'string' && v.trim() ? v.trim() : undefined;
   }
 
   getRefreshCookie(req: Request): string | undefined {

@@ -16,9 +16,13 @@ const nextConfig = {
     // Úsalo solo si lo necesitas temporalmente; puede ocultar bugs reales.
     ignoreBuildErrors: true,
   },
-  // Headers de seguridad
+  // Headers de seguridad y cache
   async headers() {
     return [
+      {
+        source: '/_next/static/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
       {
         source: '/:path*',
         headers: [
@@ -56,7 +60,11 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: http: blob:; connect-src 'self' https://*.railway.app https://*.vercel.app https://vercel.live; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+            value: "default-src 'self'; script-src 'self' https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: http: blob:; connect-src 'self' https://*.railway.app https://*.vercel.app https://vercel.live; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
           },
         ],
       },

@@ -1,31 +1,69 @@
-import { IsObject, IsOptional, IsString } from 'class-validator';
+import { IsObject, IsOptional, IsString, IsNotEmpty, MinLength, MaxLength, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateOrderDto {
+class AddressDto {
   @ApiProperty()
-  @IsObject()
-  shippingAddress: {
-    firstName: string;
-    lastName: string;
-    address: string;
-    city: string;
-    zipCode: string;
-    country: string;
-    phone?: string;
-  };
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(50)
+  firstName: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(50)
+  lastName: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(10)
+  @MaxLength(200)
+  address: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(100)
+  city: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(4)
+  @MaxLength(10)
+  zipCode: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(100)
+  country: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsObject()
-  billingAddress?: {
-    firstName: string;
-    lastName: string;
-    address: string;
-    city: string;
-    zipCode: string;
-    country: string;
-    phone?: string;
-  };
+  @IsString()
+  @MinLength(10)
+  @MaxLength(20)
+  phone?: string;
+}
+
+export class CreateOrderDto {
+  @ApiProperty()
+  @ValidateNested()
+  @Type(() => AddressDto)
+  shippingAddress: AddressDto;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => AddressDto)
+  billingAddress?: AddressDto;
 
   @ApiProperty({ required: false })
   @IsOptional()
