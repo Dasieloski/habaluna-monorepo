@@ -61,12 +61,10 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy',
             // Next.js requiere 'unsafe-inline' para scripts inline de hidratación
-            // 'strict-dynamic' permite que scripts confiables carguen otros scripts dinámicamente
-            // Esta combinación es necesaria para Next.js pero mantiene seguridad razonable:
-            // - Scripts inline son necesarios para Next.js (hidratación)
-            // - 'strict-dynamic' previene que scripts inline maliciosos carguen otros scripts
-            // - Solo scripts de 'self' pueden cargar scripts adicionales
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'strict-dynamic' https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: http: blob:; connect-src 'self' https://*.railway.app https://*.vercel.app https://vercel.live; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+            // No podemos usar 'strict-dynamic' porque desactiva la whitelist y bloquea scripts inline en HTML
+            // Compromiso de seguridad: 'unsafe-inline' es necesario para Next.js
+            // Mitigación: DOMPurify sanitiza HTML para prevenir XSS
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: http: blob:; connect-src 'self' https://*.railway.app https://*.vercel.app https://vercel.live; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
           },
           {
             key: 'X-XSS-Protection',
