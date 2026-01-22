@@ -119,6 +119,12 @@ export class OrdersService {
     const total = subtotal + tax + Number(shipping);
 
     // Create order (sin descontar stock ni limpiar carrito - se hará cuando se confirme el pago)
+    // Convertir AddressDto a objeto plano para Prisma (espera JSON)
+    const shippingAddressPlain = JSON.parse(JSON.stringify(createOrderDto.shippingAddress));
+    const billingAddressPlain = createOrderDto.billingAddress 
+      ? JSON.parse(JSON.stringify(createOrderDto.billingAddress))
+      : shippingAddressPlain;
+    
     const order = await this.prisma.order.create({
       data: {
         orderNumber,
@@ -127,8 +133,8 @@ export class OrdersService {
         tax,
         shipping,
         total,
-        shippingAddress: createOrderDto.shippingAddress,
-        billingAddress: createOrderDto.billingAddress || createOrderDto.shippingAddress,
+        shippingAddress: shippingAddressPlain,
+        billingAddress: billingAddressPlain,
         paymentIntentId: createOrderDto.paymentIntentId,
         offerId: createOrderDto.offerId,
         notes: createOrderDto.notes,
