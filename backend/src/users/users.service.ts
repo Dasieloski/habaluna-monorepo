@@ -165,6 +165,15 @@ export class UsersService {
     });
   }
 
+  async updateRole(id: string, role: 'USER' | 'ADMIN' | 'OPERATOR' | 'LOGISTICS' | 'SUPPORT') {
+    await this.findOne(id);
+    return this.prisma.user.update({
+      where: { id },
+      data: { role },
+      select: { id: true, email: true, role: true },
+    });
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     await this.findOne(id);
     return this.prisma.user.update({
