@@ -840,6 +840,83 @@ export const api = {
     return response.data
   },
 
+  // Roles (Admin)
+  updateUserRole: async (id: string, role: string) => {
+    const response = await api.patch(`/users/${id}/role`, { role })
+    return response.data
+  },
+
+  // Devoluciones (Admin)
+  getReturnRequests: async (params?: { page?: number; limit?: number; status?: string }) => {
+    const qp = new URLSearchParams()
+    if (params?.page) qp.append("page", String(params.page))
+    if (params?.limit) qp.append("limit", String(params.limit))
+    if (params?.status) qp.append("status", params.status)
+    const response = await api.get(`/returns?${qp.toString()}`)
+    return response.data
+  },
+
+  updateReturnStatus: async (id: string, status: string) => {
+    const response = await api.patch(`/returns/${id}/status`, { status })
+    return response.data
+  },
+
+  processRefund: async (returnId: string, data: { amount: number; method: string; reason?: string }) => {
+    const response = await api.post(`/returns/${returnId}/refund`, data)
+    return response.data
+  },
+
+  getRefunds: async (params?: { page?: number; limit?: number }) => {
+    const qp = new URLSearchParams()
+    if (params?.page) qp.append("page", String(params.page))
+    if (params?.limit) qp.append("limit", String(params.limit))
+    const response = await api.get(`/returns/refunds?${qp.toString()}`)
+    return response.data
+  },
+
+  // Alertas (Admin)
+  getAlerts: async (params?: { page?: number; limit?: number; status?: string }) => {
+    const qp = new URLSearchParams()
+    if (params?.page) qp.append("page", String(params.page))
+    if (params?.limit) qp.append("limit", String(params.limit))
+    if (params?.status) qp.append("status", params.status)
+    const response = await api.get(`/alerts?${qp.toString()}`)
+    return response.data
+  },
+
+  markAlertViewed: async (id: string) => {
+    const response = await api.patch(`/alerts/${id}/viewed`, {})
+    return response.data
+  },
+
+  markAlertResolved: async (id: string) => {
+    const response = await api.patch(`/alerts/${id}/resolved`, {})
+    return response.data
+  },
+
+  // Contenido (CMS)
+  getContentBlocks: async (section?: string) => {
+    const qp = new URLSearchParams()
+    if (section) qp.append("section", section)
+    const response = await api.get(`/content?${qp.toString()}`)
+    return response.data
+  },
+
+  upsertContentBlock: async (data: { slug: string; title: string; content: string; section?: string; isActive?: boolean }) => {
+    const response = await api.post('/content', data)
+    return response.data
+  },
+
+  deleteContentBlock: async (slug: string) => {
+    const response = await api.delete(`/content/${slug}`)
+    return response.data
+  },
+
+  // Stats (Admin)
+  getDashboardStats: async () => {
+    const response = await api.get('/stats/dashboard')
+    return response.data
+  },
   getAdminOffer: async (id: string): Promise<BackendAdminOffer> => {
     const response = await api.get(`/offers/admin/${id}`)
     return response.data as BackendAdminOffer
