@@ -65,7 +65,6 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pdfkit": "^0.17.2",
-    "prisma": "^5.22.0",
     "redis": "^5.10.0",
     "reflect-metadata": "^0.1.13",
     "resend": "^4.8.0",
@@ -78,6 +77,7 @@
   "devDependencies": {
     "@nestjs/cli": "^10.2.1",
     "@nestjs/schematics": "^10.0.3",
+    "prisma": "^5.22.0",
     "@nestjs/testing": "^10.3.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.10",
@@ -106,5 +106,8 @@
   },
   "prisma": {
     "seed": "ts-node --project tsconfig.json prisma/seed.ts"
+  },
+  "engines": {
+    "node": ">=18.18.0"
   }
 }
