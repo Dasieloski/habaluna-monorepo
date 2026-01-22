@@ -6,8 +6,6 @@ generator client {
   // Railway puede usar imágenes con OpenSSL 3 (y/o musl). Incluir binarios explícitos
   // evita errores tipo: "libssl.so not found" en runtime.
   binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
-  // Fijar versión exacta para evitar auto-instalaciones durante despliegue
-  version = "5.22.0"
 }
 
 datasource db {

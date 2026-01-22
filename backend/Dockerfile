@@ -18,6 +18,8 @@ COPY package.json ./
 COPY package-lock.json* ./
 COPY prisma ./prisma/
 
+# Limpiar cache de npm y instalar dependencias desde cero
+RUN npm cache clean --force
 # Instalar dependencias (sharp se compilará aquí, puede tardar 5-10 min)
 # En workspaces, usar npm install directamente (más flexible que npm ci)
 # --prefer-offline para usar cache si está disponible
