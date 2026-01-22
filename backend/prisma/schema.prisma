@@ -19,6 +19,9 @@ datasource db {
 enum UserRole {
   USER
   ADMIN
+  OPERATOR
+  LOGISTICS
+  SUPPORT
 }
 
 enum OrderStatus {
@@ -72,6 +75,7 @@ model User {
   searchHistory SearchHistory[]
   marketingEmailLogs MarketingEmailLog[]
   auditLogs AuditLog[]
+  returnRequests ReturnRequest[]
 
   @@map("users")
 }
@@ -413,6 +417,8 @@ model Order {
   user  User        @relation(fields: [userId], references: [id])
   offer Offer?      @relation(fields: [offerId], references: [id])
   items OrderItem[]
+  returnRequests ReturnRequest[]
+  refunds Refund[]
 
   @@index([userId])
   @@index([orderNumber])
@@ -526,6 +532,107 @@ model Media {
 
   @@index([createdAt])
   @@map("media")
+}
+
+enum ReturnStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  REFUNDED
+}
+
+enum RefundStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+enum AlertType {
+  LOW_STOCK
+  OUT_OF_STOCK
+  ORDER_STUCK
+  PAYMENT_ISSUE
+  SYSTEM_ERROR
+}
+
+enum AlertStatus {
+  NEW
+  VIEWED
+  RESOLVED
+}
+
+model ReturnRequest {
+  id          String       @id @default(uuid())
+  orderId     String
+  userId      String
+  status      ReturnStatus @default(REQUESTED)
+  reason      String
+  notes       String?      @db.Text
+  refundAmount Decimal?    @db.Decimal(10, 2)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  order   Order    @relation(fields: [orderId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
+  refunds Refund[]
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([status])
+  @@map("return_requests")
+}
+
+model Refund {
+  id              String       @id @default(uuid())
+  returnRequestId String?
+  orderId         String?
+  amount          Decimal      @db.Decimal(10, 2)
+  reason          String?
+  status          RefundStatus @default(PENDING)
+  method          String?      // 'balance', 'original_payment', 'cash'
+  processedAt     DateTime?
+  processedBy     String?      // User ID of admin
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  returnRequest ReturnRequest? @relation(fields: [returnRequestId], references: [id])
+  order         Order?         @relation(fields: [orderId], references: [id])
+
+  @@index([returnRequestId])
+  @@index([orderId])
+  @@index([status])
+  @@map("refunds")
+}
+
+model SystemAlert {
+  id        String      @id @default(uuid())
+  type      AlertType
+  message   String
+  details   Json?
+  status    AlertStatus @default(NEW)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+  @@map("system_alerts")
+}
+
+model ContentBlock {
+  id        String   @id @default(uuid())
+  slug      String   @unique // e.g., 'terms-and-conditions', 'home-banner-text'
+  title     String
+  content   String   @db.Text
+  section   String?  // Grouping key: 'legal', 'marketing', 'info'
+  isActive  Boolean  @default(true)
+  updatedBy String?  // User ID
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([section])
+  @@map("content_blocks")
 }
 
 /// Auditoría de acciones administrativas para trazabilidad y seguridad
