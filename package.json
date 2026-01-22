@@ -21,10 +21,17 @@
     "docker:down": "docker-compose down",
     "docker:build": "docker-compose build",
     "postinstall": "npm run prisma:generate",
-    "prisma:generate": "cd backend && npx prisma generate",
-    "prisma:migrate": "cd backend && npx prisma migrate dev",
-    "prisma:seed": "cd backend && npx prisma db seed",
-    "prisma:studio": "cd backend && npx prisma studio"
+    "prisma:generate": "npx prisma generate --schema=backend/prisma/schema.prisma",
+    "prisma:migrate": "npx prisma migrate dev --schema=backend/prisma/schema.prisma",
+    "prisma:seed": "npx prisma db seed --schema=backend/prisma/schema.prisma",
+    "prisma:studio": "npx prisma studio --schema=backend/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prisma": "5.22.0"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
