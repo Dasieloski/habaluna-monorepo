@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { PageTransition } from "@/components/layout/page-transition"
+import { ThemeProvider } from "@/components/themes/theme-provider"
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -26,6 +27,11 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer />
+
+      {/* Theme Provider - Renderiza temas estacionales */}
+      <Suspense fallback={null}>
+        <ThemeProvider />
+      </Suspense>
     </>
   )
 }

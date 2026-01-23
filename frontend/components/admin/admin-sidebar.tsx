@@ -29,7 +29,8 @@ import {
   FileText,
   History,
   BarChart3,
-  Undo2
+  Undo2,
+  Palette
 } from "lucide-react"
 import React, { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
@@ -99,6 +100,13 @@ const menuGroups = [
       { href: "/admin/content", label: "Contenido (CMS)", icon: FileText },
       { href: "/admin/settings", label: "Configuración", icon: Settings },
       { href: "/admin/history", label: "Historial", icon: History },
+    ]
+  },
+  {
+    id: "themes",
+    title: "Temas / Estacionalidad",
+    items: [
+      { href: "/admin/themes", label: "Gestión de Temas", icon: Palette },
     ]
   }
 ]

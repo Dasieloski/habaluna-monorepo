@@ -28,6 +28,7 @@ import { MediaModule } from './media/media.module';
 import { EmailMarketingModule } from './email-marketing/email-marketing.module';
 import { TransportConfigModule } from './transport-config/transport-config.module';
 import { AuditModule } from './common/services/audit.module';
+import { ThemesModule } from './themes/themes.module';
 
 @Module({
   imports: [
@@ -103,6 +104,7 @@ import { AuditModule } from './common/services/audit.module';
     EmailMarketingModule,
     TransportConfigModule,
     AuditModule,
+    ThemesModule,
   ],
   providers: [
     HttpExceptionFilter,

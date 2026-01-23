@@ -654,3 +654,72 @@ model AuditLog {
   @@index([createdAt])
   @@map("audit_logs")
 }
+
+enum ThemeType {
+  CHRISTMAS
+  VALENTINES
+  MOTHERS_DAY
+  EASTER
+  HALLOWEEN
+  NEW_YEAR
+  SUMMER
+  WINTER
+  SPRING
+  AUTUMN
+}
+
+enum ThemeStatus {
+  INACTIVE
+  ACTIVE
+  SCHEDULED
+}
+
+model Theme {
+  id          String      @id @default(uuid())
+  type        ThemeType   @unique
+  name        String
+  description String?
+  status      ThemeStatus @default(INACTIVE)
+
+  // Configuración del tema
+  config      Json?       // Configuración específica del tema (colores, animaciones, etc.)
+
+  // Programación automática
+  startDate   DateTime?
+  endDate     DateTime?
+  isRecurring Boolean     @default(false)
+
+  // Prioridad para conflictos (mayor número = mayor prioridad)
+  priority    Int         @default(0)
+
+  // Metadata
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("themes")
+}
+
+model ThemeSchedule {
+  id        String   @id @default(uuid())
+  themeId   String
+  theme     Theme    @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  // Fechas específicas o rangos
+  startDate DateTime
+  endDate   DateTime?
+
+  // Si es recurrente (anual)
+  isRecurring Boolean @default(false)
+
+  // Metadata
+  createdBy String?  // User ID
+  createdAt DateTime @default(now())
+
+  @@index([themeId])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("theme_schedules")
+}
