@@ -44,12 +44,6 @@ export class ThemesController {
     return this.themesService.findAll();
   }
 
-  @Get('active')
-  @ApiOperation({ summary: 'Obtener el tema activo actualmente' })
-  @ApiResponse({ status: 200, description: 'Tema activo o null' })
-  getActiveTheme() {
-    return this.themesService.getActiveTheme();
-  }
 
   @Get('scheduled')
   @UseGuards(RolesGuard)
