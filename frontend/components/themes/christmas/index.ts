@@ -1,5 +1,5 @@
 // Exportaciones del tema navideño
-// Importar así: import { ChristmasTheme } from "@/themes/christmas"
+// Importar así: import { ChristmasTheme } from "@/components/themes/christmas"
 
 export { ChristmasTheme } from "./ChristmasTheme"
 export type { ChristmasThemeProps } from "./ChristmasTheme"
