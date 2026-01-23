@@ -136,7 +136,7 @@ export function ChristmasBanner({
                     }}
                     transition={{
                       duration: 2,
-                      delay: i * 0.2,
+                      delay: Math.max(0, i * 0.2),
                       repeat: Infinity,
                       repeatDelay: 3,
                     }}
@@ -209,7 +209,7 @@ export function ChristmasBanner({
                 style={{ color: colors.creamLight }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: animation.fast }}
+                transition={{ delay: 0.4, duration: Math.max(0.1, animation.fast) }}
               >
                 {message}
               </motion.p>
@@ -220,7 +220,7 @@ export function ChristmasBanner({
                 style={{ color: colors.ivory }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: animation.fast }}
+                transition={{ delay: 0.6, duration: Math.max(0.1, animation.fast) }}
               >
                 {subMessage}
               </motion.p>
@@ -233,7 +233,7 @@ export function ChristmasBanner({
                   rotate: [0, 5, -5, 0],
                 }}
                 transition={{
-                  duration: 3,
+                  duration: Math.max(1, 3),
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}

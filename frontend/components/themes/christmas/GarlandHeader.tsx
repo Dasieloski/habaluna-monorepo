@@ -83,15 +83,15 @@ export function GarlandHeader() {
           }}
           transition={{
             scale: {
-              duration: animation.fast,
-              delay: light.delay / 1000,
+              duration: Math.max(0.1, animation.fast),
+              delay: Math.max(0, light.delay / 1000),
             },
             opacity: {
-              duration: light.twinkleDuration / 1000,
+              duration: Math.max(0.5, light.twinkleDuration / 1000),
               repeat: Infinity,
               repeatType: "reverse",
               ease: "easeInOut",
-              delay: light.delay / 1000,
+              delay: Math.max(0, light.delay / 1000),
             },
           }}
         />

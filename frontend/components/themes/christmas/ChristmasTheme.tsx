@@ -75,6 +75,18 @@ export function ChristmasTheme({
   // Si no está habilitado, no renderizar nada
   if (!enabled) return null
 
+  // Validar configuración básica antes de renderizar
+  try {
+    // Verificar que los colores existan
+    if (!christmasConfig.colors || typeof christmasConfig.colors !== 'object') {
+      console.warn('Christmas theme: Invalid color configuration')
+      return null
+    }
+  } catch (error) {
+    console.warn('Christmas theme: Configuration error', error)
+    return null
+  }
+
   return (
     <>
       {/* Iluminación ambiental - fondo de la escena */}

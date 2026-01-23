@@ -45,7 +45,7 @@ export function AmbientLights() {
           scale: [1, 1.1, 1],
         }}
         transition={{
-          duration: 6,
+          duration: Math.max(1, 6),
           repeat: Infinity,
           ease: "easeInOut",
         }}
@@ -62,7 +62,7 @@ export function AmbientLights() {
           scale: [1, 1.05, 1],
         }}
         transition={{
-          duration: 8,
+          duration: Math.max(1, 8),
           repeat: Infinity,
           ease: "easeInOut",
           delay: 2,
@@ -80,7 +80,7 @@ export function AmbientLights() {
           scale: [1, 1.08, 1],
         }}
         transition={{
-          duration: 10,
+          duration: Math.max(1, 10),
           repeat: Infinity,
           ease: "easeInOut",
           delay: 4,
@@ -104,10 +104,10 @@ export function AmbientLights() {
             opacity: [0.1, 0.3, 0.1],
           }}
           transition={{
-            duration: 8 + Math.random() * 4,
+            duration: Math.max(1, 8 + Math.random() * 4),
             repeat: Infinity,
             ease: "easeInOut",
-            delay: i * 0.5,
+            delay: Math.max(0, i * 0.5),
           }}
         />
       ))}

@@ -25,9 +25,9 @@ export function FestiveOrnaments() {
       type: ornaments.types[Math.floor(Math.random() * ornaments.types.length)] as any,
       x: Math.random() * 90 + 5, // 5% to 95% to avoid edges
       y: Math.random() * 80 + 10, // 10% to 90% to avoid header/footer
-      size: ornaments.minSize + Math.random() * (ornaments.maxSize - ornaments.minSize),
+      size: Math.max(12, ornaments.minSize + Math.random() * (ornaments.maxSize - ornaments.minSize)),
       rotation: Math.random() * 360,
-      delay: i * ornaments.animationDelay,
+      delay: Math.max(0, i * ornaments.animationDelay),
       color: Math.random() > 0.5 ? colors.gold : colors.cranberry,
     }))
   }, [ornaments, colors])
@@ -48,6 +48,11 @@ export function FestiveOrnaments() {
   }
 
   if (!isVisible) return null
+
+  // Validar que tenemos datos válidos antes de renderizar
+  if (!festiveOrnaments.length || festiveOrnaments.some(o => o.size <= 0)) {
+    return null
+  }
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-[9996]" aria-hidden="true">
@@ -73,8 +78,8 @@ export function FestiveOrnaments() {
             opacity: [0, 0.8, 1],
           }}
           transition={{
-            duration: animation.normal,
-            delay: ornament.delay / 1000,
+            duration: Math.max(0.1, animation.normal),
+            delay: Math.max(0, ornament.delay / 1000),
             ease: animation.bounce,
           }}
         >
@@ -84,10 +89,10 @@ export function FestiveOrnaments() {
               scale: [1, 1.05, 1],
             }}
             transition={{
-              duration: 4 + Math.random() * 2,
+              duration: Math.max(2, 4 + Math.random() * 2),
               repeat: Infinity,
               ease: "easeInOut",
-              delay: ornament.delay / 1000,
+              delay: Math.max(0, ornament.delay / 1000),
             }}
           >
             {getOrnamentSymbol(ornament.type)}

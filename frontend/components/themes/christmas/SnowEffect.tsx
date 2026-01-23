@@ -24,10 +24,10 @@ export function SnowEffect() {
     return Array.from({ length: snow.particleCount }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
-      size: snow.minSize + Math.random() * (snow.maxSize - snow.minSize),
-      duration: snow.minDuration + Math.random() * (snow.maxDuration - snow.minDuration),
-      delay: Math.random() * snow.maxDuration,
-      opacity: snow.minOpacity + Math.random() * (snow.maxOpacity - snow.minOpacity),
+      size: Math.max(1, snow.minSize + Math.random() * (snow.maxSize - snow.minSize)),
+      duration: Math.max(1, snow.minDuration + Math.random() * (snow.maxDuration - snow.minDuration)),
+      delay: Math.max(0, Math.random() * snow.maxDuration),
+      opacity: Math.max(0.1, snow.minOpacity + Math.random() * (snow.maxOpacity - snow.minOpacity)),
       windOffset: (Math.random() - 0.5) * snow.windStrength * 100,
       rotation: Math.random() * 360,
       glow: Math.random() > 0.7, // 30% of snowflakes glow
@@ -40,6 +40,11 @@ export function SnowEffect() {
   }, [])
 
   if (!isVisible) return null
+
+  // Validar que tenemos datos válidos antes de renderizar
+  if (!snowflakes.length || snowflakes.some(f => f.duration <= 0)) {
+    return null
+  }
 
   return (
     <div
@@ -74,8 +79,8 @@ export function SnowEffect() {
             opacity: [0, flake.opacity, 0],
           }}
           transition={{
-            duration: flake.duration,
-            delay: flake.delay,
+            duration: Math.max(1, flake.duration),
+            delay: Math.max(0, flake.delay),
             ease: "linear",
             repeat: Infinity,
             repeatType: "loop",
