@@ -8,6 +8,8 @@ export type { ChristmasThemeProps } from "./ChristmasTheme"
 export { SnowEffect } from "./SnowEffect"
 export { GarlandHeader } from "./GarlandHeader"
 export { ChristmasBanner } from "./ChristmasBanner"
+export { FestiveOrnaments } from "./FestiveOrnaments"
+export { AmbientLights } from "./AmbientLights"
 
 // Configuración del tema
 export { christmasConfig } from "./themeConfig"

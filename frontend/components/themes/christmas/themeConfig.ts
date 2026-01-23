@@ -1,56 +1,108 @@
-// Premium Christmas Theme Configuration
-// Refined color palette with sophisticated, muted tones
+// Professional Christmas Theme Configuration
+// Elegant, modern and visually stunning color palette
 
 export const christmasConfig = {
-  // Premium color palette - muted, elegant, minimal
+  // Premium color palette - elegant, festive and professional
   colors: {
-    // Snow - very subtle, almost invisible
-    snow: "rgba(255, 255, 255, 0.6)",
-    snowSoft: "rgba(245, 245, 245, 0.3)",
-    
-    // Foliage - deep, sophisticated greens
-    pine: "#1a3a2f",
-    pineLight: "#2a4a3f",
-    pineMuted: "rgba(26, 58, 47, 0.9)",
-    
-    // Accent - warm gold, understated
-    gold: "#c9a962",
-    goldMuted: "rgba(201, 169, 98, 0.7)",
-    
-    // Surface - for overlays
-    surface: "rgba(26, 58, 47, 0.95)",
-    surfaceLight: "rgba(42, 74, 63, 0.9)",
+    // Snow - crystalline and luminous
+    snow: "rgba(255, 255, 255, 0.8)",
+    snowGlow: "rgba(255, 255, 255, 0.95)",
+    snowShadow: "rgba(255, 255, 255, 0.3)",
+
+    // Deep forest greens - sophisticated and natural
+    pine: "#0f2920",
+    pineLight: "#1a3a2f",
+    pineMuted: "rgba(26, 58, 47, 0.85)",
+    pineGlow: "rgba(34, 197, 94, 0.1)",
+
+    // Warm festive reds - elegant and classic
+    cranberry: "#8b1e3f",
+    cranberryLight: "#a8334c",
+    cranberryGlow: "rgba(168, 51, 76, 0.2)",
+
+    // Premium gold accents - luxurious and refined
+    gold: "#d4af37",
+    goldLight: "#f4e87c",
+    goldMuted: "rgba(212, 175, 55, 0.8)",
+    goldGlow: "rgba(244, 232, 124, 0.3)",
+
+    // Surface overlays - modern glass morphism
+    surface: "rgba(15, 41, 32, 0.95)",
+    surfaceLight: "rgba(26, 58, 47, 0.9)",
+    surfaceGlow: "rgba(15, 41, 32, 0.85)",
+
+    // Warm festive whites and creams
+    cream: "rgba(255, 248, 240, 0.9)",
+    creamLight: "rgba(255, 253, 248, 0.95)",
+    ivory: "rgba(255, 255, 240, 0.92)",
   },
 
-  // Snow effect - sparse and gentle
+  // Enhanced snow effect - realistic and mesmerizing
   snow: {
-    particleCount: 25,
-    minSize: 2,
-    maxSize: 4,
-    minDuration: 12,
-    maxDuration: 20,
-    minOpacity: 0.2,
-    maxOpacity: 0.5,
+    particleCount: 35,
+    minSize: 1.5,
+    maxSize: 5,
+    minDuration: 8,
+    maxDuration: 18,
+    minOpacity: 0.3,
+    maxOpacity: 0.7,
+    windStrength: 0.5,
+    glowIntensity: 0.4,
   },
 
-  // Garland - minimal and refined
+  // Professional garland system
   garland: {
-    height: 3,
-    ornamentCount: 0, // No ornaments for cleaner look
+    height: 4,
+    lightCount: 12,
+    twinkleSpeed: 2000,
+    colors: ["#d4af37", "#f4e87c", "#8b1e3f", "#a8334c"],
+    intensity: 0.8,
   },
 
-  // Banner - sleek and modern
+  // Festive banner system
   banner: {
     dismissible: true,
-    delayMs: 800,
+    delayMs: 1200,
+    autoHideDelay: 30000,
+    cornerRadius: "16px",
+    blurStrength: "20px",
   },
 
-  // Animation timings - smooth, professional
+  // Sophisticated ornament collection
+  ornaments: {
+    count: 8,
+    types: ["star", "bell", "candy", "snowflake"],
+    minSize: 16,
+    maxSize: 24,
+    animationDelay: 300,
+    glowEffect: true,
+  },
+
+  // Professional animation timings
   animation: {
-    fast: "200ms",
-    normal: "300ms",
-    slow: "400ms",
-    easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+    instant: "100ms",
+    fast: "250ms",
+    normal: "400ms",
+    slow: "600ms",
+    slower: "800ms",
+    easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    bounce: "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+  },
+
+  // Sound effects (optional, subtle)
+  sounds: {
+    enabled: false,
+    snowVolume: 0.1,
+    bellVolume: 0.05,
+    windVolume: 0.08,
+  },
+
+  // Performance settings
+  performance: {
+    reduceMotion: false,
+    maxParticles: 50,
+    enableWebGL: true,
+    useHardwareAcceleration: true,
   },
 } as const
 
