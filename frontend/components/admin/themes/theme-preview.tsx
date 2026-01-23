@@ -8,6 +8,8 @@ import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { EyeIcon, XIcon } from "lucide-react"
 import { ChristmasTheme } from "@/components/themes/christmas"
+import { ValentinesTheme } from "@/components/themes/valentines"
+import { MothersDayTheme } from "@/components/themes/mothers-day"
 
 interface ThemePreviewProps {
   theme: any
@@ -34,6 +36,30 @@ export function ThemePreview({ theme, onClose }: ThemePreviewProps) {
             showBanner={theme.config?.showBanner ?? true}
             bannerMessage={theme.config?.bannerMessage || "Vista Previa"}
             bannerSubMessage={theme.config?.bannerSubMessage}
+          />
+        )
+      case 'VALENTINES':
+        return (
+          <ValentinesTheme
+            enabled={isVisible}
+            showHearts={theme.config?.showHearts ?? true}
+            showGarland={theme.config?.showGarland ?? true}
+            showBanner={theme.config?.showBanner ?? true}
+            bannerMessage={theme.config?.bannerMessage || "Vista Previa"}
+            bannerSubMessage={theme.config?.bannerSubMessage}
+            bannerCtaText={theme.config?.bannerCtaText}
+          />
+        )
+      case 'MOTHERS_DAY':
+        return (
+          <MothersDayTheme
+            enabled={isVisible}
+            showPetals={theme.config?.showPetals ?? true}
+            showGarland={theme.config?.showGarland ?? true}
+            showBanner={theme.config?.showBanner ?? true}
+            bannerMessage={theme.config?.bannerMessage || "Vista Previa"}
+            bannerSubMessage={theme.config?.bannerSubMessage}
+            bannerCtaText={theme.config?.bannerCtaText}
           />
         )
       default:

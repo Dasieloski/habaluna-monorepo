@@ -279,8 +279,6 @@ export class ThemesService {
           showSnow: true,
           showGarland: true,
           showBanner: true,
-          showOrnaments: true,
-          showAmbientLights: true,
           bannerMessage: '¡Feliz Navidad!',
           bannerSubMessage: 'Descubre nuestras ofertas especiales'
         }
@@ -290,11 +288,12 @@ export class ThemesService {
         name: 'San Valentín',
         description: 'Tema romántico para el día de los enamorados',
         config: {
+          showHearts: true,
+          showGarland: true,
           showBanner: true,
-          showOrnaments: false,
-          showAmbientLights: false,
           bannerMessage: '¡Feliz Día de los Enamorados!',
-          bannerSubMessage: 'Descuentos especiales en productos para parejas'
+          bannerSubMessage: 'Detalles únicos para compartir',
+          bannerCtaText: 'Ver regalos'
         }
       },
       {
@@ -302,11 +301,12 @@ export class ThemesService {
         name: 'Día de la Madre',
         description: 'Tema especial para celebrar a las madres',
         config: {
+          showPetals: true,
+          showGarland: true,
           showBanner: true,
-          showOrnaments: false,
-          showAmbientLights: false,
           bannerMessage: '¡Feliz Día de la Madre!',
-          bannerSubMessage: 'Ofertas especiales para regalar'
+          bannerSubMessage: 'Sorpréndela con un detalle especial',
+          bannerCtaText: 'Explorar regalos'
         }
       }
     ];
