@@ -26,10 +26,11 @@ interface Theme {
 
 interface ThemeListProps {
   onPreview: (theme: Theme) => void
+  onConfigure: (theme: Theme) => void
   onRefresh: () => void
 }
 
-export function ThemeList({ onPreview, onRefresh }: ThemeListProps) {
+export function ThemeList({ onPreview, onConfigure, onRefresh }: ThemeListProps) {
   const [themes, setThemes] = useState<Theme[]>([])
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
@@ -176,7 +177,7 @@ export function ThemeList({ onPreview, onRefresh }: ThemeListProps) {
                     <EyeIcon className="h-4 w-4 mr-2" />
                     Previsualizar
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => onConfigure(theme)}>
                     <SettingsIcon className="h-4 w-4 mr-2" />
                     Configurar
                   </Button>

@@ -508,8 +508,19 @@ export const api = {
         }
         throw await buildApiError(response, finalUrl)
       }
-      const data = await response.json()
-      return { data }
+      const contentType = response.headers.get("content-type") || ""
+      const text = await response.text()
+      if (!text) {
+        return { data: null }
+      }
+      if (contentType.includes("application/json")) {
+        try {
+          return { data: JSON.parse(text) }
+        } catch {
+          return { data: null }
+        }
+      }
+      return { data: text }
     } catch (error) {
       // No spamear consola: 401/404 pueden ser casos normales (sesión expirada / producto no existe)
       throw error
@@ -1479,6 +1490,11 @@ export const api = {
 
   getThemePreview: async (type: string): Promise<any> => {
     const res = await api.get(`/admin/themes/preview/${type}`)
+    return res.data
+  },
+
+  updateTheme: async (themeId: string, data: { name?: string; description?: string; config?: any; priority?: number }) => {
+    const res = await api.patch(`/admin/themes/${themeId}`, data)
     return res.data
   },
 }

@@ -87,13 +87,13 @@ export function ThemePreview({ theme, onClose }: ThemePreviewProps) {
   return (
     <>
       {/* Overlay del tema (se renderiza fuera del modal) */}
-      <div className="fixed inset-0 pointer-events-none z-50">
+      <div className="fixed inset-0 pointer-events-none z-40">
         {getThemeComponent()}
       </div>
 
       {/* Modal de preview */}
       <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[80vh] relative z-[60]">
+        <DialogContent className="max-w-5xl max-h-[85vh] top-[6%] translate-y-0 overflow-hidden z-[80]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <EyeIcon className="h-5 w-5" />
@@ -102,7 +102,7 @@ export function ThemePreview({ theme, onClose }: ThemePreviewProps) {
             </DialogTitle>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[60vh]">
+          <ScrollArea className="max-h-[65vh]">
             <div className="space-y-6">
               {/* Información del tema */}
               <div className="space-y-4">

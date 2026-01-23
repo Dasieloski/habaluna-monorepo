@@ -9,6 +9,7 @@ import { CalendarIcon, EyeIcon, SettingsIcon, PlusIcon } from "lucide-react"
 import { ThemeList } from "@/components/admin/themes/theme-list"
 import { ThemeScheduler } from "@/components/admin/themes/theme-scheduler"
 import { ThemePreview } from "@/components/admin/themes/theme-preview"
+import { ThemeConfigDialog } from "@/components/admin/themes/theme-config"
 import { useToast } from "@/hooks/use-toast"
 import { api } from "@/lib/api"
 
@@ -18,6 +19,8 @@ export default function ThemesPage() {
   const [scheduledThemes, setScheduledThemes] = useState<any[]>([])
   const [showPreview, setShowPreview] = useState(false)
   const [previewTheme, setPreviewTheme] = useState<any>(null)
+  const [showConfig, setShowConfig] = useState(false)
+  const [configTheme, setConfigTheme] = useState<any>(null)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -43,6 +46,11 @@ export default function ThemesPage() {
   const handlePreview = (theme: any) => {
     setPreviewTheme(theme)
     setShowPreview(true)
+  }
+
+  const handleConfigure = (theme: any) => {
+    setConfigTheme(theme)
+    setShowConfig(true)
   }
 
   const handleInitialize = async () => {
@@ -111,7 +119,7 @@ export default function ThemesPage() {
                   <EyeIcon className="h-4 w-4 mr-2" />
                   Previsualizar
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => handleConfigure(activeTheme)}>
                   <SettingsIcon className="h-4 w-4 mr-2" />
                   Configurar
                 </Button>
@@ -126,6 +134,7 @@ export default function ThemesPage() {
       {/* Lista de temas disponibles */}
       <ThemeList
         onPreview={handlePreview}
+        onConfigure={handleConfigure}
         onRefresh={loadThemes}
       />
 
@@ -177,6 +186,18 @@ export default function ThemesPage() {
             setShowPreview(false)
             setPreviewTheme(null)
           }}
+        />
+      )}
+
+      {showConfig && configTheme && (
+        <ThemeConfigDialog
+          theme={configTheme}
+          open={showConfig}
+          onClose={() => {
+            setShowConfig(false)
+            setConfigTheme(null)
+          }}
+          onSaved={loadThemes}
         />
       )}
     </div>
