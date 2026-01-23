@@ -148,50 +148,62 @@ export class ThemesService {
 
   async getActiveTheme() {
     try {
-      const theme = await this.prisma.theme.findFirst({
+      // Primero buscar tema activo manualmente
+      const activeTheme = await this.prisma.theme.findFirst({
         where: { status: ThemeStatus.ACTIVE },
         include: {
           themeSchedules: true
         }
       });
 
-      // Si no hay tema activo manualmente, buscar por fecha
-      if (!theme) {
-        const now = new Date();
-        const scheduledTheme = await this.prisma.theme.findFirst({
-          where: {
-            status: ThemeStatus.SCHEDULED,
-            OR: [
-              {
-                startDate: { lte: now },
-                endDate: { gte: now }
-              },
-              {
-                isRecurring: true,
-                OR: [
-                  // Para temas recurrentes, verificar mes y día
-                  {
-                    startDate: {
-                      lte: new Date(now.getFullYear(), now.getMonth(), now.getDate())
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          include: {
-            themeSchedules: true
-          },
-          orderBy: { priority: 'desc' }
-        });
-
-        return scheduledTheme;
+      if (activeTheme) {
+        return activeTheme;
       }
 
-      return theme;
+      // Si no hay tema activo manualmente, buscar temas programados para la fecha actual
+      const now = new Date();
+
+      // Buscar temas programados que estén activos en la fecha actual
+      const scheduledThemes = await this.prisma.themeSchedule.findMany({
+        where: {
+          OR: [
+            {
+              startDate: { lte: now },
+              endDate: { gte: now }
+            },
+            {
+              isRecurring: true,
+              startDate: {
+                lte: new Date(now.getFullYear(), now.getMonth(), now.getDate())
+              }
+            }
+          ]
+        },
+        include: {
+          theme: {
+            include: {
+              themeSchedules: true
+            }
+          }
+        },
+        orderBy: {
+          theme: {
+            priority: 'desc'
+          }
+        }
+      });
+
+      // Devolver el primer tema programado encontrado (ordenado por prioridad)
+      if (scheduledThemes.length > 0) {
+        return scheduledThemes[0].theme;
+      }
+
+      // Si no hay ningún tema activo, devolver null
+      return null;
+
     } catch (error) {
-      // Si la tabla no existe, devolver null
-      console.log('Themes table does not exist yet, returning null for active theme');
+      console.error('Error getting active theme:', error);
+      // Devolver null en caso de error para evitar romper la aplicación
       return null;
     }
   }
