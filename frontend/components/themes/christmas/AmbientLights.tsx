@@ -4,9 +4,13 @@ import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { christmasConfig } from "./themeConfig"
 
-export function AmbientLights() {
+interface AmbientLightsProps {
+  config?: typeof christmasConfig
+}
+
+export function AmbientLights({ config = christmasConfig }: AmbientLightsProps) {
   const [isVisible, setIsVisible] = useState(false)
-  const { colors, animation } = christmasConfig
+  const { colors, animation } = config
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 800)

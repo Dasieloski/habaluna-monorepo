@@ -15,9 +15,13 @@ interface Ornament {
   color: string
 }
 
-export function FestiveOrnaments() {
+interface FestiveOrnamentsProps {
+  config?: typeof christmasConfig
+}
+
+export function FestiveOrnaments({ config = christmasConfig }: FestiveOrnamentsProps) {
   const [isVisible, setIsVisible] = useState(false)
-  const { ornaments, colors, animation } = christmasConfig
+  const { ornaments, colors, animation } = config
 
   const festiveOrnaments = useMemo<Ornament[]>(() => {
     return Array.from({ length: ornaments.count }, (_, i) => ({

@@ -12,9 +12,13 @@ interface Light {
   twinkleDuration: number
 }
 
-export function GarlandHeader() {
+interface GarlandHeaderProps {
+  config?: typeof christmasConfig
+}
+
+export function GarlandHeader({ config = christmasConfig }: GarlandHeaderProps) {
   const [isVisible, setIsVisible] = useState(false)
-  const { garland, colors, animation } = christmasConfig
+  const { garland, colors, animation } = config
 
   const lights = useMemo<Light[]>(() => {
     return Array.from({ length: garland.lightCount }, (_, i) => ({

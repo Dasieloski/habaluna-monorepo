@@ -16,9 +16,13 @@ interface Snowflake {
   glow: boolean
 }
 
-export function SnowEffect() {
+interface SnowEffectProps {
+  config?: typeof christmasConfig
+}
+
+export function SnowEffect({ config = christmasConfig }: SnowEffectProps) {
   const [isVisible, setIsVisible] = useState(false)
-  const { snow, colors, animation, performance } = christmasConfig
+  const { snow, colors, animation, performance } = config
 
   const snowflakes = useMemo<Snowflake[]>(() => {
     return Array.from({ length: snow.particleCount }, (_, i) => ({

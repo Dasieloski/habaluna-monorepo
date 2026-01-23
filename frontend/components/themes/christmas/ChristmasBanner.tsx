@@ -7,16 +7,18 @@ import { christmasConfig } from "./themeConfig"
 interface ChristmasBannerProps {
   message?: string
   subMessage?: string
+  config?: typeof christmasConfig
 }
 
 export function ChristmasBanner({
   message = "¡Feliz Navidad! 🎄",
   subMessage = "Descubre nuestras ofertas especiales",
+  config = christmasConfig,
 }: ChristmasBannerProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [isDismissed, setIsDismissed] = useState(false)
   const [showSparkle, setShowSparkle] = useState(false)
-  const { banner, colors, animation } = christmasConfig
+  const { banner, colors, animation } = config
 
   useEffect(() => {
     const dismissed = sessionStorage.getItem("christmas-banner-dismissed")

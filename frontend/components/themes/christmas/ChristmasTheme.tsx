@@ -6,6 +6,7 @@ import { ChristmasBanner } from "./ChristmasBanner"
 import { FestiveOrnaments } from "./FestiveOrnaments"
 import { AmbientLights } from "./AmbientLights"
 import { ErrorBoundary } from "../../error-boundary"
+import { christmasConfig } from "./themeConfig"
 
 export interface ChristmasThemeProps {
   /** Activa o desactiva todo el tema navideño */
@@ -77,15 +78,17 @@ export function ChristmasTheme({
   if (!enabled) return null
 
   // Validar configuración básica antes de renderizar
-  try {
-    // Verificar que los colores existan
-    if (!christmasConfig.colors || typeof christmasConfig.colors !== 'object') {
-      console.warn('Christmas theme: Invalid color configuration')
+  if (typeof window !== 'undefined') {
+    try {
+      // Solo validar en el cliente para evitar problemas de SSR
+      if (!christmasConfig || !christmasConfig.colors) {
+        console.warn('Christmas theme: Configuration not available, theme disabled')
+        return null
+      }
+    } catch (error) {
+      console.warn('Christmas theme: Configuration error, theme disabled', error)
       return null
     }
-  } catch (error) {
-    console.warn('Christmas theme: Configuration error', error)
-    return null
   }
 
   return (
@@ -93,28 +96,28 @@ export function ChristmasTheme({
       {/* Iluminación ambiental - fondo de la escena */}
       {showAmbientLights && (
         <ErrorBoundary fallback={null}>
-          <AmbientLights />
+          <AmbientLights config={christmasConfig} />
         </ErrorBoundary>
       )}
 
       {/* Adornos festivos flotantes - elementos decorativos */}
       {showOrnaments && (
         <ErrorBoundary fallback={null}>
-          <FestiveOrnaments />
+          <FestiveOrnaments config={christmasConfig} />
         </ErrorBoundary>
       )}
 
       {/* Efecto de nieve - copos realistas con brillo */}
       {showSnow && (
         <ErrorBoundary fallback={null}>
-          <SnowEffect />
+          <SnowEffect config={christmasConfig} />
         </ErrorBoundary>
       )}
 
       {/* Guirnalda en el header - luces parpadeantes */}
       {showGarland && (
         <ErrorBoundary fallback={null}>
-          <GarlandHeader />
+          <GarlandHeader config={christmasConfig} />
         </ErrorBoundary>
       )}
 
@@ -124,6 +127,7 @@ export function ChristmasTheme({
           <ChristmasBanner
             message={bannerMessage}
             subMessage={bannerSubMessage}
+            config={christmasConfig}
           />
         </ErrorBoundary>
       )}
