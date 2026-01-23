@@ -5,6 +5,7 @@ import { GarlandHeader } from "./GarlandHeader"
 import { ChristmasBanner } from "./ChristmasBanner"
 import { FestiveOrnaments } from "./FestiveOrnaments"
 import { AmbientLights } from "./AmbientLights"
+import { ErrorBoundary } from "../../error-boundary"
 
 export interface ChristmasThemeProps {
   /** Activa o desactiva todo el tema navideño */
@@ -90,23 +91,41 @@ export function ChristmasTheme({
   return (
     <>
       {/* Iluminación ambiental - fondo de la escena */}
-      {showAmbientLights && <AmbientLights />}
+      {showAmbientLights && (
+        <ErrorBoundary fallback={null}>
+          <AmbientLights />
+        </ErrorBoundary>
+      )}
 
       {/* Adornos festivos flotantes - elementos decorativos */}
-      {showOrnaments && <FestiveOrnaments />}
+      {showOrnaments && (
+        <ErrorBoundary fallback={null}>
+          <FestiveOrnaments />
+        </ErrorBoundary>
+      )}
 
       {/* Efecto de nieve - copos realistas con brillo */}
-      {showSnow && <SnowEffect />}
+      {showSnow && (
+        <ErrorBoundary fallback={null}>
+          <SnowEffect />
+        </ErrorBoundary>
+      )}
 
       {/* Guirnalda en el header - luces parpadeantes */}
-      {showGarland && <GarlandHeader />}
+      {showGarland && (
+        <ErrorBoundary fallback={null}>
+          <GarlandHeader />
+        </ErrorBoundary>
+      )}
 
       {/* Banner de temporada - animado y moderno */}
       {showBanner && (
-        <ChristmasBanner
-          message={bannerMessage}
-          subMessage={bannerSubMessage}
-        />
+        <ErrorBoundary fallback={null}>
+          <ChristmasBanner
+            message={bannerMessage}
+            subMessage={bannerSubMessage}
+          />
+        </ErrorBoundary>
       )}
     </>
   )
