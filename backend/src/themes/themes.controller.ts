@@ -23,12 +23,12 @@ import { ToggleThemeDto } from './dto/toggle-theme.dto';
 
 @ApiTags('themes')
 @Controller('admin/themes')
-@UseGuards(RolesGuard)
-@Roles(UserRole.ADMIN)
 export class ThemesController {
   constructor(private readonly themesService: ThemesService) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Crear un nuevo tema' })
   @ApiResponse({ status: 201, description: 'Tema creado exitosamente' })
   create(@Body() createThemeDto: CreateThemeDto) {
@@ -36,6 +36,8 @@ export class ThemesController {
   }
 
   @Get()
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Obtener todos los temas' })
   @ApiResponse({ status: 200, description: 'Lista de temas' })
   findAll() {
@@ -50,6 +52,8 @@ export class ThemesController {
   }
 
   @Get('scheduled')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Obtener temas programados' })
   @ApiResponse({ status: 200, description: 'Lista de temas programados' })
   getScheduledThemes() {
@@ -57,6 +61,8 @@ export class ThemesController {
   }
 
   @Get(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Obtener un tema específico' })
   @ApiResponse({ status: 200, description: 'Tema encontrado' })
   @ApiResponse({ status: 404, description: 'Tema no encontrado' })
@@ -65,6 +71,8 @@ export class ThemesController {
   }
 
   @Get('type/:type')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Obtener tema por tipo' })
   @ApiResponse({ status: 200, description: 'Tema encontrado' })
   @ApiResponse({ status: 404, description: 'Tema no encontrado' })
@@ -73,6 +81,8 @@ export class ThemesController {
   }
 
   @Patch(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Actualizar un tema' })
   @ApiResponse({ status: 200, description: 'Tema actualizado' })
   update(@Param('id') id: string, @Body() updateThemeDto: UpdateThemeDto) {
@@ -80,6 +90,8 @@ export class ThemesController {
   }
 
   @Post(':id/toggle')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Activar/desactivar un tema' })
   @ApiResponse({ status: 200, description: 'Estado del tema cambiado' })
@@ -88,6 +100,8 @@ export class ThemesController {
   }
 
   @Post('schedule')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Programar un tema para fechas específicas' })
   @ApiResponse({ status: 201, description: 'Tema programado exitosamente' })
@@ -96,6 +110,8 @@ export class ThemesController {
   }
 
   @Delete('schedule/:scheduleId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Eliminar una programación de tema' })
   @ApiResponse({ status: 200, description: 'Programación eliminada' })
   removeSchedule(@Param('scheduleId') scheduleId: string) {
@@ -103,6 +119,8 @@ export class ThemesController {
   }
 
   @Get('preview/:type')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Obtener configuración para previsualización' })
   @ApiResponse({ status: 200, description: 'Configuración del tema para preview' })
   previewTheme(@Param('type') type: string) {
@@ -110,6 +128,8 @@ export class ThemesController {
   }
 
   @Post('initialize')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Inicializar temas por defecto' })
   @ApiResponse({ status: 200, description: 'Temas por defecto inicializados' })
@@ -118,6 +138,8 @@ export class ThemesController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Eliminar un tema' })
   @ApiResponse({ status: 200, description: 'Tema eliminado' })
   remove(@Param('id') id: string) {
