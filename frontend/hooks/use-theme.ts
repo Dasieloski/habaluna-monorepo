@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { api } from '@/lib/api'
 
 export interface ThemeConfig {
   type: string
@@ -19,11 +20,8 @@ export function useTheme() {
 
   const loadActiveTheme = async () => {
     try {
-      const response = await fetch('/api/themes/active')
-      if (response.ok) {
-        const theme = await response.json()
-        setActiveTheme(theme)
-      }
+      const theme = await api.getActiveTheme()
+      setActiveTheme(theme)
     } catch (error) {
       console.error('Error loading active theme:', error)
     } finally {
