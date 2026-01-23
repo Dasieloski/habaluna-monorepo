@@ -1,27 +1,24 @@
 import { NextResponse } from 'next/server'
+import { fetchJsonWithAuth, getApiBaseUrlLazy } from '@/lib/api'
 
 export async function GET(
   request: Request,
   { params }: { params: { type: string } }
 ) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/themes/preview/${params.type}`, {
-      headers: {
-        // TODO: Agregar autenticación cuando esté disponible
-      }
-    })
+    const finalUrl = `${getApiBaseUrlLazy()}/api/admin/themes/preview/${params.type}`
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch theme preview')
-    }
+    const response = await fetchJsonWithAuth(finalUrl, {
+      headers: { 'Content-Type': 'application/json' },
+    })
 
     const preview = await response.json()
     return NextResponse.json(preview)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching theme preview:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch theme preview' },
-      { status: 500 }
+      { error: error.message || 'Failed to fetch theme preview' },
+      { status: error.status || 500 }
     )
   }
 }

@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
+import { getApiBaseUrlLazy } from '@/lib/api'
 
 export async function GET() {
   try {
     // Llamar al backend para obtener el tema activo
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/themes/active`, {
-      cache: 'no-store' // No cachear para obtener el tema actual en tiempo real
+    const finalUrl = `${getApiBaseUrlLazy()}/api/admin/themes/active`
+
+    const response = await fetch(finalUrl, {
+      cache: 'no-store', // No cachear para obtener el tema actual en tiempo real
+      headers: { 'Content-Type': 'application/json' }
     })
 
     if (!response.ok) {

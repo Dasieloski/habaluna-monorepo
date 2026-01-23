@@ -1,24 +1,21 @@
 import { NextResponse } from 'next/server'
+import { fetchJsonWithAuth, getApiBaseUrlLazy } from '@/lib/api'
 
 export async function GET() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/themes/scheduled`, {
-      headers: {
-        // TODO: Agregar autenticación cuando esté disponible
-      }
-    })
+    const finalUrl = `${getApiBaseUrlLazy()}/api/admin/themes/scheduled`
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch scheduled themes')
-    }
+    const response = await fetchJsonWithAuth(finalUrl, {
+      headers: { 'Content-Type': 'application/json' },
+    })
 
     const schedules = await response.json()
     return NextResponse.json(schedules)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching scheduled themes:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch scheduled themes' },
-      { status: 500 }
+      { error: error.message || 'Failed to fetch scheduled themes' },
+      { status: error.status || 500 }
     )
   }
 }

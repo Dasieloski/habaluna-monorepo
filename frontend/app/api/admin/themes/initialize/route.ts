@@ -1,25 +1,22 @@
 import { NextResponse } from 'next/server'
+import { fetchJsonWithAuth, getApiBaseUrlLazy } from '@/lib/api'
 
 export async function POST() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/themes/initialize`, {
-      method: 'POST',
-      headers: {
-        // TODO: Agregar autenticación cuando esté disponible
-      }
-    })
+    const finalUrl = `${getApiBaseUrlLazy()}/api/admin/themes/initialize`
 
-    if (!response.ok) {
-      throw new Error('Failed to initialize themes')
-    }
+    const response = await fetchJsonWithAuth(finalUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    })
 
     const result = await response.json()
     return NextResponse.json(result)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error initializing themes:', error)
     return NextResponse.json(
-      { error: 'Failed to initialize themes' },
-      { status: 500 }
+      { error: error.message || 'Failed to initialize themes' },
+      { status: error.status || 500 }
     )
   }
 }

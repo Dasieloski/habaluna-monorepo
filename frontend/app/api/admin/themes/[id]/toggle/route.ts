@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { fetchJsonWithAuth, getApiBaseUrlLazy } from '@/lib/api'
 
 export async function POST(
   request: Request,
@@ -7,27 +8,21 @@ export async function POST(
   try {
     const body = await request.json()
     const { enabled } = body
+    const finalUrl = `${getApiBaseUrlLazy()}/api/admin/themes/${params.id}/toggle`
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/themes/${params.id}/toggle`, {
+    const response = await fetchJsonWithAuth(finalUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // TODO: Agregar autenticación cuando esté disponible
-      },
-      body: JSON.stringify({ enabled })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled }),
     })
-
-    if (!response.ok) {
-      throw new Error('Failed to toggle theme')
-    }
 
     const theme = await response.json()
     return NextResponse.json(theme)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error toggling theme:', error)
     return NextResponse.json(
-      { error: 'Failed to toggle theme' },
-      { status: 500 }
+      { error: error.message || 'Failed to toggle theme' },
+      { status: error.status || 500 }
     )
   }
 }

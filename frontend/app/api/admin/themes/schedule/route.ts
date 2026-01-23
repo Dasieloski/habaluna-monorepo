@@ -1,24 +1,21 @@
 import { NextResponse } from 'next/server'
+import { fetchJsonWithAuth, getApiBaseUrlLazy } from '@/lib/api'
 
 export async function GET() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/themes/scheduled`, {
-      headers: {
-        // TODO: Agregar autenticación cuando esté disponible
-      }
-    })
+    const finalUrl = `${getApiBaseUrlLazy()}/api/admin/themes/scheduled`
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch scheduled themes')
-    }
+    const response = await fetchJsonWithAuth(finalUrl, {
+      headers: { 'Content-Type': 'application/json' },
+    })
 
     const schedules = await response.json()
     return NextResponse.json(schedules)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching scheduled themes:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch scheduled themes' },
-      { status: 500 }
+      { error: error.message || 'Failed to fetch scheduled themes' },
+      { status: error.status || 500 }
     )
   }
 }
@@ -26,27 +23,21 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+    const finalUrl = `${getApiBaseUrlLazy()}/api/admin/themes/schedule`
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/themes/schedule`, {
+    const response = await fetchJsonWithAuth(finalUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // TODO: Agregar autenticación cuando esté disponible
-      },
-      body: JSON.stringify(body)
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     })
-
-    if (!response.ok) {
-      throw new Error('Failed to schedule theme')
-    }
 
     const schedule = await response.json()
     return NextResponse.json(schedule)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error scheduling theme:', error)
     return NextResponse.json(
-      { error: 'Failed to schedule theme' },
-      { status: 500 }
+      { error: error.message || 'Failed to schedule theme' },
+      { status: error.status || 500 }
     )
   }
 }

@@ -238,19 +238,31 @@ export class ThemesService {
       }
     ];
 
-    for (const themeData of defaultThemes) {
-      try {
-        await this.prisma.theme.upsert({
-          where: { type: themeData.type },
-          update: themeData,
-          create: themeData,
-        });
-      } catch (error) {
-        // Ignorar errores de duplicados
-        console.log(`Theme ${themeData.type} already exists or error:`, error.message);
+    try {
+      // Verificar si ya existen temas
+      const existingThemes = await this.prisma.theme.findMany();
+      if (existingThemes.length > 0) {
+        return { message: 'Themes already initialized', count: existingThemes.length };
       }
-    }
 
-    return { message: 'Default themes initialized successfully' };
+      // Crear temas usando create en lugar de upsert para evitar problemas
+      const createdThemes = [];
+      for (const themeData of defaultThemes) {
+        try {
+          const created = await this.prisma.theme.create({
+            data: themeData,
+          });
+          createdThemes.push(created);
+        } catch (error) {
+          // Si ya existe, continuar
+          console.log(`Theme ${themeData.type} already exists:`, error.message);
+        }
+      }
+
+      return { message: 'Default themes initialized successfully', count: createdThemes.length };
+    } catch (error) {
+      console.error('Error initializing themes:', error);
+      throw new Error(`Failed to initialize themes: ${error.message}`);
+    }
   }
 }
