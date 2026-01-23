@@ -28,7 +28,7 @@ export class ThemesService {
     return this.prisma.theme.findMany({
       include: {
         _count: {
-          select: { ThemeSchedule: true }
+          select: { themeSchedules: true }
         }
       },
       orderBy: { priority: 'desc' }
@@ -39,7 +39,7 @@ export class ThemesService {
     const theme = await this.prisma.theme.findUnique({
       where: { id },
       include: {
-        ThemeSchedule: {
+        themeSchedules: {
           orderBy: { startDate: 'asc' }
         }
       }
@@ -56,7 +56,7 @@ export class ThemesService {
     const theme = await this.prisma.theme.findUnique({
       where: { type },
       include: {
-        ThemeSchedule: {
+        themeSchedules: {
           orderBy: { startDate: 'asc' }
         }
       }
@@ -123,7 +123,7 @@ export class ThemesService {
     const theme = await this.prisma.theme.findFirst({
       where: { status: ThemeStatus.ACTIVE },
       include: {
-        ThemeSchedule: true
+        themeSchedules: true
       }
     });
 
@@ -152,7 +152,7 @@ export class ThemesService {
           ]
         },
         include: {
-          ThemeSchedule: true
+          themeSchedules: true
         },
         orderBy: { priority: 'desc' }
       });
