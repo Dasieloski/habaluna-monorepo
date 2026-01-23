@@ -1458,7 +1458,7 @@ export const api = {
   },
 
   getActiveTheme: async (): Promise<any> => {
-    const res = await api.get("/themes/active")
+    const res = await api.get("/public/themes/active")
     return res.data
   },
 
