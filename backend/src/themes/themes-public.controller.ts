@@ -10,7 +10,14 @@ export class ThemesPublicController {
   @Get('active')
   @ApiOperation({ summary: 'Obtener el tema activo actualmente (público)' })
   @ApiResponse({ status: 200, description: 'Tema activo o null' })
-  getActiveTheme() {
-    return this.themesService.getActiveTheme();
+  async getActiveTheme() {
+    try {
+      const activeTheme = await this.themesService.getActiveTheme();
+      return activeTheme;
+    } catch (error) {
+      console.error('Error in getActiveTheme endpoint:', error);
+      // Siempre devolver null en caso de error para evitar respuestas vacías
+      return null;
+    }
   }
 }
