@@ -1,108 +1,78 @@
-// Professional Christmas Theme Configuration
-// Elegant, modern and visually stunning color palette
+// Premium Christmas Theme Configuration
+// Professional palette inspired by luxury brands
 
 export const christmasConfig = {
-  // Premium color palette - elegant, festive and professional
   colors: {
-    // Snow - crystalline and luminous
-    snow: "rgba(255, 255, 255, 0.8)",
-    snowGlow: "rgba(255, 255, 255, 0.95)",
-    snowShadow: "rgba(255, 255, 255, 0.3)",
-
-    // Deep forest greens - sophisticated and natural
-    pine: "#0f2920",
-    pineLight: "#1a3a2f",
-    pineMuted: "rgba(26, 58, 47, 0.85)",
-    pineGlow: "rgba(34, 197, 94, 0.1)",
-
-    // Warm festive reds - elegant and classic
-    cranberry: "#8b1e3f",
-    cranberryLight: "#a8334c",
-    cranberryGlow: "rgba(168, 51, 76, 0.2)",
-
-    // Premium gold accents - luxurious and refined
-    gold: "#d4af37",
-    goldLight: "#f4e87c",
-    goldMuted: "rgba(212, 175, 55, 0.8)",
-    goldGlow: "rgba(244, 232, 124, 0.3)",
-
-    // Surface overlays - modern glass morphism
-    surface: "rgba(15, 41, 32, 0.95)",
-    surfaceLight: "rgba(26, 58, 47, 0.9)",
-    surfaceGlow: "rgba(15, 41, 32, 0.85)",
-
-    // Warm festive whites and creams
-    cream: "rgba(255, 248, 240, 0.9)",
-    creamLight: "rgba(255, 253, 248, 0.95)",
-    ivory: "rgba(255, 255, 240, 0.92)",
+    // Deep reds - luxurious, not aggressive
+    red: {
+      deep: "#7A0F14",
+      primary: "#B91C1C",
+      muted: "rgba(185, 28, 28, 0.15)",
+      glow: "rgba(185, 28, 28, 0.4)",
+    },
+    // Forest greens - sophisticated
+    green: {
+      deep: "#0F3D2E",
+      primary: "#14532D",
+      muted: "rgba(20, 83, 45, 0.15)",
+      glow: "rgba(20, 83, 45, 0.4)",
+    },
+    // Gold accent - warm and elegant
+    gold: {
+      primary: "#D4AF37",
+      light: "#E8C547",
+      muted: "rgba(212, 175, 55, 0.3)",
+      shimmer: "rgba(232, 197, 71, 0.6)",
+    },
+    // Snow white
+    snow: {
+      pure: "#FFFFFF",
+      soft: "#F8FAFC",
+      muted: "rgba(248, 250, 252, 0.9)",
+    },
   },
 
-  // Enhanced snow effect - realistic and mesmerizing
+  // Snow effect - visible but elegant
   snow: {
-    particleCount: 35,
-    minSize: 1.5,
-    maxSize: 5,
-    minDuration: 8,
+    particleCount: 40,
+    minSize: 3,
+    maxSize: 6,
+    minDuration: 10,
     maxDuration: 18,
-    minOpacity: 0.3,
-    maxOpacity: 0.7,
-    windStrength: 0.5,
-    glowIntensity: 0.4,
+    minOpacity: 0.4,
+    maxOpacity: 0.8,
   },
 
-  // Professional garland system
-  garland: {
-    height: 4,
-    lightCount: 12,
-    twinkleSpeed: 2000,
-    colors: ["#d4af37", "#f4e87c", "#8b1e3f", "#a8334c"],
-    intensity: 0.8,
+  // Decorative lights
+  lights: {
+    count: 20,
+    colors: ["#B91C1C", "#D4AF37", "#14532D", "#F8FAFC"],
+    glowIntensity: 0.6,
   },
 
-  // Festive banner system
+  // Banner
   banner: {
     dismissible: true,
-    delayMs: 1200,
-    autoHideDelay: 30000,
-    cornerRadius: "16px",
-    blurStrength: "20px",
+    delayMs: 1000,
   },
 
-  // Sophisticated ornament collection
-  ornaments: {
-    count: 8,
-    types: ["star", "bell", "candy", "snowflake"],
-    minSize: 16,
-    maxSize: 24,
-    animationDelay: 300,
-    glowEffect: true,
-  },
-
-  // Professional animation timings
-  animation: {
-    instant: "100ms",
-    fast: "250ms",
-    normal: "400ms",
-    slow: "600ms",
-    slower: "800ms",
-    easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-    bounce: "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
-  },
-
-  // Sound effects (optional, subtle)
-  sounds: {
-    enabled: false,
-    snowVolume: 0.1,
-    bellVolume: 0.05,
-    windVolume: 0.08,
-  },
-
-  // Performance settings
-  performance: {
-    reduceMotion: false,
-    maxParticles: 50,
-    enableWebGL: true,
-    useHardwareAcceleration: true,
+  // Framer Motion variants
+  motion: {
+    fadeInUp: {
+      initial: { opacity: 0, y: 20 },
+      animate: { opacity: 1, y: 0 },
+      transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+    },
+    fadeIn: {
+      initial: { opacity: 0 },
+      animate: { opacity: 1 },
+      transition: { duration: 0.6 },
+    },
+    scale: {
+      initial: { scale: 0.95, opacity: 0 },
+      animate: { scale: 1, opacity: 1 },
+      transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+    },
   },
 } as const
 

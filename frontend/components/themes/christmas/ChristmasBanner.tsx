@@ -1,24 +1,26 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import { christmasConfig } from "./themeConfig"
 
 interface ChristmasBannerProps {
   message?: string
   subMessage?: string
-  config?: typeof christmasConfig
+  ctaText?: string
+  onCtaClick?: () => void
 }
 
 export function ChristmasBanner({
-  message = "¡Feliz Navidad! 🎄",
-  subMessage = "Descubre nuestras ofertas especiales",
-  config = christmasConfig,
+  message = "Season's Greetings",
+  subMessage = "Discover our holiday collection with exclusive offers",
+  ctaText = "Shop Now",
+  onCtaClick,
 }: ChristmasBannerProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [isDismissed, setIsDismissed] = useState(false)
-  const [showSparkle, setShowSparkle] = useState(false)
-  const { banner, colors, animation } = config
+  const prefersReducedMotion = useReducedMotion()
+  const { banner, colors } = christmasConfig
 
   useEffect(() => {
     const dismissed = sessionStorage.getItem("christmas-banner-dismissed")
@@ -26,254 +28,149 @@ export function ChristmasBanner({
       setIsDismissed(true)
       return
     }
-
-    const timer = setTimeout(() => {
-      setIsVisible(true)
-      // Trigger sparkle animation after banner appears
-      setTimeout(() => setShowSparkle(true), 500)
-    }, banner.delayMs)
-
+    const timer = setTimeout(() => setIsVisible(true), banner.delayMs)
     return () => clearTimeout(timer)
   }, [banner.delayMs])
 
   const handleDismiss = () => {
     setIsVisible(false)
-    setShowSparkle(false)
     setTimeout(() => {
       setIsDismissed(true)
       sessionStorage.setItem("christmas-banner-dismissed", "true")
-    }, 400)
+    }, 300)
   }
 
-  // Auto-hide after delay
-  useEffect(() => {
-    if (isVisible && banner.autoHideDelay) {
-      const autoHideTimer = setTimeout(() => {
-        handleDismiss()
-      }, banner.autoHideDelay)
-
-      return () => clearTimeout(autoHideTimer)
-    }
-  }, [isVisible, banner.autoHideDelay])
+  if (isDismissed) return null
 
   return (
     <AnimatePresence>
-      {!isDismissed && (
+      {isVisible && (
         <motion.div
           className="fixed bottom-6 right-6 z-[9999] max-w-sm"
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-          animate={isVisible ? {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            transition: {
-              type: "spring",
-              stiffness: 200,
-              damping: 20,
-              duration: animation.normal,
-            }
-          } : {}}
-          exit={{
-            opacity: 0,
-            y: 10,
-            scale: 0.95,
-            transition: { duration: animation.fast }
-          }}
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 10, scale: 0.98 }}
+          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
           role="complementary"
-          aria-label="Mensaje festivo de Navidad"
+          aria-label="Seasonal promotion"
         >
           <div
-            className="relative overflow-hidden shadow-2xl"
+            className="relative overflow-hidden rounded-2xl shadow-2xl border"
             style={{
-              background: `linear-gradient(135deg, ${colors.surface} 0%, ${colors.surfaceLight} 100%)`,
-              backdropFilter: `blur(${banner.blurStrength})`,
-              borderRadius: banner.cornerRadius,
-              border: `1px solid ${colors.goldMuted}`,
-              boxShadow: `
-                0 20px 40px rgba(0,0,0,0.3),
-                0 0 60px ${colors.goldGlow},
-                inset 0 1px 0 rgba(255,255,255,0.1)
-              `,
+              background: `linear-gradient(135deg, ${colors.green.deep} 0%, ${colors.red.deep} 100%)`,
+              borderColor: colors.gold.muted,
             }}
           >
-            {/* Animated border glow */}
-            <motion.div
-              className="absolute inset-0 rounded-xl"
-              style={{
-                background: `linear-gradient(45deg,
-                  transparent 0%,
-                  ${colors.goldGlow} 25%,
-                  transparent 50%,
-                  ${colors.pineGlow} 75%,
-                  transparent 100%
-                )`,
-                backgroundSize: '200% 200%',
-              }}
-              animate={{
-                backgroundPosition: ['0% 0%', '200% 200%', '0% 0%'],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-
-            {/* Sparkle effects */}
-            {showSparkle && (
-              <>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-1 h-1 bg-yellow-300 rounded-full"
-                    style={{
-                      top: `${20 + Math.random() * 60}%`,
-                      left: `${20 + Math.random() * 60}%`,
-                    }}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{
-                      scale: [0, 1, 0],
-                      opacity: [0, 1, 0],
-                      rotate: [0, 180, 360],
-                    }}
-                    transition={{
-                      duration: 2,
-                      delay: Math.max(0, i * 0.2),
-                      repeat: Infinity,
-                      repeatDelay: 3,
-                    }}
-                  />
-                ))}
-              </>
-            )}
-
-            {/* Top accent with animated gradient */}
-            <motion.div
-              className="absolute top-0 left-0 right-0 h-0.5"
-              style={{
-                background: `linear-gradient(90deg,
-                  transparent 0%,
-                  ${colors.gold} 20%,
-                  ${colors.goldLight} 50%,
-                  ${colors.gold} 80%,
-                  transparent 100%
-                )`,
-              }}
-              animate={{
-                backgroundPosition: ['0% 0%', '100% 0%', '0% 0%'],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-
-            <div className="relative p-5 pr-12">
-              {/* Icon and title */}
+            {/* Shimmer effect */}
+            {!prefersReducedMotion && (
               <motion.div
-                className="flex items-center gap-3 mb-3"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2, duration: animation.fast }}
-              >
-                <motion.div
-                  className="text-2xl"
-                  animate={{
-                    rotate: [0, 10, -10, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatDelay: 5,
-                    ease: "easeInOut",
-                  }}
-                >
-                  🎄
-                </motion.div>
-                <div>
-                  <h3
-                    className="text-lg font-bold tracking-wide"
-                    style={{ color: colors.cream }}
-                  >
-                    ¡Feliz Navidad!
-                  </h3>
-                  <div
-                    className="w-12 h-0.5 mt-1"
-                    style={{ background: colors.gold }}
-                  />
-                </div>
-              </motion.div>
-
-              {/* Main message */}
-              <motion.p
-                className="text-sm font-medium leading-relaxed mb-2"
-                style={{ color: colors.creamLight }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: Math.max(0.1, animation.fast) }}
-              >
-                {message}
-              </motion.p>
-
-              {/* Sub message */}
-              <motion.p
-                className="text-xs leading-relaxed"
-                style={{ color: colors.ivory }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: Math.max(0.1, animation.fast) }}
-              >
-                {subMessage}
-              </motion.p>
-
-              {/* Festive elements */}
-              <motion.div
-                className="absolute bottom-3 right-3 text-lg opacity-80"
-                animate={{
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 5, -5, 0],
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: `linear-gradient(110deg, transparent 30%, ${colors.gold.shimmer} 50%, transparent 70%)`,
                 }}
+                animate={{ x: ["-100%", "200%"] }}
                 transition={{
-                  duration: Math.max(1, 3),
+                  duration: 2.5,
                   repeat: Infinity,
+                  repeatDelay: 3,
                   ease: "easeInOut",
                 }}
-              >
-                ✨
-              </motion.div>
+              />
+            )}
+
+            {/* Gold accent line */}
+            <div
+              className="absolute top-0 left-0 right-0 h-0.5"
+              style={{
+                background: `linear-gradient(90deg, transparent, ${colors.gold.primary}, transparent)`,
+              }}
+            />
+
+            <div className="relative p-5 pr-10">
+              {/* Star icon */}
+              <div className="flex items-start gap-4">
+                <div
+                  className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: colors.gold.muted }}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill={colors.gold.primary}
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3
+                    className="text-base font-semibold tracking-wide"
+                    style={{ color: colors.snow.pure }}
+                  >
+                    {message}
+                  </h3>
+                  <p
+                    className="text-sm mt-1 leading-relaxed"
+                    style={{ color: colors.snow.muted }}
+                  >
+                    {subMessage}
+                  </p>
+
+                  {/* CTA Button with glow */}
+                  <motion.button
+                    onClick={onCtaClick}
+                    className="mt-4 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                    style={{
+                      background: colors.gold.primary,
+                      color: colors.green.deep,
+                    }}
+                    whileHover={{
+                      scale: 1.02,
+                      boxShadow: `0 0 20px ${colors.gold.shimmer}`,
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {ctaText}
+                  </motion.button>
+                </div>
+              </div>
             </div>
 
             {/* Dismiss button */}
             {banner.dismissible && (
               <motion.button
                 onClick={handleDismiss}
-                className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
-                style={{
-                  background: colors.surfaceLight,
-                  color: colors.cream,
-                  boxShadow: `0 2px 8px rgba(0,0,0,0.2)`,
+                className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full transition-colors"
+                style={{ color: colors.snow.muted }}
+                whileHover={{ 
+                  color: colors.snow.pure,
+                  background: "rgba(255,255,255,0.1)",
                 }}
-                whileHover={{
-                  backgroundColor: colors.goldMuted,
-                  scale: 1.1,
-                }}
-                whileTap={{ scale: 0.95 }}
-                aria-label="Cerrar mensaje festivo"
+                aria-label="Dismiss"
               >
-                <motion.svg
+                <svg
                   className="w-4 h-4"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
-                  animate={{ rotate: isVisible ? 0 : 180 }}
-                  transition={{ duration: animation.fast }}
                 >
-                  <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                </motion.svg>
+                  <path
+                    d="M18 6L6 18M6 6l12 12"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </motion.button>
             )}
+
+            {/* Decorative corner elements */}
+            <div
+              className="absolute bottom-0 left-0 w-16 h-16 opacity-10"
+              style={{
+                background: `radial-gradient(circle at bottom left, ${colors.gold.primary}, transparent 70%)`,
+              }}
+            />
           </div>
         </motion.div>
       )}

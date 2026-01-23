@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
-import { motion } from "framer-motion"
+import { useMemo } from "react"
+import { motion, useReducedMotion } from "framer-motion"
 import { christmasConfig } from "./themeConfig"
 
 interface Light {
@@ -9,154 +9,137 @@ interface Light {
   x: number
   color: string
   delay: number
-  twinkleDuration: number
+  size: number
 }
 
-interface GarlandHeaderProps {
-  config?: typeof christmasConfig
-}
+export function GarlandHeader() {
+  const prefersReducedMotion = useReducedMotion()
+  const { colors, lights } = christmasConfig
 
-export function GarlandHeader({ config = christmasConfig }: GarlandHeaderProps) {
-  const [isVisible, setIsVisible] = useState(false)
-  const { garland, colors, animation } = config
-
-  const lights = useMemo<Light[]>(() => {
-    return Array.from({ length: garland.lightCount }, (_, i) => ({
+  const decorativeLights = useMemo<Light[]>(() => {
+    return Array.from({ length: lights.count }, (_, i) => ({
       id: i,
-      x: (i / (garland.lightCount - 1)) * 100, // Distribute evenly across width
-      color: garland.colors[i % garland.colors.length],
-      delay: (i * garland.twinkleSpeed) / garland.lightCount,
-      twinkleDuration: garland.twinkleSpeed + Math.random() * 1000,
+      x: (i / lights.count) * 100,
+      color: lights.colors[i % lights.colors.length],
+      delay: i * 0.1,
+      size: 8 + Math.random() * 4,
     }))
-  }, [garland])
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100)
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (!isVisible) return null
+  }, [lights])
 
   return (
-    <div
-      className="fixed top-0 left-0 right-0 pointer-events-none z-[9997]"
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-12 pointer-events-none z-[9997] overflow-visible"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
       aria-hidden="true"
-      style={{
-        height: `${garland.height + 8}px`, // Extra space for glow
-      }}
     >
-      {/* Base garland strand */}
-      <motion.div
-        className="absolute top-0 left-0 right-0"
-        style={{
-          height: `${garland.height}px`,
-          background: `linear-gradient(90deg,
-            transparent 0%,
-            ${colors.pine} 10%,
-            ${colors.pineLight} 20%,
-            ${colors.gold} 50%,
-            ${colors.pineLight} 80%,
-            ${colors.pine} 90%,
-            transparent 100%
-          )`,
-        }}
-        initial={{ scaleX: 0, opacity: 0 }}
-        animate={{ scaleX: 1, opacity: 1 }}
-        transition={{
-          duration: animation.normal,
-          ease: animation.easing,
-        }}
-      />
+      {/* Main garland line */}
+      <svg
+        className="absolute top-0 left-0 w-full h-12"
+        viewBox="0 0 1200 48"
+        preserveAspectRatio="none"
+        fill="none"
+      >
+        <defs>
+          <linearGradient id="garlandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={colors.green.deep} stopOpacity="0" />
+            <stop offset="20%" stopColor={colors.green.primary} />
+            <stop offset="50%" stopColor={colors.green.deep} />
+            <stop offset="80%" stopColor={colors.green.primary} />
+            <stop offset="100%" stopColor={colors.green.deep} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        
+        {/* Curved garland path */}
+        <path
+          d="M0,6 Q150,20 300,10 T600,14 T900,10 T1200,6"
+          stroke="url(#garlandGrad)"
+          strokeWidth="6"
+          strokeLinecap="round"
+          fill="none"
+        />
+        
+        {/* Secondary lighter strand */}
+        <path
+          d="M0,4 Q150,16 300,8 T600,12 T900,8 T1200,4"
+          stroke={colors.green.primary}
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.4"
+          fill="none"
+        />
+      </svg>
 
-      {/* Twinkling lights */}
-      {lights.map((light) => (
+      {/* Decorative lights */}
+      {decorativeLights.map((light) => (
         <motion.div
           key={light.id}
-          className="absolute top-1/2 transform -translate-y-1/2 rounded-full"
+          className="absolute"
           style={{
             left: `${light.x}%`,
-            width: "6px",
-            height: "6px",
-            backgroundColor: light.color,
-            boxShadow: `0 0 8px ${light.color}`,
+            top: 8 + Math.sin((light.x / 100) * Math.PI * 4) * 6,
           }}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{
-            scale: [0, 1, 1.2, 1],
-            opacity: [0, 0.6, garland.intensity, 0.6],
-          }}
-          transition={{
-            scale: {
-              duration: Math.max(0.1, animation.fast),
-              delay: Math.max(0, light.delay / 1000),
-            },
-            opacity: {
-              duration: Math.max(0.5, light.twinkleDuration / 1000),
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: light.delay + 0.3 }}
+        >
+          {/* Light bulb */}
+          <motion.div
+            className="relative"
+            animate={
+              prefersReducedMotion
+                ? {}
+                : {
+                    opacity: [0.7, 1, 0.7],
+                  }
+            }
+            transition={{
+              duration: 2 + Math.random(),
+              delay: light.delay,
               repeat: Infinity,
-              repeatType: "reverse",
               ease: "easeInOut",
-              delay: Math.max(0, light.delay / 1000),
-            },
-          }}
-        />
+            }}
+          >
+            {/* Wire */}
+            <div
+              className="absolute left-1/2 -translate-x-1/2 w-px h-2 -top-2"
+              style={{ background: colors.green.deep }}
+            />
+            {/* Bulb */}
+            <div
+              className="rounded-full"
+              style={{
+                width: light.size,
+                height: light.size,
+                background: light.color,
+                boxShadow: `0 0 ${light.size}px ${light.color}, 0 0 ${light.size * 2}px ${light.color}40`,
+              }}
+            />
+          </motion.div>
+        </motion.div>
       ))}
 
-      {/* Subtle glow effect */}
+      {/* Subtle gold shimmer overlay */}
       <motion.div
-        className="absolute top-0 left-0 right-0"
+        className="absolute top-0 left-0 right-0 h-1"
         style={{
-          height: `${garland.height + 4}px`,
-          background: `linear-gradient(90deg,
-            transparent 0%,
-            rgba(212, 175, 55, 0.1) 20%,
-            rgba(212, 175, 55, 0.2) 50%,
-            rgba(212, 175, 55, 0.1) 80%,
-            transparent 100%
-          )`,
-          filter: 'blur(2px)',
+          background: `linear-gradient(90deg, transparent, ${colors.gold.shimmer}, transparent)`,
         }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        animate={
+          prefersReducedMotion
+            ? {}
+            : {
+                x: ["-100%", "100%"],
+              }
+        }
         transition={{
-          duration: animation.slow,
-          delay: animation.normal,
+          duration: 3,
+          repeat: Infinity,
+          ease: "linear",
+          repeatDelay: 2,
         }}
       />
-
-      {/* Festive ribbon elements */}
-      <motion.div
-        className="absolute top-0 left-1/4 transform -translate-x-1/2"
-        style={{
-          width: "20px",
-          height: `${garland.height + 2}px`,
-          background: `linear-gradient(180deg, ${colors.cranberry} 0%, ${colors.cranberryLight} 100%)`,
-          clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
-        }}
-        initial={{ scaleY: 0, opacity: 0 }}
-        animate={{ scaleY: 1, opacity: 0.8 }}
-        transition={{
-          duration: animation.normal,
-          delay: animation.fast,
-          ease: animation.bounce,
-        }}
-      />
-
-      <motion.div
-        className="absolute top-0 right-1/4 transform translate-x-1/2"
-        style={{
-          width: "20px",
-          height: `${garland.height + 2}px`,
-          background: `linear-gradient(180deg, ${colors.cranberry} 0%, ${colors.cranberryLight} 100%)`,
-          clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
-        }}
-        initial={{ scaleY: 0, opacity: 0 }}
-        animate={{ scaleY: 1, opacity: 0.8 }}
-        transition={{
-          duration: animation.normal,
-          delay: animation.fast,
-          ease: animation.bounce,
-        }}
-      />
-    </div>
+    </motion.div>
   )
 }
