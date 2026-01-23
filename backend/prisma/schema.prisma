@@ -696,6 +696,9 @@ model Theme {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
+  // Relations
+  themeSchedules ThemeSchedule[]
+
   @@index([status])
   @@index([startDate])
   @@index([endDate])

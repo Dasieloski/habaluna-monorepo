@@ -10,7 +10,6 @@ import { ThemeList } from "@/components/admin/themes/theme-list"
 import { ThemeScheduler } from "@/components/admin/themes/theme-scheduler"
 import { ThemePreview } from "@/components/admin/themes/theme-preview"
 import { useToast } from "@/hooks/use-toast"
-import { useToast } from "@/hooks/use-toast"
 
 export default function ThemesPage() {
   const [activeTheme, setActiveTheme] = useState<any>(null)
