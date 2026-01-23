@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { CalendarIcon, EyeIcon, SettingsIcon, ClockIcon } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { api } from "@/lib/api"
 
 interface Theme {
   id: string
@@ -39,11 +40,8 @@ export function ThemeList({ onPreview, onRefresh }: ThemeListProps) {
 
   const loadThemes = async () => {
     try {
-      const response = await fetch('/api/admin/themes')
-      if (response.ok) {
-        const data = await response.json()
-        setThemes(data)
-      }
+      const data = await api.getThemes()
+      setThemes(data)
     } catch (error) {
       console.error('Error loading themes:', error)
     } finally {
@@ -53,33 +51,23 @@ export function ThemeList({ onPreview, onRefresh }: ThemeListProps) {
 
   const toggleTheme = async (theme: Theme, enabled: boolean) => {
     try {
-      const response = await fetch(`/api/admin/themes/${theme.id}/toggle`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ enabled }),
+      const updatedTheme = await api.toggleTheme(theme.id, enabled)
+
+      // Actualizar el estado local
+      setThemes(prev => prev.map(t =>
+        t.id === theme.id ? { ...t, status: updatedTheme.status } : t
+      ))
+
+      toast({
+        title: enabled ? "Tema activado" : "Tema desactivado",
+        description: `El tema "${theme.name}" ha sido ${enabled ? 'activado' : 'desactivado'}.`
       })
 
-      if (response.ok) {
-        const updatedTheme = await response.json()
-
-        // Actualizar el estado local
-        setThemes(prev => prev.map(t =>
-          t.id === theme.id ? { ...t, status: updatedTheme.status } : t
-        ))
-
-        toast({
-          title: enabled ? "Tema activado" : "Tema desactivado",
-          description: `El tema "${theme.name}" ha sido ${enabled ? 'activado' : 'desactivado'}.`
-        })
-
-        onRefresh()
-      }
-    } catch (error) {
+      onRefresh()
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "No se pudo cambiar el estado del tema.",
+        description: error.message || "No se pudo cambiar el estado del tema.",
         variant: "destructive"
       })
     }

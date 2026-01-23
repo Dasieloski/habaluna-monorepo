@@ -10,6 +10,7 @@ import { ThemeList } from "@/components/admin/themes/theme-list"
 import { ThemeScheduler } from "@/components/admin/themes/theme-scheduler"
 import { ThemePreview } from "@/components/admin/themes/theme-preview"
 import { useToast } from "@/hooks/use-toast"
+import { api } from "@/lib/api"
 
 export default function ThemesPage() {
   const [activeTheme, setActiveTheme] = useState<any>(null)
@@ -25,27 +26,16 @@ export default function ThemesPage() {
 
   const loadThemes = async () => {
     try {
-      const [activeRes, themesRes, scheduledRes] = await Promise.all([
-        fetch('/api/admin/themes/active'),
-        fetch('/api/admin/themes'),
-        fetch('/api/admin/themes/scheduled')
+      const [active, themesList, scheduled] = await Promise.all([
+        api.getActiveTheme(),
+        api.getThemes(),
+        api.getScheduledThemes()
       ])
 
-      if (activeRes.ok) {
-        const active = await activeRes.json()
-        setActiveTheme(active)
-      }
-
-      if (themesRes.ok) {
-        const themesList = await themesRes.json()
-        setThemes(themesList)
-      }
-
-      if (scheduledRes.ok) {
-        const scheduled = await scheduledRes.json()
-        setScheduledThemes(scheduled)
-      }
-    } catch (error) {
+      setActiveTheme(active)
+      setThemes(themesList)
+      setScheduledThemes(scheduled)
+    } catch (error: any) {
       console.error('Error loading themes:', error)
     }
   }
@@ -57,21 +47,16 @@ export default function ThemesPage() {
 
   const handleInitialize = async () => {
     try {
-      const response = await fetch('/api/admin/themes/initialize', {
-        method: 'POST'
+      await api.initializeThemes()
+      toast({
+        title: "Temas inicializados",
+        description: "Los temas por defecto han sido creados exitosamente."
       })
-
-      if (response.ok) {
-        toast({
-          title: "Temas inicializados",
-          description: "Los temas por defecto han sido creados exitosamente."
-        })
-        loadThemes()
-      }
-    } catch (error) {
+      loadThemes()
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "No se pudieron inicializar los temas.",
+        description: error.message || "No se pudieron inicializar los temas.",
         variant: "destructive"
       })
     }

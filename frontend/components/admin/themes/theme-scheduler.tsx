@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CalendarIcon, PlusIcon } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { api } from "@/lib/api"
 
 interface ThemeSchedulerProps {
   themes: any[]
@@ -35,39 +36,29 @@ export function ThemeScheduler({ themes, onScheduled }: ThemeSchedulerProps) {
 
     setLoading(true)
     try {
-      const response = await fetch('/api/admin/themes/schedule', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          themeId: selectedTheme,
-          startDate,
-          endDate: endDate || undefined,
-          isRecurring,
-        }),
+      await api.scheduleTheme({
+        themeId: selectedTheme,
+        startDate,
+        endDate: endDate || undefined,
+        isRecurring,
       })
 
-      if (response.ok) {
-        toast({
-          title: "Tema programado",
-          description: "El tema ha sido programado exitosamente."
-        })
+      toast({
+        title: "Tema programado",
+        description: "El tema ha sido programado exitosamente."
+      })
 
-        // Limpiar formulario
-        setSelectedTheme("")
-        setStartDate("")
-        setEndDate("")
-        setIsRecurring(false)
+      // Limpiar formulario
+      setSelectedTheme("")
+      setStartDate("")
+      setEndDate("")
+      setIsRecurring(false)
 
-        onScheduled()
-      } else {
-        throw new Error('Error al programar tema')
-      }
-    } catch (error) {
+      onScheduled()
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "No se pudo programar el tema.",
+        description: error.message || "No se pudo programar el tema.",
         variant: "destructive"
       })
     } finally {

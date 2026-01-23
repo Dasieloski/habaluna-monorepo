@@ -1445,6 +1445,42 @@ export const api = {
     const res = await api.post("/email-marketing/admin/campaigns/preview", data)
     return res.data as { html: string }
   },
+
+  // Themes (Admin)
+  getThemes: async (): Promise<any[]> => {
+    const res = await api.get("/admin/themes")
+    return res.data as any[]
+  },
+
+  initializeThemes: async (): Promise<{ message: string }> => {
+    const res = await api.post("/admin/themes/initialize", {})
+    return res.data as { message: string }
+  },
+
+  getActiveTheme: async (): Promise<any> => {
+    const res = await api.get("/admin/themes/active")
+    return res.data
+  },
+
+  toggleTheme: async (themeId: string, enabled: boolean): Promise<any> => {
+    const res = await api.post(`/admin/themes/${themeId}/toggle`, { enabled })
+    return res.data
+  },
+
+  scheduleTheme: async (data: { themeId: string; startDate: string; endDate?: string; isRecurring?: boolean }): Promise<any> => {
+    const res = await api.post("/admin/themes/schedule", data)
+    return res.data
+  },
+
+  getScheduledThemes: async (): Promise<any[]> => {
+    const res = await api.get("/admin/themes/scheduled")
+    return res.data as any[]
+  },
+
+  getThemePreview: async (type: string): Promise<any> => {
+    const res = await api.get(`/admin/themes/preview/${type}`)
+    return res.data
+  },
 }
 
 // Función para normalizar URLs de imágenes
