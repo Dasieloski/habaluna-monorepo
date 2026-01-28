@@ -60,6 +60,19 @@ export class SearchProductsDto extends PaginationDto {
   isFeatured?: boolean;
 
   @ApiPropertyOptional({
+    description: 'Filtrar solo productos que son combos',
+    type: Boolean,
+  })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return undefined;
+  })
+  @IsBoolean()
+  isCombo?: boolean;
+
+  @ApiPropertyOptional({
     description: 'Ordenar resultados',
     enum: SortOrder,
     enumName: 'SortOrder',

@@ -31,12 +31,12 @@ class AddressDto {
   @MaxLength(100)
   city: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false, description: 'Código postal (opcional, no siempre usado en Cuba)' })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  @MinLength(4)
+  @MinLength(0)
   @MaxLength(10)
-  zipCode: string;
+  zipCode?: string;
 
   @ApiProperty()
   @IsString()

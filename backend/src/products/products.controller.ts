@@ -94,6 +94,7 @@ export class ProductsController {
     if (searchDto.maxPrice !== undefined) filters.maxPrice = searchDto.maxPrice;
     if (searchDto.inStock !== undefined) filters.inStock = searchDto.inStock;
     if (searchDto.isFeatured !== undefined) filters.isFeatured = searchDto.isFeatured;
+    if (searchDto.isCombo !== undefined) filters.isCombo = searchDto.isCombo;
     if (searchDto.sortBy) filters.sortBy = searchDto.sortBy;
 
     const result = await this.productsService.findAll(pagination, filters);
