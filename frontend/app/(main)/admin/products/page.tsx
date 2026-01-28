@@ -37,6 +37,7 @@ import { Switch } from "@/components/ui/switch"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { api as apiClient, type BackendCategory } from "@/lib/api"
 import { Badge as FilterBadge } from "@/components/ui/badge"
+import { SmartImg } from "@/components/ui/smart-image"
 
 const statusConfig = {
   active: { label: "Activo", className: "bg-green-100 text-green-700 border-green-200" },
@@ -457,12 +458,14 @@ export default function ProductsPage() {
                   <TableRow key={product.id} className="hover:bg-secondary/30 transition-colors">
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-lg bg-secondary overflow-hidden flex-shrink-0">
-                          <img
+                        <div className="w-12 h-12 rounded-lg bg-secondary overflow-hidden flex-shrink-0 relative">
+                          <SmartImg
                             src={product.images[0] || "/placeholder.svg"}
                             alt={product.name}
                             className="w-full h-full object-cover"
-                            crossOrigin="anonymous"
+                            width={48}
+                            height={48}
+                            aspectRatio="1/1"
                           />
                         </div>
                         <div>

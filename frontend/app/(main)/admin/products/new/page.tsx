@@ -16,6 +16,7 @@ import { ArrowLeft, X, Save, ImagePlus, Loader2 } from "lucide-react"
 import { api, type BackendCategory } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { slugify } from "@/lib/slug"
+import { SmartImg } from "@/components/ui/smart-image"
 
 export default function NewProductPage() {
   const router = useRouter()
@@ -305,16 +306,17 @@ export default function NewProductPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {images.map((image, index) => (
                     <div key={index} className="relative aspect-square rounded-xl bg-secondary overflow-hidden group">
-                      <img
+                      <SmartImg
                         src={image || "/placeholder.svg"}
                         alt={`Product ${index + 1}`}
                         className="w-full h-full object-cover"
+                        aspectRatio="1/1"
                       />
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
                         disabled={isLoading}
-                        className="absolute top-2 right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
                       >
                         <X className="w-4 h-4" />
                       </button>

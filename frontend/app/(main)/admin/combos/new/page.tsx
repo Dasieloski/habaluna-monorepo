@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { ArrowLeft, ImagePlus, Loader2, Save, X, Search, Boxes } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { SmartImg } from "@/components/ui/smart-image"
 
 type SelectedItem = { productId: string; name: string; quantity: number }
 
@@ -446,13 +447,12 @@ export default function NewComboPage() {
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {images.map((src, i) => (
                       <div key={i} className="relative rounded-lg overflow-hidden border">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={src} alt="preview" className="w-full h-28 object-cover" />
+                        <SmartImg src={src} alt="preview" className="w-full h-28 object-cover" aspectRatio="4/3" />
                         <button
                           type="button"
                           onClick={() => removeImage(i)}
                           disabled={isLoading}
-                          className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1"
+                          className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 z-10"
                         >
                           <X className="w-4 h-4" />
                         </button>

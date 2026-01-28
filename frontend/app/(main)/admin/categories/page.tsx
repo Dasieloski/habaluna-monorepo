@@ -29,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Plus, Search, Pencil, Trash2, FolderTree, Package, Image as ImageIcon, Loader2 } from "lucide-react"
 import { slugify } from "@/lib/slug"
+import { SmartImg } from "@/components/ui/smart-image"
 
 type CategoryRow = BackendAdminCategory & { productCount: number }
 
@@ -444,17 +445,20 @@ function CategoriesContent() {
               <div className="space-y-2">
                 <Label>Foto</Label>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-secondary/50 rounded-xl flex items-center justify-center overflow-hidden border border-border">
+                  <div className="w-12 h-12 bg-secondary/50 rounded-xl flex items-center justify-center overflow-hidden border border-border relative">
                     {newCategory.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <SmartImg
                         src={
-                          newCategory.image.startsWith("/uploads/")
+                          newCategory.image.startsWith("/uploads/") ||
+                          newCategory.image.startsWith("/api/media/")
                             ? `${getApiBaseUrl()}${newCategory.image}`
                             : newCategory.image
                         }
                         alt="Categoría"
                         className="w-full h-full object-cover"
+                        width={48}
+                        height={48}
+                        aspectRatio="1/1"
                       />
                     ) : (
                       <ImageIcon className="w-5 h-5 text-muted-foreground" />

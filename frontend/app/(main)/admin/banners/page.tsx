@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import Image from "next/image"
+import { SmartImage } from "@/components/ui/smart-image"
 import { api, type BackendBanner, getApiBaseUrlLazy } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -742,7 +743,7 @@ export default function AdminBannersPage() {
                         </TableCell>
                         <TableCell>
                           <div className="relative h-12 w-20 rounded-md overflow-hidden bg-muted">
-                            <Image src={img} alt={b.title} fill sizes="80px" className="object-cover" />
+                            <SmartImage src={img} alt={b.title} fill sizes="80px" className="object-cover" />
                           </div>
                         </TableCell>
                         <TableCell>
@@ -850,7 +851,7 @@ export default function AdminBannersPage() {
               </div>
               {form.image ? (
                 <div className="relative h-40 w-full rounded-lg overflow-hidden bg-muted">
-                  <Image src={normalizeImageUrl(form.image)} alt="preview" fill sizes="(max-width: 768px) 90vw, 640px" className="object-cover" />
+                  <SmartImage src={normalizeImageUrl(form.image)} alt="preview" fill sizes="(max-width: 768px) 90vw, 640px" className="object-cover" />
                 </div>
               ) : null}
             </div>
