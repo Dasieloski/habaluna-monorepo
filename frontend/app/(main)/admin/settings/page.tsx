@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,14 +9,49 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Save, Store, Bell, Lock, Globe, Palette } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+
+const NOTIFICATION_PREFS_KEY = 'admin_notification_preferences'
+
+const notificationTypes = [
+  { key: 'newOrders', label: "Nuevos pedidos", desc: "Recibe alertas cuando lleguen nuevos pedidos", alertType: 'PENDING_PAYMENT' },
+  { key: 'lowStock', label: "Stock bajo", desc: "Alerta cuando un producto tenga poco stock", alertType: 'LOW_STOCK' },
+  { key: 'outOfStock', label: "Productos agotados", desc: "Alerta cuando un producto esté agotado", alertType: 'OUT_OF_STOCK' },
+  { key: 'reviews', label: "Reseñas", desc: "Cuando un cliente deje una reseña", alertType: 'REVIEW' },
+]
 
 export default function SettingsPage() {
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
+  const [notificationPrefs, setNotificationPrefs] = useState<Record<string, boolean>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(NOTIFICATION_PREFS_KEY)
+      if (saved) {
+        try {
+          return JSON.parse(saved)
+        } catch {
+          return { newOrders: true, lowStock: true, outOfStock: true, reviews: true }
+        }
+      }
+    }
+    return { newOrders: true, lowStock: true, outOfStock: true, reviews: true }
+  })
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(NOTIFICATION_PREFS_KEY, JSON.stringify(notificationPrefs))
+    }
+  }, [notificationPrefs])
 
   const handleSave = async () => {
     setIsLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 1500))
     setIsLoading(false)
+    toast({ title: "Configuración guardada" })
+  }
+
+  const handleNotificationToggle = (key: string, checked: boolean) => {
+    setNotificationPrefs(prev => ({ ...prev, [key]: checked }))
   }
 
   return (
@@ -143,18 +178,16 @@ export default function SettingsPage() {
               <CardDescription>Configura cómo quieres recibir alertas</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {[
-                { label: "Nuevos pedidos", desc: "Recibe alertas cuando lleguen nuevos pedidos" },
-                { label: "Stock bajo", desc: "Alerta cuando un producto tenga poco stock" },
-                { label: "Nuevos clientes", desc: "Notificación de nuevos registros" },
-                { label: "Reseñas", desc: "Cuando un cliente deje una reseña" },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between p-4 bg-secondary/50 rounded-xl">
+              {notificationTypes.map((item) => (
+                <div key={item.key} className="flex items-center justify-between p-4 bg-secondary/50 rounded-xl">
                   <div>
                     <p className="font-medium text-foreground">{item.label}</p>
                     <p className="text-sm text-muted-foreground">{item.desc}</p>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch 
+                    checked={notificationPrefs[item.key] ?? true}
+                    onCheckedChange={(checked) => handleNotificationToggle(item.key, checked)}
+                  />
                 </div>
               ))}
             </CardContent>

@@ -35,8 +35,33 @@ export function AdminHeader({ onMenuToggle, isMenuOpen }: AdminHeaderProps) {
       try {
         const response = await api.getAlerts()
         const alertsData = Array.isArray(response.data) ? response.data : []
-        setAlerts(alertsData)
-        setUnreadCount(alertsData.filter((a: any) => a.status === 'NEW').length)
+        
+        // Filtrar según preferencias de notificación
+        const NOTIFICATION_PREFS_KEY = 'admin_notification_preferences'
+        let prefs: Record<string, boolean> = { newOrders: true, lowStock: true, outOfStock: true, reviews: true }
+        if (typeof window !== 'undefined') {
+          const saved = localStorage.getItem(NOTIFICATION_PREFS_KEY)
+          if (saved) {
+            try {
+              prefs = JSON.parse(saved)
+            } catch {}
+          }
+        }
+        
+        // Mapeo de tipos de alerta a preferencias
+        const alertTypeToPref: Record<string, string> = {
+          'LOW_STOCK': 'lowStock',
+          'OUT_OF_STOCK': 'outOfStock',
+          'PENDING_PAYMENT': 'newOrders',
+        }
+        
+        const filteredAlerts = alertsData.filter((alert: any) => {
+          const prefKey = alertTypeToPref[alert.type]
+          return !prefKey || prefs[prefKey] !== false // Mostrar si no hay pref o está activa
+        })
+        
+        setAlerts(filteredAlerts)
+        setUnreadCount(filteredAlerts.filter((a: any) => a.status === 'NEW').length)
       } catch (error) {
         console.error("Error loading alerts:", error)
       }
