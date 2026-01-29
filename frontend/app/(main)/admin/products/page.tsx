@@ -251,8 +251,8 @@ export default function ProductsPage() {
     estado: statusConfig[p.status as keyof typeof statusConfig]?.label || p.status,
   }))
 
-  const totalPages = getTotalPages(products.length, ADMIN_TABLE_PAGE_SIZE)
-  const displayedProducts = getPaginatedSlice(products, page, ADMIN_TABLE_PAGE_SIZE)
+  const totalPages = getTotalPages(products.length, pageSize)
+  const displayedProducts = getPaginatedSlice(products, page, pageSize)
   useEffect(() => {
     if (page >= totalPages && totalPages > 0) setPage(Math.max(0, totalPages - 1))
   }, [page, totalPages])

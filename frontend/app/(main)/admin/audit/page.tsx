@@ -37,6 +37,8 @@ export default function AuditPage() {
   const [logs, setLogs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(ADMIN_TABLE_PAGE_SIZE)
 
   useEffect(() => {
     loadLogs()
