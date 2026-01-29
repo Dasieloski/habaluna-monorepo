@@ -67,13 +67,6 @@ export default function AbandonedCartsPage() {
     abandonado: formatDistanceToNow(new Date(cart.lastUpdatedAt), { addSuffix: true, locale: es }),
   }))
 
-  const handleExportCarts = () => {
-    exportTableToCSV({
-      filename: `carritos-abandonados-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: cartsColumns,
-      data: cartsTableData,
-    })
-  }
   const handlePrintCarts = () => {
     printTableOnly({
       title: "Carritos Abandonados",
@@ -87,9 +80,12 @@ export default function AbandonedCartsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Carritos Abandonados</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportCarts}>
-            <Download className="w-4 h-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Carritos Abandonados"
+            filename={`carritos-abandonados-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={cartsColumns}
+            data={cartsTableData}
+          />
           <Button variant="outline" onClick={handlePrintCarts}>
             <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
           </Button>

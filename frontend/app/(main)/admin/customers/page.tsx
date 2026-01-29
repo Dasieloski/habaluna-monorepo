@@ -36,12 +36,25 @@ import {
   DollarSign,
   ShoppingCart,
   TrendingUp,
-  Download,
   Printer,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 import { format } from "date-fns"
+import {
+  ADMIN_TABLE_PAGE_SIZE,
+  getPaginatedSlice,
+  getTotalPages,
+} from "@/lib/admin-table"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 type CustomerRow = BackendAdminCustomer
 
@@ -65,6 +78,8 @@ function CustomersContent() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [confirmTarget, setConfirmTarget] = useState<CustomerRow | null>(null)
   const [isToggling, setIsToggling] = useState(false)
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(ADMIN_TABLE_PAGE_SIZE)
 
   const refreshCustomers = async () => {
     setError("")
@@ -94,6 +109,10 @@ function CustomersContent() {
     })
   }, [customers, searchQuery])
 
+  useEffect(() => {
+    setPage(0)
+  }, [searchQuery])
+
   const totalRevenue = customers.reduce((acc, c) => acc + (c.totalSpent || 0), 0)
   const totalOrders = customers.reduce((acc, c) => acc + (c.totalOrders || 0), 0)
   const activeCustomers = customers.filter((c) => c.isActive).length
@@ -106,6 +125,12 @@ function CustomersContent() {
     { key: "totalGastado", label: "Total gastado (USD)", format: (v: unknown) => (v != null ? Number(v).toFixed(2) : "—") },
     { key: "estado", label: "Estado" },
   ]
+  const totalPages = getTotalPages(filteredCustomers.length, pageSize)
+  const displayedCustomers = getPaginatedSlice(filteredCustomers, page, pageSize)
+  useEffect(() => {
+    if (page >= totalPages && totalPages > 0) setPage(Math.max(0, totalPages - 1))
+  }, [page, totalPages])
+
   const customerTableData = filteredCustomers.map((c) => ({
     cliente: getCustomerName(c),
     email: c.email || "—",
@@ -115,13 +140,6 @@ function CustomersContent() {
     estado: c.isActive ? "Activo" : "Inactivo",
   }))
 
-  const handleExportCustomers = () => {
-    exportTableToCSV({
-      filename: `clientes-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: customerColumns,
-      data: customerTableData,
-    })
-  }
   const handlePrintCustomers = () => {
     printTableOnly({
       title: "Clientes — Listado",
@@ -175,9 +193,12 @@ function CustomersContent() {
           <p className="text-muted-foreground mt-1">Gestiona tu base de clientes</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportCustomers}>
-            <Download className="w-4 h-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Clientes — Listado"
+            filename={`clientes-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={customerColumns}
+            data={customerTableData}
+          />
           <Button variant="outline" onClick={handlePrintCustomers}>
             <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
           </Button>
@@ -296,7 +317,7 @@ function CustomersContent() {
                   </TableRow>
                 )}
 
-                {filteredCustomers.map((customer) => (
+                {displayedCustomers.map((customer) => (
                   <TableRow key={customer.id} className="hover:bg-secondary/30 transition-colors">
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -379,6 +400,54 @@ function CustomersContent() {
               </TableBody>
             </Table>
           </div>
+          {filteredCustomers.length > pageSize && (
+            <div className="flex items-center justify-between px-4 py-3 border-t">
+              <p className="text-sm text-muted-foreground">
+                Mostrando {page * pageSize + 1}-{Math.min((page + 1) * pageSize, filteredCustomers.length)} de {filteredCustomers.length}
+              </p>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page > 0) setPage(page - 1)
+                      }}
+                      className={page <= 0 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const p = totalPages <= 5 ? i : page < 3 ? i : page >= totalPages - 2 ? totalPages - 5 + i : page - 2 + i
+                    return (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setPage(p)
+                          }}
+                          isActive={page === p}
+                        >
+                          {p + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  })}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page < totalPages - 1) setPage(page + 1)
+                      }}
+                      className={page >= totalPages - 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
 

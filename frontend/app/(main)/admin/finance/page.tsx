@@ -15,9 +15,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { DollarSign, TrendingUp, CreditCard, AlertCircle, Download, Printer } from "lucide-react"
+import { DollarSign, TrendingUp, CreditCard, AlertCircle, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 
 export default function FinancePage() {
   const [transactions, setTransactions] = useState<any[]>([])
@@ -106,10 +107,12 @@ export default function FinancePage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Finanzas y Transacciones</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="w-4 h-4 mr-2" />
-            Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Finanzas — Historial de Transacciones"
+            filename={`finanzas-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={[...financeColumns]}
+            data={tableData}
+          />
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="w-4 h-4 mr-2" />
             Imprimir tabla

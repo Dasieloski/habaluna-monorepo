@@ -23,10 +23,24 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Search, Eye, Filter, Download, Printer } from "lucide-react"
+import { Search, Eye, Filter, Printer } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
+import {
+  ADMIN_TABLE_PAGE_SIZE,
+  getPaginatedSlice,
+  getTotalPages,
+} from "@/lib/admin-table"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 const statusMap: Record<string, { label: string; color: string }> = {
   PENDING: { label: "Pendiente", color: "bg-yellow-100 text-yellow-800" },
@@ -50,6 +64,8 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("ALL")
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(ADMIN_TABLE_PAGE_SIZE)
 
   useEffect(() => {
     loadOrders()
@@ -58,6 +74,10 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     filterOrders()
   }, [search, statusFilter, orders])
+
+  useEffect(() => {
+    setPage(0)
+  }, [search, statusFilter])
 
   const loadOrders = async () => {
     try {
@@ -92,6 +112,12 @@ export default function AdminOrdersPage() {
     setFilteredOrders(result)
   }
 
+  const totalPages = getTotalPages(filteredOrders.length, pageSize)
+  const displayedOrders = getPaginatedSlice(filteredOrders, page, pageSize)
+  useEffect(() => {
+    if (page >= totalPages && totalPages > 0) setPage(Math.max(0, totalPages - 1))
+  }, [page, totalPages])
+
   const orderColumns = [
     { key: "orden", label: "Nº Orden" },
     { key: "fecha", label: "Fecha", format: (v: unknown) => (v ? format(new Date(v as string), "dd/MM/yyyy", { locale: es }) : "—") },
@@ -109,13 +135,6 @@ export default function AdminOrdersPage() {
     total: o.total,
   }))
 
-  const handleExportOrders = () => {
-    exportTableToCSV({
-      filename: `pedidos-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: orderColumns,
-      data: orderTableData,
-    })
-  }
   const handlePrintOrders = () => {
     printTableOnly({
       title: "Pedidos — Listado",
@@ -129,10 +148,12 @@ export default function AdminOrdersPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Pedidos</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportOrders}>
-            <Download className="mr-2 h-4 w-4" />
-            Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Pedidos — Listado"
+            filename={`pedidos-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={orderColumns}
+            data={orderTableData}
+            />
           <Button variant="outline" onClick={handlePrintOrders}>
             <Printer className="mr-2 h-4 w-4" />
             Imprimir tabla
@@ -198,7 +219,7 @@ export default function AdminOrdersPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredOrders.map((order) => (
+                  displayedOrders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">
                         {order.orderNumber || order.id.slice(0, 8)}
@@ -249,6 +270,58 @@ export default function AdminOrdersPage() {
               </TableBody>
             </Table>
           </div>
+          {filteredOrders.length > pageSize && (
+            <div className="flex items-center justify-between px-4 py-3 border-t">
+              <p className="text-sm text-muted-foreground">
+                Mostrando {page * pageSize + 1}-{Math.min((page + 1) * pageSize, filteredOrders.length)} de {filteredOrders.length}
+              </p>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page > 0) setPage(page - 1)
+                      }}
+                      className={page <= 0 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let p: number
+                    if (totalPages <= 5) p = i
+                    else if (page < 3) p = i
+                    else if (page >= totalPages - 2) p = totalPages - 5 + i
+                    else p = page - 2 + i
+                    return (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setPage(p)
+                          }}
+                          isActive={page === p}
+                        >
+                          {p + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  })}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page < totalPages - 1) setPage(page + 1)
+                      }}
+                      className={page >= totalPages - 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

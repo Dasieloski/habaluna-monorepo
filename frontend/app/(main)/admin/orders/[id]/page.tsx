@@ -15,12 +15,13 @@ import {
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, Truck, CreditCard, User, MapPin, Calendar, Mail, Download, Printer } from "lucide-react"
+import { ArrowLeft, Truck, CreditCard, User, MapPin, Calendar, Mail, Printer } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 
 export default function AdminOrderDetailPage() {
   const { id } = useParams()
@@ -119,13 +120,6 @@ export default function AdminOrderDetailPage() {
     subtotal: item.price * item.quantity,
   }))
 
-  const handleExportOrder = () => {
-    exportTableToCSV({
-      filename: `pedido-${order.orderNumber || order.id}-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: orderItemsColumns,
-      data: orderItemsData,
-    })
-  }
   const handlePrintOrder = () => {
     printTableOnly({
       title: `Pedido #${order.orderNumber || order.id.slice(0, 8)} — ${format(new Date(order.createdAt), "dd/MM/yyyy HH:mm", { locale: es })}`,
@@ -151,10 +145,12 @@ export default function AdminOrderDetailPage() {
           </p>
         </div>
         <div className="ml-auto flex gap-2">
-          <Button variant="outline" onClick={handleExportOrder}>
-            <Download className="h-4 w-4 mr-2" />
-            Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title={`Pedido #${order.orderNumber || order.id.slice(0, 8)}`}
+            filename={`pedido-${order.orderNumber || order.id}-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={orderItemsColumns}
+            data={orderItemsData}
+          />
           <Button variant="outline" onClick={handlePrintOrder}>
             <Printer className="h-4 w-4 mr-2" />
             Imprimir tabla

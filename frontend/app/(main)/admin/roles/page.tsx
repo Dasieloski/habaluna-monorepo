@@ -21,9 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Search, Shield, UserCog, Download, Printer } from "lucide-react"
+import { Search, Shield, UserCog, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 import { format } from "date-fns"
 
 export default function RolesPage() {
@@ -129,9 +130,12 @@ export default function RolesPage() {
           <h1 className="text-3xl font-bold tracking-tight">Roles y Permisos</h1>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportRoles}>
-            <Download className="w-4 h-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Roles y Permisos — Usuarios"
+            filename={`roles-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={rolesColumns}
+            data={rolesTableData}
+          />
           <Button variant="outline" onClick={handlePrintRoles}>
             <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
           </Button>

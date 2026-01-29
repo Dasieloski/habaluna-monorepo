@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Undo2, Download, Printer } from "lucide-react"
+import { Undo2, Printer } from "lucide-react"
 import { formatPrice } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 import { Button } from "@/components/ui/button"
 
 export default function RefundsPage() {
@@ -79,9 +80,12 @@ export default function RefundsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Gestión de Reembolsos</h1>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportRefunds}>
-            <Download className="w-4 h-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Reembolsos — Historial"
+            filename={`reembolsos-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={refundsColumns}
+            data={refundsTableData}
+          />
           <Button variant="outline" onClick={handlePrintRefunds}>
             <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
           </Button>

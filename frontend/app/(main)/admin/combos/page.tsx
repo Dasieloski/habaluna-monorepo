@@ -17,9 +17,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Trash2, ExternalLink, Boxes, Download, Printer } from "lucide-react"
+import { Plus, Search, Trash2, ExternalLink, Boxes, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 import { format } from "date-fns"
 
 export default function AdminCombosPage() {
@@ -117,9 +118,12 @@ export default function AdminCombosPage() {
           <p className="text-muted-foreground mt-1">Gestiona los combos (productos con composición)</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportCombos}>
-            <Download className="w-4 h-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Combos — Listado"
+            filename={`combos-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={combosColumns}
+            data={combosTableData}
+          />
           <Button variant="outline" onClick={handlePrintCombos}>
             <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
           </Button>

@@ -13,12 +13,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { RotateCcw, Check, X, Eye, Download, Printer } from "lucide-react"
+import { RotateCcw, Check, X, Eye, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { formatPrice } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 import {
   Dialog,
   DialogContent,
@@ -108,13 +109,6 @@ export default function ReturnsPage() {
     estado: req.status,
   }))
 
-  const handleExportReturns = () => {
-    exportTableToCSV({
-      filename: `devoluciones-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: returnsColumns,
-      data: returnsTableData,
-    })
-  }
   const handlePrintReturns = () => {
     printTableOnly({
       title: "Devoluciones — Solicitudes",
@@ -131,9 +125,12 @@ export default function ReturnsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Gestión de Devoluciones</h1>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportReturns}>
-            <Download className="w-4 h-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Devoluciones — Solicitudes"
+            filename={`devoluciones-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={returnsColumns}
+            data={returnsTableData}
+          />
           <Button variant="outline" onClick={handlePrintReturns}>
             <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
           </Button>

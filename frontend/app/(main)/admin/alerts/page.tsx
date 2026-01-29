@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Bell, CheckCircle, Eye, Download, Printer } from "lucide-react"
+import { Bell, CheckCircle, Eye, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { formatDistanceToNow, format } from "date-fns"
 import { es } from "date-fns/locale"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<any[]>([])
@@ -85,9 +86,12 @@ export default function AlertsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Centro de Alertas</h1>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportAlerts}>
-            <Download className="w-4 h-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Centro de Alertas — Notificaciones"
+            filename={`alertas-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={alertsColumns}
+            data={alertsTableData}
+          />
           <Button variant="outline" onClick={handlePrintAlerts}>
             <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
           </Button>

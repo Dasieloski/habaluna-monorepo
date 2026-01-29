@@ -14,10 +14,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { Search, Download, Printer } from "lucide-react"
+import { Search, Printer } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
+import {
+  ADMIN_TABLE_PAGE_SIZE,
+  getPaginatedSlice,
+  getTotalPages,
+} from "@/lib/admin-table"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 export default function AuditPage() {
   const [logs, setLogs] = useState<any[]>([])
@@ -50,6 +64,10 @@ export default function AuditPage() {
     log.user?.email.toLowerCase().includes(search.toLowerCase())
   )
 
+  useEffect(() => {
+    setPage(0)
+  }, [search])
+
   const getActionColor = (action: string) => {
     if (action.includes("CREATE")) return "bg-green-100 text-green-800"
     if (action.includes("UPDATE")) return "bg-blue-100 text-blue-800"
@@ -65,6 +83,12 @@ export default function AuditPage() {
     { key: "detalles", label: "Detalles", format: (v: unknown) => (v != null ? (typeof v === "string" ? v : JSON.stringify(v)) : "—") },
     { key: "ip", label: "IP" },
   ]
+  const totalPages = getTotalPages(filteredLogs.length, pageSize)
+  const displayedLogs = getPaginatedSlice(filteredLogs, page, pageSize)
+  useEffect(() => {
+    if (page >= totalPages && totalPages > 0) setPage(Math.max(0, totalPages - 1))
+  }, [page, totalPages])
+
   const auditTableData = filteredLogs.map((log) => ({
     fecha: log.createdAt,
     usuario: [log.user?.firstName, log.user?.email].filter(Boolean).join(" — ") || "—",
@@ -74,13 +98,6 @@ export default function AuditPage() {
     ip: log.ipAddress || "—",
   }))
 
-  const handleExportAudit = () => {
-    exportTableToCSV({
-      filename: `auditoria-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: auditColumns,
-      data: auditTableData,
-    })
-  }
   const handlePrintAudit = () => {
     printTableOnly({
       title: "Auditoría — Registro de Actividad",
@@ -94,9 +111,12 @@ export default function AuditPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Auditoría y Seguridad</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportAudit}>
-            <Download className="w-4 h-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Auditoría — Registro de Actividad"
+            filename={`auditoria-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={auditColumns}
+            data={auditTableData}
+          />
           <Button variant="outline" onClick={handlePrintAudit}>
             <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
           </Button>
@@ -146,7 +166,7 @@ export default function AuditPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredLogs.map((log) => (
+                  displayedLogs.map((log) => (
                     <TableRow key={log.id}>
                       <TableCell className="whitespace-nowrap">
                         {format(new Date(log.createdAt), "dd MMM HH:mm", { locale: es })}
@@ -178,6 +198,54 @@ export default function AuditPage() {
               </TableBody>
             </Table>
           </div>
+          {filteredLogs.length > pageSize && (
+            <div className="flex items-center justify-between px-4 py-3 border-t">
+              <p className="text-sm text-muted-foreground">
+                Mostrando {page * pageSize + 1}-{Math.min((page + 1) * pageSize, filteredLogs.length)} de {filteredLogs.length}
+              </p>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page > 0) setPage(page - 1)
+                      }}
+                      className={page <= 0 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const p = totalPages <= 5 ? i : page < 3 ? i : page >= totalPages - 2 ? totalPages - 5 + i : page - 2 + i
+                    return (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setPage(p)
+                          }}
+                          isActive={page === p}
+                        >
+                          {p + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  })}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page < totalPages - 1) setPage(page + 1)
+                      }}
+                      className={page >= totalPages - 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

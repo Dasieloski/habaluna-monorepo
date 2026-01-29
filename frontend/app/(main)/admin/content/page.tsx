@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { FileText, Plus, Pencil, Trash2, Download, Printer } from "lucide-react"
+import { FileText, Plus, Pencil, Trash2, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   Dialog,
@@ -25,7 +25,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 import { format } from "date-fns"
 
 export default function ContentPage() {
@@ -131,9 +132,12 @@ export default function ContentPage() {
           <h1 className="text-3xl font-bold tracking-tight">Gestión de Contenido</h1>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportContent}>
-            <Download className="h-4 w-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Contenido CMS — Bloques"
+            filename={`contenido-cms-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={contentColumns}
+            data={contentTableData}
+          />
           <Button variant="outline" onClick={handlePrintContent}>
             <Printer className="h-4 w-4 mr-2" /> Imprimir tabla
           </Button>

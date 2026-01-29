@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Filter, Package, Loader2, X, Download, Printer } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Filter, Package, Loader2, X, Printer } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ProductViewDialog } from "@/components/admin/product-view-dialog"
 import { ProductEditDialog } from "@/components/admin/product-edit-dialog"
@@ -38,8 +38,22 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { api as apiClient, type BackendCategory } from "@/lib/api"
 import { Badge as FilterBadge } from "@/components/ui/badge"
 import { SmartImg } from "@/components/ui/smart-image"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 import { format } from "date-fns"
+import {
+  ADMIN_TABLE_PAGE_SIZE,
+  getPaginatedSlice,
+  getTotalPages,
+} from "@/lib/admin-table"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 const statusConfig = {
   active: { label: "Activo", className: "bg-green-100 text-green-700 border-green-200" },
@@ -78,6 +92,10 @@ export default function ProductsPage() {
     }, 300) // Debounce para búsqueda
     
     return () => clearTimeout(timeoutId)
+  }, [searchQuery, selectedStatus, selectedCategory, isFeaturedFilter])
+
+  useEffect(() => {
+    setPage(0)
   }, [searchQuery, selectedStatus, selectedCategory, isFeaturedFilter])
 
   const loadCategories = async () => {
@@ -233,13 +251,12 @@ export default function ProductsPage() {
     estado: statusConfig[p.status as keyof typeof statusConfig]?.label || p.status,
   }))
 
-  const handleExportProducts = () => {
-    exportTableToCSV({
-      filename: `productos-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: productColumns,
-      data: productTableData,
-    })
-  }
+  const totalPages = getTotalPages(products.length, ADMIN_TABLE_PAGE_SIZE)
+  const displayedProducts = getPaginatedSlice(products, page, ADMIN_TABLE_PAGE_SIZE)
+  useEffect(() => {
+    if (page >= totalPages && totalPages > 0) setPage(Math.max(0, totalPages - 1))
+  }, [page, totalPages])
+
   const handlePrintProducts = () => {
     printTableOnly({
       title: "Productos — Catálogo",
@@ -257,9 +274,12 @@ export default function ProductsPage() {
           <p className="text-muted-foreground mt-1">Gestiona tu catálogo de productos</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={handleExportProducts}>
-            <Download className="w-4 h-4 mr-2" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Productos — Catálogo"
+            filename={`productos-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={productColumns}
+            data={productTableData}
+          />
           <Button variant="outline" onClick={handlePrintProducts}>
             <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
           </Button>
@@ -494,7 +514,7 @@ export default function ProductsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  products.map((product: Product) => (
+                  displayedProducts.map((product: Product) => (
                   <TableRow key={product.id} className="hover:bg-secondary/30 transition-colors">
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -581,6 +601,54 @@ export default function ProductsPage() {
               </TableBody>
             </Table>
           </div>
+          {products.length > ADMIN_TABLE_PAGE_SIZE && (
+            <div className="flex items-center justify-between px-4 py-3 border-t">
+              <p className="text-sm text-muted-foreground">
+                Mostrando {page * ADMIN_TABLE_PAGE_SIZE + 1}-{Math.min((page + 1) * ADMIN_TABLE_PAGE_SIZE, products.length)} de {products.length}
+              </p>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page > 0) setPage(page - 1)
+                      }}
+                      className={page <= 0 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const p = totalPages <= 5 ? i : page < 3 ? i : page >= totalPages - 2 ? totalPages - 5 + i : page - 2 + i
+                    return (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setPage(p)
+                          }}
+                          isActive={page === p}
+                        >
+                          {p + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  })}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (page < totalPages - 1) setPage(page + 1)
+                      }}
+                      className={page >= totalPages - 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
 

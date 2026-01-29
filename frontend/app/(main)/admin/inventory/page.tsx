@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Save, AlertTriangle, Download, Printer } from "lucide-react"
+import { Search, Save, AlertTriangle, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
 import { format } from "date-fns"
@@ -153,13 +153,6 @@ export default function InventoryPage() {
     { key: "estado", label: "Estado" },
     { key: "stock", label: "Stock" },
   ]
-  const handleExportInventory = () => {
-    exportTableToCSV({
-      filename: `inventario-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: inventoryColumns,
-      data: inventoryRows,
-    })
-  }
   const handlePrintInventory = () => {
     printTableOnly({
       title: "Inventario — Control de Stock",
@@ -173,9 +166,12 @@ export default function InventoryPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Control de Stock</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportInventory}>
-            <Download className="mr-2 h-4 w-4" /> Exportar tabla
-          </Button>
+          <ExportTableDropdown
+            title="Inventario — Control de Stock"
+            filename={`inventario-${format(new Date(), "yyyy-MM-dd")}`}
+            columns={inventoryColumns}
+            data={inventoryRows}
+          />
           <Button variant="outline" onClick={handlePrintInventory}>
             <Printer className="mr-2 h-4 w-4" /> Imprimir tabla
           </Button>
