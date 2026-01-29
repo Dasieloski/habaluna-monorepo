@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
+import Link from "next/link" // Dependencia explícita para que next/link esté en el chunk del layout (AdminSidebar usa Link)
 import { useRouter, usePathname } from "next/navigation"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { AdminSidebar } from "@/components/admin/admin-sidebar"

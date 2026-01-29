@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { RefreshCw, Home, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
