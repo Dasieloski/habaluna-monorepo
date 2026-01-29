@@ -20,7 +20,7 @@ export default function AyudaPage() {
           content: (
             <p>
               ¿Necesitas ayuda? Visita{" "}
-              <Link href="/help" className="text-sky-600 hover:underline">
+              <Link href="/help" className="text-primary hover:underline">
                 Servicio al Cliente
               </Link>
               .
@@ -32,22 +32,22 @@ export default function AyudaPage() {
           content: (
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                <Link href="/payment" className="text-sky-600 hover:underline">
+                <Link href="/payment" className="text-primary hover:underline">
                   Métodos de pago
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-sky-600 hover:underline">
+                <Link href="/shipping" className="text-primary hover:underline">
                   Gastos de envío
                 </Link>
               </li>
               <li>
-                <Link href="/tracking" className="text-sky-600 hover:underline">
+                <Link href="/tracking" className="text-primary hover:underline">
                   Seguimiento de pedido
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="text-sky-600 hover:underline">
+                <Link href="/returns" className="text-primary hover:underline">
                   Devoluciones
                 </Link>
               </li>

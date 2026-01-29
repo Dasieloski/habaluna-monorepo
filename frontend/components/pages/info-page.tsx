@@ -31,11 +31,11 @@ export function InfoPage({
       ]
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Breadcrumbs */}
-      <div className="border-b border-gray-100">
+      <div className="border-b border-border">
         <div className="container mx-auto px-4 py-3">
-          <nav className="flex items-center gap-2 text-sm text-gray-500">
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground">
             {crumbs.map((c, idx) => {
               const isFirst = idx === 0
               const isLast = idx === crumbs.length - 1
@@ -56,7 +56,7 @@ export function InfoPage({
               return (
                 <span key={`${c.label}-${idx}`} className="flex items-center gap-2">
                   {c.href && !isLast ? (
-                    <Link href={c.href} className="hover:text-sky-600 transition-colors flex items-center gap-1">
+                    <Link href={c.href} className="hover:text-primary transition-colors flex items-center gap-1">
                       {item}
                     </Link>
                   ) : (

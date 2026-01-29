@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { api } from "@/lib/api"
 import { formatPrice } from "@/lib/utils"
 import {
@@ -59,6 +60,7 @@ const paymentStatusMap: Record<string, { label: string; color: string }> = {
 }
 
 export default function AdminOrdersPage() {
+  const searchParams = useSearchParams()
   const [orders, setOrders] = useState<any[]>([])
   const [filteredOrders, setFilteredOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -66,6 +68,11 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState("ALL")
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(ADMIN_TABLE_PAGE_SIZE)
+
+  useEffect(() => {
+    const q = searchParams.get("search")
+    if (q != null && q !== "") setSearch(q)
+  }, [searchParams])
 
   useEffect(() => {
     loadOrders()

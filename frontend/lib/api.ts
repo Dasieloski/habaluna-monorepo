@@ -1588,6 +1588,22 @@ export const api = {
     const res = await api.patch(`/orders/${id}/status`, body)
     return res.data
   },
+
+  /** Búsqueda global admin: productos, clientes y ofertas en paralelo */
+  getAdminGlobalSearch: async (query: string, limitPerType: number = 5) => {
+    const q = (query || "").trim()
+    if (!q) return { products: [], customers: [], offers: [] }
+    const [productsRes, customersRes, offersRes] = await Promise.all([
+      api.getAdminProducts({ search: q, limit: limitPerType }).catch(() => ({ data: [] })),
+      api.getAdminCustomers({ search: q, limit: limitPerType }).catch(() => ({ data: [] })),
+      api.getAdminOffers({ search: q, limit: limitPerType }).catch(() => ({ data: [] })),
+    ])
+    return {
+      products: Array.isArray(productsRes?.data) ? productsRes.data : [],
+      customers: Array.isArray(customersRes?.data) ? customersRes.data : [],
+      offers: Array.isArray(offersRes?.data) ? offersRes.data : [],
+    }
+  },
 }
 
 // Función para normalizar URLs de imágenes

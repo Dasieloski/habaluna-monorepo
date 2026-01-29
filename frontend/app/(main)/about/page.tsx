@@ -25,15 +25,15 @@ export default function AboutPage() {
           content: (
             <p>
               Queremos que tengas toda la información a mano:{" "}
-              <Link href="/shipping" className="text-sky-600 hover:underline">
+              <Link href="/shipping" className="text-primary hover:underline">
                 gastos de envío
               </Link>
               ,{" "}
-              <Link href="/returns" className="text-sky-600 hover:underline">
+              <Link href="/returns" className="text-primary hover:underline">
                 devoluciones
               </Link>{" "}
               y{" "}
-              <Link href="/terms" className="text-sky-600 hover:underline">
+              <Link href="/terms" className="text-primary hover:underline">
                 términos y condiciones
               </Link>
               .

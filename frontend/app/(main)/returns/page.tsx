@@ -30,7 +30,7 @@ export default function ReturnsPage() {
           content: (
             <p>
               Escríbenos desde{" "}
-              <Link href="/help" className="text-sky-600 hover:underline">
+              <Link href="/help" className="text-primary hover:underline">
                 Servicio al Cliente
               </Link>{" "}
               indicando número de pedido y motivo.

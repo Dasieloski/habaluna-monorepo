@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { api, type BackendAdminCustomer } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -65,6 +66,7 @@ function getCustomerName(c: CustomerRow) {
 }
 
 function CustomersContent() {
+  const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState("")
   const [customers, setCustomers] = useState<CustomerRow[]>([])
   const [error, setError] = useState("")
@@ -80,6 +82,11 @@ function CustomersContent() {
   const [isToggling, setIsToggling] = useState(false)
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(ADMIN_TABLE_PAGE_SIZE)
+
+  useEffect(() => {
+    const q = searchParams.get("search")
+    if (q != null && q !== "") setSearchQuery(q)
+  }, [searchParams])
 
   const refreshCustomers = async () => {
     setError("")

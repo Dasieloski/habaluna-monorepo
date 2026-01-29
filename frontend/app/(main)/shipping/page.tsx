@@ -30,7 +30,7 @@ export default function ShippingPage() {
           content: (
             <p>
               Cuando tu pedido esté en camino podrás consultarlo en{" "}
-              <Link href="/tracking" className="text-sky-600 hover:underline">
+              <Link href="/tracking" className="text-primary hover:underline">
                 Seguimiento de pedido
               </Link>
               .

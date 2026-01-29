@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, Suspense } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { api, type BackendAdminOffer } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -56,6 +57,7 @@ function computeStatus(offer: BackendAdminOffer): OfferRow["status"] {
 }
 
 function OffersContent() {
+  const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState("")
   const [offers, setOffers] = useState<OfferRow[]>([])
   const [error, setError] = useState("")
@@ -64,6 +66,11 @@ function OffersContent() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<OfferRow | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const q = searchParams.get("search")
+    if (q != null && q !== "") setSearchQuery(q)
+  }, [searchParams])
 
   const refreshOffers = async () => {
     setError("")

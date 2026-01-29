@@ -65,7 +65,7 @@ export default function SobreHabalunaPage() {
           content: (
             <p>
               Descubre nuestra historia en{" "}
-              <Link href="/about" className="text-sky-600 hover:underline">
+              <Link href="/about" className="text-primary hover:underline">
                 Quiénes somos
               </Link>
               .
@@ -77,17 +77,17 @@ export default function SobreHabalunaPage() {
           content: (
             <ul className="list-disc pl-5 space-y-2">
               <li>
-                <Link href="/cookies" className="text-sky-600 hover:underline">
+                <Link href="/cookies" className="text-primary hover:underline">
                   Política de Cookies
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-sky-600 hover:underline">
+                <Link href="/shipping" className="text-primary hover:underline">
                   Gastos de envío
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="text-sky-600 hover:underline">
+                <Link href="/returns" className="text-primary hover:underline">
                   Devoluciones
                 </Link>
               </li>

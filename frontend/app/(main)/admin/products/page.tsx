@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { type Product } from "@/lib/mock-data"
 import { api, mapBackendProductToFrontend } from "@/lib/api"
 import { Button } from "@/components/ui/button"
@@ -62,6 +63,7 @@ const statusConfig = {
 }
 
 export default function ProductsPage() {
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const [products, setProducts] = useState<Product[]>([])
   const [allProducts, setAllProducts] = useState<Product[]>([]) // Para calcular stats
@@ -81,6 +83,11 @@ export default function ProductsPage() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [page, setPage] = useState(0)
   const pageSize = ADMIN_TABLE_PAGE_SIZE
+
+  useEffect(() => {
+    const q = searchParams.get("search")
+    if (q != null && q !== "") setSearchQuery(q)
+  }, [searchParams])
 
   useEffect(() => {
     loadCategories()

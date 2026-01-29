@@ -38,25 +38,25 @@ export default function HelpPage() {
             <ul className="list-disc pl-5 space-y-2">
               <li>
                 Consultar el estado:{" "}
-                <Link href="/tracking" className="text-sky-600 hover:underline">
+                <Link href="/tracking" className="text-primary hover:underline">
                   Seguimiento de pedido
                 </Link>
               </li>
               <li>
                 Información de envío:{" "}
-                <Link href="/shipping" className="text-sky-600 hover:underline">
+                <Link href="/shipping" className="text-primary hover:underline">
                   Gastos de envío
                 </Link>
               </li>
               <li>
                 Cambios y devoluciones:{" "}
-                <Link href="/returns" className="text-sky-600 hover:underline">
+                <Link href="/returns" className="text-primary hover:underline">
                   Devoluciones
                 </Link>
               </li>
               <li>
                 Cómo pagar:{" "}
-                <Link href="/payment" className="text-sky-600 hover:underline">
+                <Link href="/payment" className="text-primary hover:underline">
                   Métodos de pago
                 </Link>
               </li>
