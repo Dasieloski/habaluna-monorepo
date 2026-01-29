@@ -63,13 +63,6 @@ export default function AlertsPage() {
     estado: a.status,
   }))
 
-  const handleExportAlerts = () => {
-    exportTableToCSV({
-      filename: `alertas-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: alertsColumns,
-      data: alertsTableData,
-    })
-  }
   const handlePrintAlerts = () => {
     printTableOnly({
       title: "Centro de Alertas — Notificaciones",

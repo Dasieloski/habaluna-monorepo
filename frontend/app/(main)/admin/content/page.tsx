@@ -109,13 +109,6 @@ export default function ContentPage() {
     seccion: item.section || "—",
   }))
 
-  const handleExportContent = () => {
-    exportTableToCSV({
-      filename: `contenido-cms-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: contentColumns,
-      data: contentTableData,
-    })
-  }
   const handlePrintContent = () => {
     printTableOnly({
       title: "Contenido CMS — Bloques",

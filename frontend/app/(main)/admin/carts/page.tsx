@@ -16,9 +16,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
-import { Mail, ShoppingCart, Download, Printer } from "lucide-react"
+import { Mail, ShoppingCart, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 import { format } from "date-fns"
 
 export default function AbandonedCartsPage() {

@@ -95,13 +95,6 @@ export default function AdminCombosPage() {
     slug: p.slug || "—",
   }))
 
-  const handleExportCombos = () => {
-    exportTableToCSV({
-      filename: `combos-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: combosColumns,
-      data: combosTableData,
-    })
-  }
   const handlePrintCombos = () => {
     printTableOnly({
       title: "Combos — Listado",

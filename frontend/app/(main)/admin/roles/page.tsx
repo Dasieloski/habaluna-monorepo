@@ -107,13 +107,6 @@ export default function RolesPage() {
     rol: u.role || "—",
   }))
 
-  const handleExportRoles = () => {
-    exportTableToCSV({
-      filename: `roles-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: rolesColumns,
-      data: rolesTableData,
-    })
-  }
   const handlePrintRoles = () => {
     printTableOnly({
       title: "Roles y Permisos — Usuarios",

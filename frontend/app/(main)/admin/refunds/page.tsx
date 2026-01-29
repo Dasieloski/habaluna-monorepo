@@ -57,13 +57,6 @@ export default function RefundsPage() {
     estado: r.status,
   }))
 
-  const handleExportRefunds = () => {
-    exportTableToCSV({
-      filename: `reembolsos-${format(new Date(), "yyyy-MM-dd")}.csv`,
-      columns: refundsColumns,
-      data: refundsTableData,
-    })
-  }
   const handlePrintRefunds = () => {
     printTableOnly({
       title: "Reembolsos — Historial",

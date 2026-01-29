@@ -16,7 +16,8 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search, Save, AlertTriangle, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { printTableOnly } from "@/lib/table-export-print"
+import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 import { format } from "date-fns"
 
 export default function InventoryPage() {

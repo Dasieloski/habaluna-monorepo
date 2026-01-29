@@ -86,14 +86,6 @@ export default function FinancePage() {
     monto: t.total,
   }))
 
-  const handleExport = () => {
-    exportTableToCSV({
-      filename: `finanzas-${format(new Date(), 'yyyy-MM-dd')}.csv`,
-      columns: financeColumns,
-      data: tableData,
-    })
-  }
-
   const handlePrint = () => {
     printTableOnly({
       title: 'Finanzas — Historial de Transacciones',
