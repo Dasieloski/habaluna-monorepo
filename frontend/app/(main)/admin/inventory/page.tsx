@@ -14,8 +14,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Save, AlertTriangle } from "lucide-react"
+import { Search, Save, AlertTriangle, Download, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { format } from "date-fns"
 
 export default function InventoryPage() {
   const { toast } = useToast()
@@ -120,17 +122,68 @@ export default function InventoryPage() {
     p.sku?.toLowerCase().includes(search.toLowerCase())
   )
 
-  // Flatten list to show variants as rows if needed, or just nested
-  // Nested rows might be better visually.
+  // Flatten for export/print: product + variant rows
+  const inventoryRows: { producto: string; sku: string; estado: string; stock: number }[] = []
+  filteredProducts.forEach((product) => {
+    const hasVariants = product.variants && product.variants.length > 0
+    if (hasVariants) {
+      product.variants.forEach((variant: any) => {
+        const stock = changes[`v_${variant.id}`] !== undefined ? changes[`v_${variant.id}`] : variant.stock
+        inventoryRows.push({
+          producto: `${product.name} — ${variant.name}`,
+          sku: variant.sku || product.sku || "—",
+          estado: variant.stock <= 5 ? "Bajo stock" : "Normal",
+          stock,
+        })
+      })
+    } else {
+      const stock = changes[`p_${product.id}`] !== undefined ? changes[`p_${product.id}`] : product.stock
+      inventoryRows.push({
+        producto: product.name,
+        sku: product.sku || "—",
+        estado: product.stock <= 5 ? "Bajo stock" : "Normal",
+        stock,
+      })
+    }
+  })
+
+  const inventoryColumns = [
+    { key: "producto", label: "Producto" },
+    { key: "sku", label: "SKU" },
+    { key: "estado", label: "Estado" },
+    { key: "stock", label: "Stock" },
+  ]
+  const handleExportInventory = () => {
+    exportTableToCSV({
+      filename: `inventario-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: inventoryColumns,
+      data: inventoryRows,
+    })
+  }
+  const handlePrintInventory = () => {
+    printTableOnly({
+      title: "Inventario — Control de Stock",
+      columns: inventoryColumns,
+      data: inventoryRows,
+    })
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Control de Stock</h1>
-        <Button onClick={handleSave} disabled={Object.keys(changes).length === 0 || saving}>
-          <Save className="mr-2 h-4 w-4" />
-          {saving ? "Guardando..." : "Guardar Cambios"}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportInventory}>
+            <Download className="mr-2 h-4 w-4" /> Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintInventory}>
+            <Printer className="mr-2 h-4 w-4" /> Imprimir tabla
+          </Button>
+          <Button onClick={handleSave} disabled={Object.keys(changes).length === 0 || saving}>
+            <Save className="mr-2 h-4 w-4" />
+            {saving ? "Guardando..." : "Guardar Cambios"}
+          </Button>
+        </div>
       </div>
 
       <Card>

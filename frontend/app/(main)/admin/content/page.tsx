@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { FileText, Plus, Pencil, Trash2 } from "lucide-react"
+import { FileText, Plus, Pencil, Trash2, Download, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   Dialog,
@@ -25,6 +25,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { format } from "date-fns"
 
 export default function ContentPage() {
   const { toast } = useToast()
@@ -95,6 +97,32 @@ export default function ContentPage() {
     setSection("")
   }
 
+  const contentColumns = [
+    { key: "slug", label: "Slug (ID)" },
+    { key: "titulo", label: "Título" },
+    { key: "seccion", label: "Sección" },
+  ]
+  const contentTableData = contents.map((item) => ({
+    slug: item.slug,
+    titulo: item.title || "—",
+    seccion: item.section || "—",
+  }))
+
+  const handleExportContent = () => {
+    exportTableToCSV({
+      filename: `contenido-cms-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: contentColumns,
+      data: contentTableData,
+    })
+  }
+  const handlePrintContent = () => {
+    printTableOnly({
+      title: "Contenido CMS — Bloques",
+      columns: contentColumns,
+      data: contentTableData,
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -102,10 +130,18 @@ export default function ContentPage() {
           <FileText className="h-8 w-8 text-muted-foreground" />
           <h1 className="text-3xl font-bold tracking-tight">Gestión de Contenido</h1>
         </div>
-        <Button onClick={() => { resetForm(); setIsDialogOpen(true) }}>
-          <Plus className="h-4 w-4 mr-2" />
-          Nuevo Bloque
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportContent}>
+            <Download className="h-4 w-4 mr-2" /> Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintContent}>
+            <Printer className="h-4 w-4 mr-2" /> Imprimir tabla
+          </Button>
+          <Button onClick={() => { resetForm(); setIsDialogOpen(true) }}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo Bloque
+          </Button>
+        </div>
       </div>
       
       <Card>

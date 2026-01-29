@@ -23,9 +23,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Search, Eye, Filter, Download } from "lucide-react"
+import { Search, Eye, Filter, Download, Printer } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
 
 const statusMap: Record<string, { label: string; color: string }> = {
   PENDING: { label: "Pendiente", color: "bg-yellow-100 text-yellow-800" },
@@ -91,14 +92,52 @@ export default function AdminOrdersPage() {
     setFilteredOrders(result)
   }
 
+  const orderColumns = [
+    { key: "orden", label: "Nº Orden" },
+    { key: "fecha", label: "Fecha", format: (v: unknown) => (v ? format(new Date(v as string), "dd/MM/yyyy", { locale: es }) : "—") },
+    { key: "cliente", label: "Cliente" },
+    { key: "estado", label: "Estado" },
+    { key: "pago", label: "Pago" },
+    { key: "total", label: "Total (USD)", format: (v: unknown) => (v != null ? formatPrice(Number(v)) : "—") },
+  ]
+  const orderTableData = filteredOrders.map((o) => ({
+    orden: o.orderNumber || o.id?.slice(0, 8) || "—",
+    fecha: o.createdAt,
+    cliente: [o.user?.firstName, o.user?.lastName].filter(Boolean).join(" ") || o.user?.email || "—",
+    estado: statusMap[o.status]?.label || o.status,
+    pago: paymentStatusMap[o.paymentStatus]?.label || o.paymentStatus,
+    total: o.total,
+  }))
+
+  const handleExportOrders = () => {
+    exportTableToCSV({
+      filename: `pedidos-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: orderColumns,
+      data: orderTableData,
+    })
+  }
+  const handlePrintOrders = () => {
+    printTableOnly({
+      title: "Pedidos — Listado",
+      columns: orderColumns,
+      data: orderTableData,
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Pedidos</h1>
-        <Button variant="outline" onClick={() => window.print()}>
-          <Download className="mr-2 h-4 w-4" />
-          Exportar
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportOrders}>
+            <Download className="mr-2 h-4 w-4" />
+            Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintOrders}>
+            <Printer className="mr-2 h-4 w-4" />
+            Imprimir tabla
+          </Button>
+        </div>
       </div>
 
       <Card>

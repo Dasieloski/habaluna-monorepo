@@ -202,7 +202,7 @@ export default function EditOfferPage() {
                         <DollarSign className="w-5 h-5 text-white" />
                       </div>
                       <p className="font-semibold text-foreground">Cantidad fija</p>
-                      <p className="text-sm text-muted-foreground">Descuento en €</p>
+                      <p className="text-sm text-muted-foreground">Descuento en $</p>
                     </button>
                   </div>
 
@@ -219,7 +219,7 @@ export default function EditOfferPage() {
                         required
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                        {offerType === "PERCENTAGE" ? "%" : "€"}
+                        {offerType === "PERCENTAGE" ? "%" : "$"}
                       </span>
                     </div>
                   </div>
@@ -299,7 +299,7 @@ export default function EditOfferPage() {
                         value={form.minPurchase}
                         onChange={(e) => setForm((p) => ({ ...p, minPurchase: Number(e.target.value) }))}
                       />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">€</span>
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                     </div>
                   )}
                 </CardContent>

@@ -21,8 +21,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Search, Shield, UserCog } from "lucide-react"
+import { Search, Shield, UserCog, Download, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { format } from "date-fns"
 
 export default function RolesPage() {
   const { toast } = useToast()
@@ -93,12 +95,46 @@ export default function RolesPage() {
     USER: "bg-gray-100 text-gray-800 border-gray-200",
   }
 
+  const rolesColumns = [
+    { key: "usuario", label: "Usuario" },
+    { key: "email", label: "Email" },
+    { key: "rol", label: "Rol" },
+  ]
+  const rolesTableData = filteredUsers.map((u) => ({
+    usuario: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email?.split("@")[0] || "—",
+    email: u.email || "—",
+    rol: u.role || "—",
+  }))
+
+  const handleExportRoles = () => {
+    exportTableToCSV({
+      filename: `roles-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: rolesColumns,
+      data: rolesTableData,
+    })
+  }
+  const handlePrintRoles = () => {
+    printTableOnly({
+      title: "Roles y Permisos — Usuarios",
+      columns: rolesColumns,
+      data: rolesTableData,
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <UserCog className="h-8 w-8 text-muted-foreground" />
           <h1 className="text-3xl font-bold tracking-tight">Roles y Permisos</h1>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportRoles}>
+            <Download className="w-4 h-4 mr-2" /> Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintRoles}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
+          </Button>
         </div>
       </div>
       

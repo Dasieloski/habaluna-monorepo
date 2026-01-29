@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Filter, Package, Loader2, X } from "lucide-react"
+import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Filter, Package, Loader2, X, Download, Printer } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ProductViewDialog } from "@/components/admin/product-view-dialog"
 import { ProductEditDialog } from "@/components/admin/product-edit-dialog"
@@ -38,6 +38,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { api as apiClient, type BackendCategory } from "@/lib/api"
 import { Badge as FilterBadge } from "@/components/ui/badge"
 import { SmartImg } from "@/components/ui/smart-image"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { format } from "date-fns"
 
 const statusConfig = {
   active: { label: "Activo", className: "bg-green-100 text-green-700 border-green-200" },
@@ -216,6 +218,36 @@ export default function ProductsPage() {
     )
   }
 
+  const productColumns = [
+    { key: "producto", label: "Producto" },
+    { key: "categoria", label: "Categoría" },
+    { key: "precio", label: "Precio (USD)", format: (v: unknown) => (v != null ? Number(v).toFixed(2) : "—") },
+    { key: "stock", label: "Stock" },
+    { key: "estado", label: "Estado" },
+  ]
+  const productTableData = products.map((p: Product) => ({
+    producto: p.name,
+    categoria: p.category || "—",
+    precio: p.priceUSD,
+    stock: p.stock,
+    estado: statusConfig[p.status as keyof typeof statusConfig]?.label || p.status,
+  }))
+
+  const handleExportProducts = () => {
+    exportTableToCSV({
+      filename: `productos-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: productColumns,
+      data: productTableData,
+    })
+  }
+  const handlePrintProducts = () => {
+    printTableOnly({
+      title: "Productos — Catálogo",
+      columns: productColumns,
+      data: productTableData,
+    })
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -224,12 +256,20 @@ export default function ProductsPage() {
           <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Productos</h1>
           <p className="text-muted-foreground mt-1">Gestiona tu catálogo de productos</p>
         </div>
-        <Link href="/admin/products/new">
-          <Button className="bg-primary hover:opacity-90 text-primary-foreground shadow-lg">
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo producto
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={handleExportProducts}>
+            <Download className="w-4 h-4 mr-2" /> Exportar tabla
           </Button>
-        </Link>
+          <Button variant="outline" onClick={handlePrintProducts}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
+          </Button>
+          <Link href="/admin/products/new">
+            <Button className="bg-primary hover:opacity-90 text-primary-foreground shadow-lg">
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo producto
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
@@ -481,10 +521,10 @@ export default function ProductsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="font-semibold text-foreground">€{product.priceUSD.toFixed(2)}</span>
+                        <span className="font-semibold text-foreground">${product.priceUSD.toFixed(2)}</span>
                         {product.comparePriceUSD && (
                           <span className="text-xs text-muted-foreground line-through">
-                            €{product.comparePriceUSD.toFixed(2)}
+                            ${product.comparePriceUSD.toFixed(2)}
                           </span>
                         )}
                       </div>

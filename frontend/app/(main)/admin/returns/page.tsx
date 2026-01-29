@@ -13,11 +13,12 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { RotateCcw, Check, X, Eye } from "lucide-react"
+import { RotateCcw, Check, X, Eye, Download, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { formatPrice } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
 import {
   Dialog,
   DialogContent,
@@ -90,11 +91,53 @@ export default function ReturnsPage() {
     return <Badge variant="outline" className={map[status] || ""}>{status}</Badge>
   }
 
+  const returnsColumns = [
+    { key: "fecha", label: "Fecha", format: (v: unknown) => (v ? format(new Date(v as string), "dd/MM/yyyy HH:mm", { locale: es }) : "—") },
+    { key: "orden", label: "Orden" },
+    { key: "cliente", label: "Cliente" },
+    { key: "motivo", label: "Motivo" },
+    { key: "monto", label: "Monto solicitado", format: (v: unknown) => (v != null ? formatPrice(Number(v)) : "—") },
+    { key: "estado", label: "Estado" },
+  ]
+  const returnsTableData = requests.map((req) => ({
+    fecha: req.createdAt,
+    orden: req.order?.orderNumber || "—",
+    cliente: [req.user?.firstName, req.user?.lastName].filter(Boolean).join(" ") || req.user?.email || "—",
+    motivo: req.reason || "—",
+    monto: req.refundAmount,
+    estado: req.status,
+  }))
+
+  const handleExportReturns = () => {
+    exportTableToCSV({
+      filename: `devoluciones-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: returnsColumns,
+      data: returnsTableData,
+    })
+  }
+  const handlePrintReturns = () => {
+    printTableOnly({
+      title: "Devoluciones — Solicitudes",
+      columns: returnsColumns,
+      data: returnsTableData,
+    })
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <RotateCcw className="h-8 w-8 text-muted-foreground" />
-        <h1 className="text-3xl font-bold tracking-tight">Gestión de Devoluciones</h1>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <RotateCcw className="h-8 w-8 text-muted-foreground" />
+          <h1 className="text-3xl font-bold tracking-tight">Gestión de Devoluciones</h1>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportReturns}>
+            <Download className="w-4 h-4 mr-2" /> Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintReturns}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
+          </Button>
+        </div>
       </div>
       
       <Card>

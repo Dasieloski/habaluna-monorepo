@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Undo2 } from "lucide-react"
+import { Undo2, Download, Printer } from "lucide-react"
 import { formatPrice } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { Button } from "@/components/ui/button"
 
 export default function RefundsPage() {
   const [refunds, setRefunds] = useState<any[]>([])
@@ -37,11 +39,53 @@ export default function RefundsPage() {
     }
   }
 
+  const refundsColumns = [
+    { key: "fecha", label: "Fecha", format: (v: unknown) => (v ? format(new Date(v as string), "dd/MM/yyyy HH:mm", { locale: es }) : "—") },
+    { key: "orden", label: "Orden" },
+    { key: "cliente", label: "Cliente" },
+    { key: "monto", label: "Monto (USD)", format: (v: unknown) => (v != null ? formatPrice(Number(v)) : "—") },
+    { key: "metodo", label: "Método" },
+    { key: "estado", label: "Estado" },
+  ]
+  const refundsTableData = refunds.map((r) => ({
+    fecha: r.createdAt,
+    orden: r.order?.orderNumber || "—",
+    cliente: r.returnRequest?.user?.email || "—",
+    monto: r.amount,
+    metodo: r.method,
+    estado: r.status,
+  }))
+
+  const handleExportRefunds = () => {
+    exportTableToCSV({
+      filename: `reembolsos-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: refundsColumns,
+      data: refundsTableData,
+    })
+  }
+  const handlePrintRefunds = () => {
+    printTableOnly({
+      title: "Reembolsos — Historial",
+      columns: refundsColumns,
+      data: refundsTableData,
+    })
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Undo2 className="h-8 w-8 text-muted-foreground" />
-        <h1 className="text-3xl font-bold tracking-tight">Gestión de Reembolsos</h1>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Undo2 className="h-8 w-8 text-muted-foreground" />
+          <h1 className="text-3xl font-bold tracking-tight">Gestión de Reembolsos</h1>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportRefunds}>
+            <Download className="w-4 h-4 mr-2" /> Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintRefunds}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
+          </Button>
+        </div>
       </div>
       
       <Card>

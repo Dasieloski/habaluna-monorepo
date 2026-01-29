@@ -16,8 +16,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
-import { Mail, ShoppingCart } from "lucide-react"
+import { Mail, ShoppingCart, Download, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { format } from "date-fns"
 
 export default function AbandonedCartsPage() {
   const { toast } = useToast()
@@ -49,9 +51,50 @@ export default function AbandonedCartsPage() {
     })
   }
 
+  const cartsColumns = [
+    { key: "cliente", label: "Cliente" },
+    { key: "productos", label: "Productos" },
+    { key: "total", label: "Total potencial (USD)", format: (v: unknown) => (v != null ? formatPrice(Number(v)) : "—") },
+    { key: "abandonado", label: "Abandonado hace" },
+  ]
+  const cartsTableData = carts.map((cart) => ({
+    cliente: [cart.user?.firstName, cart.user?.lastName].filter(Boolean).join(" ") || cart.user?.email || "Usuario",
+    productos: (cart.items || [])
+      .slice(0, 5)
+      .map((item: any) => `${item.quantity}x ${item.productName}${item.variantName ? ` (${item.variantName})` : ""}`)
+      .join("; ") + (cart.items?.length > 5 ? "…" : ""),
+    total: cart.totalPotentialUSD,
+    abandonado: formatDistanceToNow(new Date(cart.lastUpdatedAt), { addSuffix: true, locale: es }),
+  }))
+
+  const handleExportCarts = () => {
+    exportTableToCSV({
+      filename: `carritos-abandonados-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: cartsColumns,
+      data: cartsTableData,
+    })
+  }
+  const handlePrintCarts = () => {
+    printTableOnly({
+      title: "Carritos Abandonados",
+      columns: cartsColumns,
+      data: cartsTableData,
+    })
+  }
+
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Carritos Abandonados</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Carritos Abandonados</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportCarts}>
+            <Download className="w-4 h-4 mr-2" /> Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintCarts}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
+          </Button>
+        </div>
+      </div>
       
       <Card>
         <CardHeader>

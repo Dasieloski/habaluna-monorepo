@@ -17,8 +17,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Trash2, ExternalLink, Boxes } from "lucide-react"
+import { Plus, Search, Trash2, ExternalLink, Boxes, Download, Printer } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { format } from "date-fns"
 
 export default function AdminCombosPage() {
   const { toast } = useToast()
@@ -83,6 +85,30 @@ export default function AdminCombosPage() {
     }
   }
 
+  const combosColumns = [
+    { key: "nombre", label: "Combo" },
+    { key: "slug", label: "Slug" },
+  ]
+  const combosTableData = filtered.map((p) => ({
+    nombre: p.name || "—",
+    slug: p.slug || "—",
+  }))
+
+  const handleExportCombos = () => {
+    exportTableToCSV({
+      filename: `combos-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: combosColumns,
+      data: combosTableData,
+    })
+  }
+  const handlePrintCombos = () => {
+    printTableOnly({
+      title: "Combos — Listado",
+      columns: combosColumns,
+      data: combosTableData,
+    })
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -90,12 +116,20 @@ export default function AdminCombosPage() {
           <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Combos</h1>
           <p className="text-muted-foreground mt-1">Gestiona los combos (productos con composición)</p>
         </div>
-        <Link href="/admin/combos/new">
-          <Button className="bg-primary hover:opacity-90 text-primary-foreground shadow-lg">
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo combo
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportCombos}>
+            <Download className="w-4 h-4 mr-2" /> Exportar tabla
           </Button>
-        </Link>
+          <Button variant="outline" onClick={handlePrintCombos}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
+          </Button>
+          <Link href="/admin/combos/new">
+            <Button className="bg-primary hover:opacity-90 text-primary-foreground shadow-lg">
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo combo
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <Card className="border-0 shadow-md">

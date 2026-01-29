@@ -91,10 +91,10 @@ export function ProductViewDialog({ product, open, onOpenChange }: ProductViewDi
             <div className="space-y-2">
               <label className="text-sm font-semibold text-muted-foreground">Precio</label>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-foreground">€{(toNumber(product.priceUSD) ?? 0).toFixed(2)}</span>
+                <span className="text-2xl font-bold text-foreground">${(toNumber(product.priceUSD) ?? 0).toFixed(2)}</span>
                 {toNumber(product.comparePriceUSD) !== null && (
                   <span className="text-lg text-muted-foreground line-through">
-                    €{toNumber(product.comparePriceUSD)!.toFixed(2)}
+                    ${toNumber(product.comparePriceUSD)!.toFixed(2)}
                   </span>
                 )}
               </div>

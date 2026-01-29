@@ -12,10 +12,11 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Bell, CheckCircle, Eye } from "lucide-react"
+import { Bell, CheckCircle, Eye, Download, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { formatDistanceToNow } from "date-fns"
+import { formatDistanceToNow, format } from "date-fns"
 import { es } from "date-fns/locale"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<any[]>([])
@@ -48,11 +49,49 @@ export default function AlertsPage() {
     return "text-blue-600 bg-blue-50 border-blue-200"
   }
 
+  const alertsColumns = [
+    { key: "tipo", label: "Tipo" },
+    { key: "mensaje", label: "Mensaje" },
+    { key: "cuando", label: "Cuándo", format: (v: unknown) => (v ? format(new Date(v as string), "dd/MM/yyyy HH:mm", { locale: es }) : "—") },
+    { key: "estado", label: "Estado" },
+  ]
+  const alertsTableData = alerts.map((a) => ({
+    tipo: a.type,
+    mensaje: a.message || "—",
+    cuando: a.createdAt,
+    estado: a.status,
+  }))
+
+  const handleExportAlerts = () => {
+    exportTableToCSV({
+      filename: `alertas-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: alertsColumns,
+      data: alertsTableData,
+    })
+  }
+  const handlePrintAlerts = () => {
+    printTableOnly({
+      title: "Centro de Alertas — Notificaciones",
+      columns: alertsColumns,
+      data: alertsTableData,
+    })
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Bell className="h-8 w-8 text-muted-foreground" />
-        <h1 className="text-3xl font-bold tracking-tight">Centro de Alertas</h1>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Bell className="h-8 w-8 text-muted-foreground" />
+          <h1 className="text-3xl font-bold tracking-tight">Centro de Alertas</h1>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportAlerts}>
+            <Download className="w-4 h-4 mr-2" /> Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintAlerts}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
+          </Button>
+        </div>
       </div>
       
       <Card>

@@ -85,7 +85,7 @@ export function SalesChart() {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: "#64748b", fontSize: 12 }}
-                  tickFormatter={(value) => `€${value}`}
+                  tickFormatter={(value) => `$${value}`}
                   tickMargin={10}
                 />
                 <Tooltip
@@ -97,7 +97,7 @@ export function SalesChart() {
                     padding: "12px 16px",
                   }}
                   labelStyle={{ color: "#0f172a", fontWeight: 600 }}
-                  formatter={(value: number) => [`€${value.toLocaleString()}`, "Ventas"]}
+                  formatter={(value: number) => [`$${value.toLocaleString()}`, "Ventas"]}
                 />
                 <Area type="monotone" dataKey="sales" stroke="#0ea5e9" strokeWidth={2.5} fill="url(#salesGradient)" />
               </AreaChart>
@@ -158,7 +158,7 @@ export function SalesChart() {
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: "#64748b", fontSize: 12 }}
-                  tickFormatter={(value) => `€${value}`}
+                  tickFormatter={(value) => `$${value}`}
                   tickMargin={10}
                 />
                 <YAxis
@@ -187,7 +187,7 @@ export function SalesChart() {
                   stroke="#0ea5e9"
                   strokeWidth={2.5}
                   dot={false}
-                  name="Ventas (€)"
+                  name="Ventas ($)"
                 />
                 <Line
                   yAxisId="right"

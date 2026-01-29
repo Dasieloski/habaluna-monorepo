@@ -252,7 +252,7 @@ function OffersContent() {
                       )}
                     >
                       <span className="text-lg font-bold text-white">
-                        {offer.type === "PERCENTAGE" ? `${parseNumber(offer.value)}%` : `€${parseNumber(offer.value)}`}
+                        {offer.type === "PERCENTAGE" ? `${parseNumber(offer.value)}%` : `$${parseNumber(offer.value)}`}
                       </span>
                     </div>
                     <div>
@@ -311,7 +311,7 @@ function OffersContent() {
                   {offer.minPurchase && (
                     <div className="flex justify-between text-muted-foreground">
                       <span>Compra mínima</span>
-                      <span>€{parseNumber(offer.minPurchase)}</span>
+                      <span>${parseNumber(offer.minPurchase)}</span>
                     </div>
                   )}
                   {offer.usageLimit && (

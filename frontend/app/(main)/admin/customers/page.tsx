@@ -36,8 +36,12 @@ import {
   DollarSign,
   ShoppingCart,
   TrendingUp,
+  Download,
+  Printer,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
+import { format } from "date-fns"
 
 type CustomerRow = BackendAdminCustomer
 
@@ -94,6 +98,38 @@ function CustomersContent() {
   const totalOrders = customers.reduce((acc, c) => acc + (c.totalOrders || 0), 0)
   const activeCustomers = customers.filter((c) => c.isActive).length
 
+  const customerColumns = [
+    { key: "cliente", label: "Cliente" },
+    { key: "email", label: "Email" },
+    { key: "telefono", label: "Teléfono" },
+    { key: "pedidos", label: "Pedidos" },
+    { key: "totalGastado", label: "Total gastado (USD)", format: (v: unknown) => (v != null ? Number(v).toFixed(2) : "—") },
+    { key: "estado", label: "Estado" },
+  ]
+  const customerTableData = filteredCustomers.map((c) => ({
+    cliente: getCustomerName(c),
+    email: c.email || "—",
+    telefono: c.phone || "—",
+    pedidos: c.totalOrders ?? 0,
+    totalGastado: c.totalSpent,
+    estado: c.isActive ? "Activo" : "Inactivo",
+  }))
+
+  const handleExportCustomers = () => {
+    exportTableToCSV({
+      filename: `clientes-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: customerColumns,
+      data: customerTableData,
+    })
+  }
+  const handlePrintCustomers = () => {
+    printTableOnly({
+      title: "Clientes — Listado",
+      columns: customerColumns,
+      data: customerTableData,
+    })
+  }
+
   const openProfile = async (customerId: string) => {
     setProfileOpen(true)
     setProfileError("")
@@ -133,9 +169,19 @@ function CustomersContent() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Clientes</h1>
-        <p className="text-muted-foreground mt-1">Gestiona tu base de clientes</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Clientes</h1>
+          <p className="text-muted-foreground mt-1">Gestiona tu base de clientes</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportCustomers}>
+            <Download className="w-4 h-4 mr-2" /> Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintCustomers}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -186,7 +232,7 @@ function CustomersContent() {
                 <DollarSign className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">€{totalRevenue.toFixed(0)}</p>
+                <p className="text-2xl font-bold text-foreground">${totalRevenue.toFixed(0)}</p>
                 <p className="text-xs text-muted-foreground">Ingresos totales</p>
               </div>
             </div>
@@ -280,7 +326,7 @@ function CustomersContent() {
                       <span className="font-semibold text-foreground">{customer.totalOrders}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="font-semibold text-foreground">€{customer.totalSpent.toFixed(2)}</span>
+                      <span className="font-semibold text-foreground">${customer.totalSpent.toFixed(2)}</span>
                     </TableCell>
                     <TableCell>
                       <Badge

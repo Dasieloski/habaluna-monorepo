@@ -128,8 +128,76 @@ export class AdminController {
       .map((p, idx) => ({
         ...p,
         rank: idx + 1,
-        revenueFormatted: `€${p.revenue.toFixed(2)}`,
+        revenueFormatted: `$${p.revenue.toFixed(2)}`,
       }));
+
+    // Ventas por categoría (últimos 12 meses, órdenes pagadas)
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    const ordersForCategory = await this.prisma.order.findMany({
+      where: {
+        paymentStatus: 'PAID',
+        createdAt: { gte: twelveMonthsAgo },
+      },
+      include: {
+        items: {
+          include: {
+            product: {
+              select: { categoryId: true, category: { select: { name: true } } },
+            },
+          },
+        },
+      },
+    });
+    const categoryRevenue: Record<string, { name: string; revenue: number }> = {};
+    ordersForCategory.forEach((order: any) => {
+      order.items.forEach((item: any) => {
+        const catName = item.product?.category?.name || 'Sin categoría';
+        const amt = Number(item.price) * item.quantity;
+        if (!categoryRevenue[catName]) categoryRevenue[catName] = { name: catName, revenue: 0 };
+        categoryRevenue[catName].revenue += amt;
+      });
+    });
+    const totalCatRevenue = Object.values(categoryRevenue).reduce((s, c) => s + c.revenue, 0) || 1;
+    const salesByCategory = Object.values(categoryRevenue).map((c) => ({
+      category: c.name,
+      sales: Math.round(c.revenue),
+      percentage: Math.round((c.revenue / totalCatRevenue) * 100),
+      color: ['#7dd3fc', '#fb923c', '#fcd34d', '#a78bfa', '#6ee7b7', '#f472b6', '#94a3b8', '#f87171'][Object.keys(categoryRevenue).indexOf(c.name) % 8],
+    }));
+
+    // Comparativa anual: este año vs año anterior por mes
+    const now = new Date();
+    const thisYearStart = new Date(now.getFullYear(), 0, 1);
+    const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
+    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const ordersThisYear = await this.prisma.order.findMany({
+      where: { paymentStatus: 'PAID', createdAt: { gte: thisYearStart } },
+      select: { total: true, createdAt: true },
+    });
+    const ordersLastYear = await this.prisma.order.findMany({
+      where: { paymentStatus: 'PAID', createdAt: { gte: lastYearStart, lt: thisYearStart } },
+      select: { total: true, createdAt: true },
+    });
+    const byMonthThis: Record<number, number> = {};
+    const byMonthLast: Record<number, number> = {};
+    monthNames.forEach((_, i) => {
+      byMonthThis[i] = 0;
+      byMonthLast[i] = 0;
+    });
+    ordersThisYear.forEach((o: any) => {
+      const m = new Date(o.createdAt).getMonth();
+      byMonthThis[m] = (byMonthThis[m] || 0) + Number(o.total);
+    });
+    ordersLastYear.forEach((o: any) => {
+      const m = new Date(o.createdAt).getMonth();
+      byMonthLast[m] = (byMonthLast[m] || 0) + Number(o.total);
+    });
+    const monthlyComparison = monthNames.map((month, i) => ({
+      month,
+      thisYear: Math.round(byMonthThis[i] || 0),
+      lastYear: Math.round(byMonthLast[i] || 0),
+    }));
 
     return {
       overview: {
@@ -139,6 +207,8 @@ export class AdminController {
         totalProducts,
       },
       salesByMonth: Object.values(salesByMonth),
+      salesByCategory,
+      monthlyComparison,
       inventory: {
         lowStockCount,
         outOfStockCount,

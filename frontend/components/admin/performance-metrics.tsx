@@ -6,7 +6,7 @@ import { TrendingUp, ShoppingBag, Target, UserPlus } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const metrics = [
-  { label: "Valor medio pedido", value: `€${weeklyStats.avgOrderValue.toFixed(2)}`, change: "+5.2%", icon: ShoppingBag, color: "bg-primary" },
+  { label: "Valor medio pedido", value: `$${weeklyStats.avgOrderValue.toFixed(2)}`, change: "+5.2%", icon: ShoppingBag, color: "bg-primary" },
   { label: "Tasa de conversión", value: `${weeklyStats.conversionRate}%`, change: "+0.3%", icon: Target, color: "bg-primary" },
   { label: "Clientes nuevos", value: weeklyStats.newCustomers.toString(), change: "+12", icon: UserPlus, color: "bg-accent" },
   { label: "Clientes recurrentes", value: weeklyStats.returningCustomers.toString(), change: "+8.4%", icon: TrendingUp, color: "bg-accent" },

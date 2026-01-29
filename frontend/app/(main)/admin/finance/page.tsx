@@ -15,8 +15,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { DollarSign, TrendingUp, CreditCard, AlertCircle, Download, FileText, Printer } from "lucide-react"
+import { DollarSign, TrendingUp, CreditCard, AlertCircle, Download, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
 
 export default function FinancePage() {
   const [transactions, setTransactions] = useState<any[]>([])
@@ -66,31 +67,38 @@ export default function FinancePage() {
     }
   }
 
-  const exportToExcel = () => {
-    // Crear CSV (compatible con Excel)
-    const headers = ['Fecha', 'ID Transacción', 'Orden', 'Método', 'Estado', 'Monto']
-    const rows = transactions.map(t => [
-      format(new Date(t.createdAt), "dd/MM/yyyy HH:mm", { locale: es }),
-      t.paymentIntentId || '-',
-      t.orderNumber || t.id.slice(0, 8),
-      'Stripe/Card',
-      t.paymentStatus,
-      Number(t.total).toFixed(2)
-    ])
-    const csv = [headers, ...rows].map(row => row.join(',')).join('\n')
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = `finanzas-${format(new Date(), 'yyyy-MM-dd')}.csv`
-    link.click()
-  }
+  const financeColumns = [
+    { key: 'fecha', label: 'Fecha', format: (v: unknown) => (v ? format(new Date(v as string), "dd/MM/yyyy HH:mm", { locale: es }) : '—') },
+    { key: 'orden', label: 'Nº Orden' },
+    { key: 'transaccion', label: 'ID Transacción' },
+    { key: 'metodo', label: 'Método' },
+    { key: 'estado', label: 'Estado' },
+    { key: 'monto', label: 'Monto (USD)', format: (v: unknown) => (v != null ? formatPrice(Number(v)) : '—') },
+  ] as const
 
-  const exportToPDF = () => {
-    window.print()
+  const tableData = transactions.map((t) => ({
+    fecha: t.createdAt,
+    orden: t.orderNumber || t.id?.slice(0, 8) || '—',
+    transaccion: t.paymentIntentId || '—',
+    metodo: 'Tarjeta',
+    estado: t.paymentStatus,
+    monto: t.total,
+  }))
+
+  const handleExport = () => {
+    exportTableToCSV({
+      filename: `finanzas-${format(new Date(), 'yyyy-MM-dd')}.csv`,
+      columns: financeColumns,
+      data: tableData,
+    })
   }
 
   const handlePrint = () => {
-    window.print()
+    printTableOnly({
+      title: 'Finanzas — Historial de Transacciones',
+      columns: financeColumns,
+      data: tableData,
+    })
   }
 
   return (
@@ -98,17 +106,13 @@ export default function FinancePage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Finanzas y Transacciones</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={exportToExcel}>
+          <Button variant="outline" onClick={handleExport}>
             <Download className="w-4 h-4 mr-2" />
-            Excel
-          </Button>
-          <Button variant="outline" onClick={exportToPDF}>
-            <FileText className="w-4 h-4 mr-2" />
-            PDF
+            Exportar tabla
           </Button>
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="w-4 h-4 mr-2" />
-            Imprimir
+            Imprimir tabla
           </Button>
         </div>
       </div>

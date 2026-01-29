@@ -14,8 +14,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { Search } from "lucide-react"
+import { Search, Download, Printer } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
 
 export default function HistoryPage() {
   const [logs, setLogs] = useState<any[]>([])
@@ -52,9 +54,51 @@ export default function HistoryPage() {
     return "bg-gray-100 text-gray-800"
   }
 
+  const historyColumns = [
+    { key: "fecha", label: "Fecha", format: (v: unknown) => (v ? format(new Date(v as string), "dd/MM/yyyy HH:mm", { locale: es }) : "—") },
+    { key: "usuario", label: "Usuario" },
+    { key: "accion", label: "Acción" },
+    { key: "recurso", label: "Recurso" },
+    { key: "detalles", label: "Detalles", format: (v: unknown) => (v != null ? (typeof v === "string" ? v : JSON.stringify(v)) : "—") },
+    { key: "ip", label: "IP" },
+  ]
+  const historyTableData = filteredLogs.map((log) => ({
+    fecha: log.createdAt,
+    usuario: [log.user?.firstName, log.user?.email].filter(Boolean).join(" — ") || "—",
+    accion: log.action,
+    recurso: log.resource + (log.resourceId ? ` #${log.resourceId.slice(0, 8)}` : ""),
+    detalles: log.details != null ? (typeof log.details === "string" ? log.details : JSON.stringify(log.details)) : "—",
+    ip: log.ipAddress || "—",
+  }))
+
+  const handleExportHistory = () => {
+    exportTableToCSV({
+      filename: `historial-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: historyColumns,
+      data: historyTableData,
+    })
+  }
+  const handlePrintHistory = () => {
+    printTableOnly({
+      title: "Historial de Cambios — Auditoría",
+      columns: historyColumns,
+      data: historyTableData,
+    })
+  }
+
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Historial de Cambios</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Historial de Cambios</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportHistory}>
+            <Download className="w-4 h-4 mr-2" /> Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintHistory}>
+            <Printer className="w-4 h-4 mr-2" /> Imprimir tabla
+          </Button>
+        </div>
+      </div>
       
       <Card>
         <CardHeader>

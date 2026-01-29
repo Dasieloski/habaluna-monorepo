@@ -15,11 +15,12 @@ import {
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, Truck, CreditCard, User, MapPin, Calendar, Mail } from "lucide-react"
+import { ArrowLeft, Truck, CreditCard, User, MapPin, Calendar, Mail, Download, Printer } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { exportTableToCSV, printTableOnly } from "@/lib/table-export-print"
 
 export default function AdminOrderDetailPage() {
   const { id } = useParams()
@@ -103,6 +104,36 @@ export default function AdminOrderDetailPage() {
   if (loading) return <div className="p-8 text-center">Cargando pedido...</div>
   if (!order) return <div className="p-8 text-center">Pedido no encontrado</div>
 
+  const orderItemsColumns = [
+    { key: "producto", label: "Producto" },
+    { key: "variante", label: "Variante" },
+    { key: "cantidad", label: "Cantidad" },
+    { key: "precioUnit", label: "Precio unit. (USD)", format: (v: unknown) => (v != null ? formatPrice(Number(v)) : "—") },
+    { key: "subtotal", label: "Subtotal (USD)", format: (v: unknown) => (v != null ? formatPrice(Number(v)) : "—") },
+  ]
+  const orderItemsData = (order.items || []).map((item: any) => ({
+    producto: item.product?.name ?? item.productName ?? "—",
+    variante: item.variantName ?? "—",
+    cantidad: item.quantity,
+    precioUnit: item.price,
+    subtotal: item.price * item.quantity,
+  }))
+
+  const handleExportOrder = () => {
+    exportTableToCSV({
+      filename: `pedido-${order.orderNumber || order.id}-${format(new Date(), "yyyy-MM-dd")}.csv`,
+      columns: orderItemsColumns,
+      data: orderItemsData,
+    })
+  }
+  const handlePrintOrder = () => {
+    printTableOnly({
+      title: `Pedido #${order.orderNumber || order.id.slice(0, 8)} — ${format(new Date(order.createdAt), "dd/MM/yyyy HH:mm", { locale: es })}`,
+      columns: orderItemsColumns,
+      data: orderItemsData,
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -120,8 +151,13 @@ export default function AdminOrderDetailPage() {
           </p>
         </div>
         <div className="ml-auto flex gap-2">
-          <Button variant="outline" onClick={() => window.print()}>
-            Imprimir
+          <Button variant="outline" onClick={handleExportOrder}>
+            <Download className="h-4 w-4 mr-2" />
+            Exportar tabla
+          </Button>
+          <Button variant="outline" onClick={handlePrintOrder}>
+            <Printer className="h-4 w-4 mr-2" />
+            Imprimir tabla
           </Button>
         </div>
       </div>
