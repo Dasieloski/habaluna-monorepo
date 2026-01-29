@@ -242,32 +242,49 @@ export class AdminController {
   @Get('carts/abandoned')
   @ApiOperation({ summary: 'Get abandoned carts' })
   async getAbandonedCarts() {
-    // Buscar carritos que no se han actualizado en la última hora
+    // Buscar carritos (CartItems) que no se han actualizado en la última hora
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const carts = await this.prisma.cart.findMany({
+    const cartItems = await this.prisma.cartItem.findMany({
       where: {
         updatedAt: { lt: oneHourAgo },
-        items: { some: {} },
       },
       include: {
         user: { select: { id: true, email: true, firstName: true, lastName: true, phone: true } },
-        items: {
-          include: {
-            product: { select: { id: true, name: true, priceUSD: true, images: true } },
-            productVariant: { select: { id: true, name: true, priceUSD: true } },
-          },
-        },
+        product: { select: { id: true, name: true, priceUSD: true, images: true } },
+        productVariant: { select: { id: true, name: true, priceUSD: true } },
       },
       take: 50,
     });
 
-    return carts.map((cart) => ({
-      id: cart.id,
-      user: cart.user,
-      items: cart.items,
-      subtotal: cart.subtotal,
-      updatedAt: cart.updatedAt,
-    }));
+    // Agrupar por usuario
+    const cartsByUser = new Map<string, any>();
+    cartItems.forEach((item) => {
+      const userId = item.userId;
+      if (!cartsByUser.has(userId)) {
+        cartsByUser.set(userId, {
+          id: userId,
+          user: item.user,
+          items: [],
+          subtotal: 0,
+          updatedAt: item.updatedAt,
+        });
+      }
+      const cart = cartsByUser.get(userId);
+      cart.items.push(item);
+      // Calcular subtotal aproximado
+      const price = item.productVariant?.priceUSD 
+        ? Number(item.productVariant.priceUSD) 
+        : item.product.priceUSD 
+        ? Number(item.product.priceUSD) 
+        : 0;
+      cart.subtotal += price * item.quantity;
+      // Actualizar updatedAt al más reciente
+      if (item.updatedAt > cart.updatedAt) {
+        cart.updatedAt = item.updatedAt;
+      }
+    });
+
+    return Array.from(cartsByUser.values());
   }
 
   @Get('audit')
@@ -290,7 +307,7 @@ export class AdminController {
       action: log.action,
       resource: log.resource,
       resourceId: log.resourceId,
-      details: log.details,
+      details: log.changes, // El campo en Prisma se llama 'changes'
       ipAddress: log.ipAddress,
       user: log.user,
       createdAt: log.createdAt,
