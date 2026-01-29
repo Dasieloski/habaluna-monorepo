@@ -28,14 +28,14 @@ export function SalesChart() {
         const data = await api.getDashboardStats()
         // Usar datos reales si están disponibles, sino mock data
         if (data.salesByMonth && data.salesByMonth.length > 0) {
-          // Convertir datos mensuales a formato diario aproximado
-          const dailyData = data.salesByMonth.map((item: any) => ({
+          // Convertir datos mensuales a formato para gráficos
+          const chartData = data.salesByMonth.map((item: any) => ({
             date: item.month,
-            sales: Math.round(item.revenue),
-            orders: 0, // Se puede calcular si hay datos
-            visitors: 0,
+            sales: Math.round(item.revenue || 0),
+            orders: item.orders || 0,
+            visitors: 0, // No tenemos datos de visitantes aún
           }))
-          setSalesData(dailyData.length > 0 ? dailyData : salesDataDaily)
+          setSalesData(chartData.length > 0 ? chartData : salesDataDaily)
         }
       } catch (error) {
         console.error("Error loading sales data:", error)
@@ -66,7 +66,7 @@ export function SalesChart() {
         <TabsContent value="sales">
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={salesDataDaily} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <AreaChart data={salesData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#7dd3fc" stopOpacity={0.4} />
@@ -108,7 +108,7 @@ export function SalesChart() {
         <TabsContent value="orders">
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={salesDataDaily} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <AreaChart data={salesData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="ordersGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#fb923c" stopOpacity={0.4} />
@@ -144,7 +144,7 @@ export function SalesChart() {
         <TabsContent value="combined">
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={salesDataDaily} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <ComposedChart data={salesData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                 <XAxis
                   dataKey="date"

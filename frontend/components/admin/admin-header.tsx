@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuthStore } from "@/lib/store/auth-store"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -15,6 +15,9 @@ import {
 import { Bell, Search, User, LogOut, Settings, Menu, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { api } from "@/lib/api"
+import { formatDistanceToNow } from "date-fns"
+import { es } from "date-fns/locale"
 
 interface AdminHeaderProps {
   onMenuToggle?: () => void
@@ -24,6 +27,25 @@ interface AdminHeaderProps {
 export function AdminHeader({ onMenuToggle, isMenuOpen }: AdminHeaderProps) {
   const { user, logout } = useAuthStore()
   const router = useRouter()
+  const [alerts, setAlerts] = useState<any[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    const loadAlerts = async () => {
+      try {
+        const response = await api.getAlerts()
+        const alertsData = Array.isArray(response.data) ? response.data : []
+        setAlerts(alertsData)
+        setUnreadCount(alertsData.filter((a: any) => a.status === 'NEW').length)
+      } catch (error) {
+        console.error("Error loading alerts:", error)
+      }
+    }
+    loadAlerts()
+    // Refrescar cada 30 segundos
+    const interval = setInterval(loadAlerts, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -33,6 +55,12 @@ export function AdminHeader({ onMenuToggle, isMenuOpen }: AdminHeaderProps) {
   const userDisplayName = user?.firstName 
     ? `${user.firstName} ${user.lastName || ''}`.trim() 
     : user?.email || "Admin"
+
+  const getAlertLink = (alert: any) => {
+    if (alert.type.includes('STOCK')) return '/admin/inventory'
+    if (alert.type.includes('PAYMENT')) return '/admin/orders'
+    return '/admin/alerts'
+  }
 
   return (
     <header className="h-16 bg-card border-b border-border px-4 lg:px-8 flex items-center justify-between gap-4 sticky top-0 z-30">
@@ -66,12 +94,51 @@ export function AdminHeader({ onMenuToggle, isMenuOpen }: AdminHeaderProps) {
       <div className="flex items-center gap-2">
         <ThemeToggle className="shrink-0" />
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5 text-muted-foreground" />
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
-            3
-          </span>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="w-5 h-5 text-muted-foreground" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuLabel>Notificaciones</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {alerts.length === 0 ? (
+              <div className="p-4 text-center text-sm text-muted-foreground">
+                No hay notificaciones
+              </div>
+            ) : (
+              alerts.slice(0, 5).map((alert) => (
+                <DropdownMenuItem
+                  key={alert.id}
+                  onClick={() => router.push(getAlertLink(alert))}
+                  className="flex flex-col items-start p-3 cursor-pointer"
+                >
+                  <div className="flex items-center justify-between w-full mb-1">
+                    <span className="text-xs font-semibold text-muted-foreground">{alert.type}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(alert.createdAt), { addSuffix: true, locale: es })}
+                    </span>
+                  </div>
+                  <span className="text-sm">{alert.message}</span>
+                </DropdownMenuItem>
+              ))
+            )}
+            {alerts.length > 5 && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/admin/alerts')}>
+                  Ver todas las notificaciones
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* User menu */}
         <DropdownMenu>

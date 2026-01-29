@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, UseGuards, Query, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { PrismaService } from '../prisma/prisma.service';
+import { ContentService } from '../content/content.service';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -11,7 +13,10 @@ import { PrismaService } from '../prisma/prisma.service';
 @Roles('ADMIN')
 @ApiBearerAuth()
 export class AdminController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly contentService: ContentService,
+  ) {}
 
   @Get('dashboard/stats')
   @ApiOperation({ summary: 'Get dashboard statistics' })
@@ -62,13 +67,14 @@ export class AdminController {
       },
     });
 
-    // Agrupar por mes
+    // Agrupar por mes y contar pedidos
     const salesByMonth = monthlyOrders.reduce((acc: any, order: any) => {
       const month = new Date(order.createdAt).toLocaleString('es-ES', { month: 'short', year: 'numeric' });
       if (!acc[month]) {
-        acc[month] = { month, revenue: 0 };
+        acc[month] = { month, revenue: 0, orders: 0 };
       }
       acc[month].revenue += Number(order.total) || 0;
+      acc[month].orders += 1;
       return acc;
     }, {});
 
@@ -270,7 +276,19 @@ export class AdminController {
         });
       }
       const cart = cartsByUser.get(userId);
-      cart.items.push(item);
+      cart.items.push({
+        id: item.id,
+        quantity: item.quantity,
+        productName: item.product.name,
+        variantName: item.productVariant?.name,
+        productId: item.productId,
+        productVariantId: item.productVariantId,
+        price: item.productVariant?.priceUSD 
+          ? Number(item.productVariant.priceUSD) 
+          : item.product.priceUSD 
+          ? Number(item.product.priceUSD) 
+          : 0,
+      });
       // Calcular subtotal aproximado
       const price = item.productVariant?.priceUSD 
         ? Number(item.productVariant.priceUSD) 
@@ -316,20 +334,31 @@ export class AdminController {
 
   @Get('content')
   @ApiOperation({ summary: 'Get content blocks' })
-  async getContentBlocks() {
-    // Por ahora retornar array vacío (implementar cuando haya tabla de content)
-    return [];
+  async getContentBlocks(@Query('section') section?: string) {
+    return this.contentService.findAll(section);
   }
 
   @Post('content')
   @ApiOperation({ summary: 'Create or update content block' })
-  async upsertContentBlock(@Body() body: { slug: string; title: string; content: string; section?: string }) {
-    return { id: `content-${Date.now()}`, ...body, createdAt: new Date() };
+  async upsertContentBlock(
+    @CurrentUser() user: any,
+    @Body() body: { slug: string; title: string; content: string; section?: string; isActive?: boolean },
+  ) {
+    return this.contentService.upsert(
+      {
+        slug: body.slug,
+        title: body.title,
+        content: body.content,
+        section: body.section,
+        isActive: body.isActive ?? true,
+      },
+      user.id,
+    );
   }
 
-  @Post('content/:slug')
-  @ApiOperation({ summary: 'Delete content block (legacy POST for compatibility)' })
-  async deleteContentBlock(@Param('slug') slug: string) {
-    return { slug, deleted: true };
+  @Delete('content/:slug')
+  @ApiOperation({ summary: 'Delete content block' })
+  async deleteContentBlock(@CurrentUser() user: any, @Param('slug') slug: string) {
+    return this.contentService.delete(slug, user.id);
   }
 }

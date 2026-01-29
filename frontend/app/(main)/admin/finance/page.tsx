@@ -15,7 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { DollarSign, TrendingUp, CreditCard, AlertCircle } from "lucide-react"
+import { DollarSign, TrendingUp, CreditCard, AlertCircle, Download, FileText, Printer } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function FinancePage() {
   const [transactions, setTransactions] = useState<any[]>([])
@@ -65,9 +66,52 @@ export default function FinancePage() {
     }
   }
 
+  const exportToExcel = () => {
+    // Crear CSV (compatible con Excel)
+    const headers = ['Fecha', 'ID Transacción', 'Orden', 'Método', 'Estado', 'Monto']
+    const rows = transactions.map(t => [
+      format(new Date(t.createdAt), "dd/MM/yyyy HH:mm", { locale: es }),
+      t.paymentIntentId || '-',
+      t.orderNumber || t.id.slice(0, 8),
+      'Stripe/Card',
+      t.paymentStatus,
+      Number(t.total).toFixed(2)
+    ])
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n')
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `finanzas-${format(new Date(), 'yyyy-MM-dd')}.csv`
+    link.click()
+  }
+
+  const exportToPDF = () => {
+    window.print()
+  }
+
+  const handlePrint = () => {
+    window.print()
+  }
+
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Finanzas y Transacciones</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold tracking-tight">Finanzas y Transacciones</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportToExcel}>
+            <Download className="w-4 h-4 mr-2" />
+            Excel
+          </Button>
+          <Button variant="outline" onClick={exportToPDF}>
+            <FileText className="w-4 h-4 mr-2" />
+            PDF
+          </Button>
+          <Button variant="outline" onClick={handlePrint}>
+            <Printer className="w-4 h-4 mr-2" />
+            Imprimir
+          </Button>
+        </div>
+      </div>
       
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

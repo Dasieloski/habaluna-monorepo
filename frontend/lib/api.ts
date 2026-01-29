@@ -1554,9 +1554,10 @@ export const api = {
   },
 
   // Contenido CMS
-  getContentBlocks: async () => {
-    const res = await api.get('/admin/content')
-    return res.data || []
+  getContentBlocks: async (section?: string) => {
+    const queryString = section ? `?section=${encodeURIComponent(section)}` : ''
+    const res = await api.get(`/admin/content${queryString}`)
+    return Array.isArray(res.data) ? res.data : []
   },
 
   upsertContentBlock: async (data: { slug: string; title: string; content: string; section?: string }) => {
@@ -1565,8 +1566,7 @@ export const api = {
   },
 
   deleteContentBlock: async (slug: string) => {
-    // Usar POST en lugar de DELETE por compatibilidad con el backend
-    const res = await api.post(`/admin/content/${slug}`)
+    const res = await api.delete(`/admin/content/${slug}`)
     return res.data
   },
 

@@ -120,7 +120,7 @@ export default function HistoryPage() {
                         {log.resourceId && <span className="text-xs text-muted-foreground block">#{log.resourceId.slice(0, 8)}</span>}
                       </TableCell>
                       <TableCell className="max-w-xs truncate text-xs text-muted-foreground">
-                        {log.changes ? JSON.stringify(log.changes) : "-"}
+                        {log.details ? (typeof log.details === 'string' ? log.details : JSON.stringify(log.details)) : "-"}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground font-mono">
                         {log.ipAddress || "-"}
