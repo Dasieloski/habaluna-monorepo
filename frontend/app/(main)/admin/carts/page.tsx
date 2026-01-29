@@ -52,6 +52,13 @@ export default function AbandonedCartsPage() {
     })
   }
 
+  const safeFormatAbandoned = (value: unknown): string => {
+    if (value == null || value === "") return "—"
+    const date = new Date(value as string | number)
+    if (Number.isNaN(date.getTime())) return "—"
+    return formatDistanceToNow(date, { addSuffix: true, locale: es })
+  }
+
   const cartsColumns = [
     { key: "cliente", label: "Cliente" },
     { key: "productos", label: "Productos" },
@@ -65,7 +72,7 @@ export default function AbandonedCartsPage() {
       .map((item: any) => `${item.quantity}x ${item.productName}${item.variantName ? ` (${item.variantName})` : ""}`)
       .join("; ") + (cart.items?.length > 5 ? "…" : ""),
     total: cart.totalPotentialUSD,
-    abandonado: formatDistanceToNow(new Date(cart.lastUpdatedAt), { addSuffix: true, locale: es }),
+    abandonado: safeFormatAbandoned(cart.lastUpdatedAt),
   }))
 
   const handlePrintCarts = () => {
@@ -153,7 +160,7 @@ export default function AbandonedCartsPage() {
                         {formatPrice(cart.totalPotentialUSD)}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {formatDistanceToNow(new Date(cart.lastUpdatedAt), { addSuffix: true, locale: es })}
+                        {safeFormatAbandoned(cart.lastUpdatedAt)}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button 

@@ -79,6 +79,8 @@ export default function ProductsPage() {
   const [isFeaturedFilter, setIsFeaturedFilter] = useState<boolean | null>(null)
   const [categories, setCategories] = useState<BackendCategory[]>([])
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [page, setPage] = useState(0)
+  const pageSize = ADMIN_TABLE_PAGE_SIZE
 
   useEffect(() => {
     loadCategories()
@@ -97,6 +99,11 @@ export default function ProductsPage() {
   useEffect(() => {
     setPage(0)
   }, [searchQuery, selectedStatus, selectedCategory, isFeaturedFilter])
+
+  const totalPages = getTotalPages(products.length, pageSize)
+  useEffect(() => {
+    if (page >= totalPages && totalPages > 0) setPage(Math.max(0, totalPages - 1))
+  }, [page, totalPages])
 
   const loadCategories = async () => {
     try {
@@ -251,11 +258,7 @@ export default function ProductsPage() {
     estado: statusConfig[p.status as keyof typeof statusConfig]?.label || p.status,
   }))
 
-  const totalPages = getTotalPages(products.length, pageSize)
   const displayedProducts = getPaginatedSlice(products, page, pageSize)
-  useEffect(() => {
-    if (page >= totalPages && totalPages > 0) setPage(Math.max(0, totalPages - 1))
-  }, [page, totalPages])
 
   const handlePrintProducts = () => {
     printTableOnly({
