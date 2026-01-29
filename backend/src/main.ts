@@ -311,6 +311,11 @@ async function bootstrap() {
   // Cookie Parser - Necesario para CSRF protection
   app.use(cookieParser());
 
+  // Configurar límites de body para archivos grandes (antes del global prefix)
+  // Express body parser para JSON y URL-encoded (aunque multer maneja multipart/form-data)
+  app.use(require('express').json({ limit: '10mb' }));
+  app.use(require('express').urlencoded({ limit: '10mb', extended: true }));
+
   // Global prefix
   app.setGlobalPrefix('api');
 

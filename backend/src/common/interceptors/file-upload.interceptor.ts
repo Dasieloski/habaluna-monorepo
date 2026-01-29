@@ -80,7 +80,7 @@ export const multerOptions = {
   // En Railway (y en general producción) no usamos disco local: subimos a Cloudinary desde memoria.
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 10 * 1024 * 1024, // 10MB (aumentado para banners grandes)
   },
   fileFilter,
 };
