@@ -167,7 +167,7 @@ export default function CheckoutPage() {
         '¡Pago recibido! 🎉',
         'Gracias por tu compra. Tu pedido está en camino.'
       );
-      router.push(`/profile?order=${orderId}&success=true`);
+      router.push(`/checkout/success?order=${orderId}`);
     } catch (err: any) {
       console.error('Error al actualizar la orden:', err);
       // Aún así redirigir, el pago ya fue exitoso
@@ -176,7 +176,7 @@ export default function CheckoutPage() {
         '¡Pago recibido! 🎉',
         'Gracias por tu compra. Tu pedido está en camino.'
       );
-      router.push(`/profile?order=${orderId}&success=true`);
+      router.push(`/checkout/success?order=${orderId}`);
     }
   };
 

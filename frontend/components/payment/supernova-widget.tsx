@@ -45,10 +45,26 @@ export function SupernovaWidget({
   const handlePay = async () => {
     setLoading(true);
     try {
-      // Aquí iría la integración real (SDK/redirect/checkout session, etc.)
-      // Por ahora simulamos un pago exitoso para no bloquear el deploy.
-      const transactionId = `sn_${orderId}_${Date.now()}`;
-      onSuccess({ transactionId, amount, currency });
+      // Simular pago: 80% éxito, 20% fallo (para pruebas)
+      const shouldSucceed = Math.random() > 0.2;
+      
+      // Simular delay de procesamiento (1-3 segundos)
+      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+      
+      if (shouldSucceed) {
+        const transactionId = `sn_${orderId}_${Date.now()}`;
+        onSuccess({ transactionId, amount, currency });
+      } else {
+        // Simular diferentes tipos de errores
+        const errors = [
+          'Tarjeta rechazada. Verifica los datos o usa otro método de pago.',
+          'Fondos insuficientes. Revisa tu saldo e intenta de nuevo.',
+          'Error de conexión con el banco. Intenta más tarde.',
+          'Transacción expirada. Por favor, intenta de nuevo.',
+        ];
+        const randomError = errors[Math.floor(Math.random() * errors.length)];
+        onError({ error: randomError });
+      }
     } catch (e: any) {
       onError({ error: e?.message || 'No se pudo procesar el pago' });
     } finally {

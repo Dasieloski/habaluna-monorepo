@@ -1,24 +1,89 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users, Package } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-const stats = [
-  { label: "Ventas totales", value: "€24,563.00", change: "+12.5%", trend: "up", icon: DollarSign, color: "bg-primary" },
-  { label: "Pedidos", value: "1,234", change: "+8.2%", trend: "up", icon: ShoppingCart, color: "bg-accent" },
-  { label: "Clientes", value: "892", change: "+15.3%", trend: "up", icon: Users, color: "bg-accent" },
-  { label: "Productos activos", value: "156", change: "-2.4%", trend: "down", icon: Package, color: "bg-accent" },
-]
+import { api } from "@/lib/api"
+import { formatPrice } from "@/lib/utils"
+import { Loader2 } from "lucide-react"
 
 interface DashboardStatsProps {
   isLoaded: boolean
 }
 
 export function DashboardStats({ isLoaded }: DashboardStatsProps) {
+  const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const data = await api.getDashboardStats()
+        setStats(data)
+      } catch (error) {
+        console.error("Error loading dashboard stats:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadStats()
+  }, [])
+
+  if (loading || !stats) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="border-0 shadow-md">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-center h-24">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  const statsData = [
+    { 
+      label: "Ventas totales", 
+      value: formatPrice(stats.overview?.totalRevenue || 0), 
+      change: "+0%", 
+      trend: "up" as const, 
+      icon: DollarSign, 
+      color: "bg-primary" 
+    },
+    { 
+      label: "Pedidos", 
+      value: (stats.overview?.totalOrders || 0).toLocaleString(), 
+      change: "+0%", 
+      trend: "up" as const, 
+      icon: ShoppingCart, 
+      color: "bg-accent" 
+    },
+    { 
+      label: "Clientes", 
+      value: (stats.overview?.totalUsers || 0).toLocaleString(), 
+      change: "+0%", 
+      trend: "up" as const, 
+      icon: Users, 
+      color: "bg-accent" 
+    },
+    { 
+      label: "Productos activos", 
+      value: (stats.overview?.totalProducts || 0).toLocaleString(), 
+      change: "+0%", 
+      trend: "up" as const, 
+      icon: Package, 
+      color: "bg-accent" 
+    },
+  ]
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-      {stats.map((stat, index) => (
+      {statsData.map((stat, index) => (
         <Card
           key={stat.label}
           className={cn(

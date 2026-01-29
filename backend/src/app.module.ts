@@ -29,6 +29,7 @@ import { EmailMarketingModule } from './email-marketing/email-marketing.module';
 import { TransportConfigModule } from './transport-config/transport-config.module';
 import { AuditModule } from './common/services/audit.module';
 import { ThemesModule } from './themes/themes.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -105,6 +106,7 @@ import { ThemesModule } from './themes/themes.module';
     TransportConfigModule,
     AuditModule,
     ThemesModule,
+    AdminModule,
   ],
   providers: [
     HttpExceptionFilter,

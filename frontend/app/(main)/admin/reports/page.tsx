@@ -5,6 +5,7 @@ import { api } from "@/lib/api"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { BarChart3, TrendingUp, Users, ShoppingBag, DollarSign, Package } from "lucide-react"
 import { formatPrice } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 import {
   BarChart,
   Bar,

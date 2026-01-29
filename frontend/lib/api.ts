@@ -1497,6 +1497,97 @@ export const api = {
     const res = await api.patch(`/admin/themes/${themeId}`, data)
     return res.data
   },
+
+  // Dashboard y estadísticas
+  getDashboardStats: async () => {
+    const res = await api.get('/admin/dashboard/stats')
+    return res.data
+  },
+
+  // Alertas
+  getAlerts: async () => {
+    const res = await api.get('/admin/alerts')
+    return { data: res.data || [] }
+  },
+
+  markAlertResolved: async (id: string) => {
+    const res = await api.patch(`/admin/alerts/${id}/resolve`)
+    return res.data
+  },
+
+  // Devoluciones
+  getReturnRequests: async () => {
+    const res = await api.get('/admin/returns')
+    return { data: res.data || [] }
+  },
+
+  updateReturnStatus: async (id: string, status: string) => {
+    const res = await api.patch(`/admin/returns/${id}`, { status })
+    return res.data
+  },
+
+  // Reembolsos
+  getRefunds: async () => {
+    const res = await api.get('/admin/refunds')
+    return { data: res.data || [] }
+  },
+
+  processRefund: async (returnId: string, data: { amount: number; method: string; reason: string }) => {
+    const res = await api.post(`/admin/refunds`, { returnId, ...data })
+    return res.data
+  },
+
+  // Carritos abandonados
+  getAbandonedCarts: async () => {
+    const res = await api.get('/admin/carts/abandoned')
+    return res.data || []
+  },
+
+  // Auditoría
+  getAuditLogs: async (params?: { limit?: number; page?: number }) => {
+    const queryParams = new URLSearchParams()
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+    if (params?.page) queryParams.append('page', params.page.toString())
+    const queryString = queryParams.toString()
+    const res = await api.get(`/admin/audit${queryString ? `?${queryString}` : ''}`)
+    return res.data || []
+  },
+
+  // Contenido CMS
+  getContentBlocks: async () => {
+    const res = await api.get('/admin/content')
+    return res.data || []
+  },
+
+  upsertContentBlock: async (data: { slug: string; title: string; content: string; section?: string }) => {
+    const res = await api.post('/admin/content', data)
+    return res.data
+  },
+
+  deleteContentBlock: async (slug: string) => {
+    // Usar POST en lugar de DELETE por compatibilidad con el backend
+    const res = await api.post(`/admin/content/${slug}`)
+    return res.data
+  },
+
+  // Órdenes (Admin)
+  getAdminOrders: async (params?: { page?: number; limit?: number; status?: string }): Promise<any> => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+    if (params?.status) queryParams.append('status', params.status)
+    const queryString = queryParams.toString()
+    const res = await api.get(`/orders/all${queryString ? `?${queryString}` : ''}`)
+    return Array.isArray(res.data) ? res.data : []
+  },
+
+  updateOrderStatus: async (id: string, status?: string, paymentStatus?: string) => {
+    const body: any = {}
+    if (status) body.status = status
+    if (paymentStatus) body.paymentStatus = paymentStatus
+    const res = await api.patch(`/orders/${id}/status`, body)
+    return res.data
+  },
 }
 
 // Función para normalizar URLs de imágenes

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import {
   Area,
   AreaChart,
@@ -14,8 +15,45 @@ import {
 } from "recharts"
 import { salesDataDaily } from "@/lib/mock-data"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { api } from "@/lib/api"
+import { Loader2 } from "lucide-react"
 
 export function SalesChart() {
+  const [salesData, setSalesData] = useState(salesDataDaily)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadSalesData = async () => {
+      try {
+        const data = await api.getDashboardStats()
+        // Usar datos reales si están disponibles, sino mock data
+        if (data.salesByMonth && data.salesByMonth.length > 0) {
+          // Convertir datos mensuales a formato diario aproximado
+          const dailyData = data.salesByMonth.map((item: any) => ({
+            date: item.month,
+            sales: Math.round(item.revenue),
+            orders: 0, // Se puede calcular si hay datos
+            visitors: 0,
+          }))
+          setSalesData(dailyData.length > 0 ? dailyData : salesDataDaily)
+        }
+      } catch (error) {
+        console.error("Error loading sales data:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSalesData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[300px]">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <Tabs defaultValue="sales" className="w-full">
