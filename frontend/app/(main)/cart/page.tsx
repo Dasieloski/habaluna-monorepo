@@ -197,7 +197,7 @@ export default function CartPage() {
     return (
       <div className="bg-muted/50 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
-          <nav className="text-sm text-gray-500 mb-4 md:mb-6">
+          <nav className="text-sm text-muted-foreground mb-4 md:mb-6">
             <span className="animate-pulse">Home &gt; Carrito</span>
           </nav>
           <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-4 md:mb-6 h-9 w-64 bg-muted rounded animate-pulse" />
@@ -247,7 +247,7 @@ export default function CartPage() {
     <div className="bg-muted/50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         {/* Breadcrumbs */}
-        <nav className="text-sm text-gray-500 mb-4 md:mb-6">
+        <nav className="text-sm text-muted-foreground mb-4 md:mb-6">
           <Link href="/" className="hover:text-primary">
             Home
           </Link>
@@ -262,12 +262,12 @@ export default function CartPage() {
 
         {/* Alertas de stock */}
         {validation && validation.hasIssues && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h3 className="font-semibold text-red-900 mb-2">Problemas de disponibilidad</h3>
-                <ul className="space-y-1 text-sm text-red-800">
+                <h3 className="font-semibold text-red-900 dark:text-red-200 mb-2">Problemas de disponibilidad</h3>
+                <ul className="space-y-1 text-sm text-red-800 dark:text-red-300">
                   {validation.items
                     .filter((item) => item.issue !== null)
                     .map((item) => {
@@ -275,9 +275,9 @@ export default function CartPage() {
                       const slug = items.find((i) => i.id === item.itemId)?.product?.slug
                       return errorMsg ? (
                         <li key={item.itemId} className="flex items-start gap-2">
-                          <span className="text-red-600 mt-1">•</span>
+                          <span className="text-red-600 dark:text-red-400 mt-1">•</span>
                           {slug ? (
-                            <Link href={`/products/${slug}`} className="text-red-800 underline hover:text-red-900">
+                            <Link href={`/products/${slug}`} className="text-red-800 dark:text-red-300 underline hover:text-red-900 dark:hover:text-red-200">
                               {errorMsg}
                             </Link>
                           ) : (
@@ -296,8 +296,8 @@ export default function CartPage() {
         <div className="bg-card rounded-xl p-4 mb-6 flex items-center gap-4 border-l-4 border-primary">
           <div className="flex-1">
             {transportEstimate?.appliedRule ? (
-              <p className="text-sm md:text-base text-gray-700">
-                <span className="text-emerald-600 font-medium">
+              <p className="text-sm md:text-base text-muted-foreground">
+                <span className="text-emerald-600 dark:text-emerald-400 font-medium">
                   Descuento en transporte aplicado
                   {transportEstimate.appliedRule.discountType === "percent"
                     ? ` (${transportEstimate.appliedRule.discountValue}%)`
@@ -305,12 +305,12 @@ export default function CartPage() {
                 </span>
               </p>
             ) : (
-              <p className="text-sm md:text-base text-gray-700">
+              <p className="text-sm md:text-base text-muted-foreground">
                 {transportEstimate?.positiveMessage || "Transporte calculado al costo justo"}
               </p>
             )}
           </div>
-          <div className="shrink-0 text-sky-500">
+          <div className="shrink-0 text-primary">
             <Truck className="h-10 w-10" />
           </div>
         </div>
@@ -323,7 +323,7 @@ export default function CartPage() {
               const option = item.productVariant?.name || "Producto"
               const imageSrc = item.product.images?.[0] || ""
               return (
-              <div key={item.id} className="bg-white rounded-xl p-4 md:p-6">
+              <div key={item.id} className="bg-card rounded-xl p-4 md:p-6 border border-border shadow-sm">
                 <div className="flex gap-4">
                   {/* Imagen: SmartImage resuelve IDs de Media a /api/media/{id} */}
                   <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-lg overflow-hidden bg-muted relative">
@@ -339,7 +339,7 @@ export default function CartPage() {
                     {/* Info del producto */}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-foreground text-sm md:text-base mb-1 truncate">{item.product.name}</h3>
-                    <p className="text-xs md:text-sm text-gray-500 mb-2">Opción: {option}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-2">Opción: {option}</p>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-bold text-primary">${price.toFixed(2)}</span>
                     </div>
@@ -349,15 +349,15 @@ export default function CartPage() {
                     
                     {/* Alerta de stock para este item */}
                     {hasItemIssue(item.id) && (
-                      <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-xs text-red-700 font-medium flex items-center gap-1">
+                      <div className="mb-3 p-2 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p className="text-xs text-red-700 dark:text-red-300 font-medium flex items-center gap-1">
                           <AlertTriangle className="h-3 w-3" />
                           {getItemErrorMessage(item.id)}
                         </p>
                         {(() => {
                           const availableStock = getItemAvailableStock(item.id)
                           return availableStock !== null && availableStock > 0 ? (
-                            <p className="text-xs text-red-600 mt-1">
+                            <p className="text-xs text-red-600 dark:text-red-400 mt-1">
                               Stock disponible: {availableStock}
                             </p>
                           ) : null
@@ -369,7 +369,7 @@ export default function CartPage() {
                     {!hasItemIssue(item.id) && (() => {
                       const availableStock = getItemAvailableStock(item.id)
                       return availableStock !== null ? (
-                        <p className="text-xs text-gray-500 mb-3">
+                        <p className="text-xs text-muted-foreground mb-3">
                           {availableStock > 0 
                             ? `${availableStock} disponible${availableStock > 1 ? 's' : ''}`
                             : 'En stock'}
@@ -379,15 +379,15 @@ export default function CartPage() {
 
                     {/* Acciones móvil y desktop */}
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                      <Link href={`/products/${item.product.slug}`} className="text-xs md:text-sm text-gray-500 hover:text-sky-600 underline">
-                        Ver producto
-                      </Link>
+<Link href={`/products/${item.product.slug}`} className="text-xs md:text-sm text-muted-foreground hover:text-primary underline">
+                          Ver producto
+                        </Link>
 
                       <div className="flex items-center gap-3">
                         {/* Botón eliminar */}
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                           aria-label="Eliminar producto"
                         >
                           <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
@@ -403,7 +403,7 @@ export default function CartPage() {
                           >
                             <Minus className="h-3 w-3" />
                           </button>
-                          <span className="w-8 text-center font-medium text-sky-600">{item.quantity}</span>
+                          <span className="w-8 text-center font-medium text-primary">{item.quantity}</span>
                           <button
                             onClick={() => {
                               const availableStock = getItemAvailableStock(item.id)
@@ -438,10 +438,10 @@ export default function CartPage() {
                   <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
                     {[1, 2, 3, 4].map((i) => (
                       <div key={i} className="shrink-0 w-32 md:w-40 animate-pulse">
-                        <div className="aspect-square rounded-lg bg-gray-200 mb-2" />
-                        <div className="h-4 bg-gray-200 rounded mb-2" />
-                        <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
-                        <div className="h-8 bg-gray-200 rounded" />
+                        <div className="aspect-square rounded-lg bg-muted mb-2" />
+                        <div className="h-4 bg-muted rounded mb-2" />
+                        <div className="h-4 bg-muted rounded w-2/3 mb-2" />
+                        <div className="h-8 bg-muted rounded" />
                       </div>
                     ))}
                   </div>
@@ -465,7 +465,7 @@ export default function CartPage() {
                             </div>
                           </Link>
                           <Link href={`/products/${product.slug}`}>
-                            <h4 className="text-xs md:text-sm text-gray-700 mb-1 line-clamp-2 hover:text-primary transition-colors">
+                            <h4 className="text-xs md:text-sm text-foreground mb-1 line-clamp-2 hover:text-primary transition-colors">
                               {product.name}
                             </h4>
                           </Link>
@@ -475,7 +475,7 @@ export default function CartPage() {
                           <button
                             onClick={(e) => handleAddSuggestedProduct(product, e)}
                             aria-label={`Añadir ${product.name} al carrito`}
-                            className="w-full bg-sky-500 hover:bg-sky-600 text-white text-xs py-2 px-3 rounded-full transition-colors"
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs py-2 px-3 rounded-full transition-colors"
                           >
                             Añadir al carrito
                           </button>
