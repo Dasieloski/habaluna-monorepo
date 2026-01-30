@@ -157,7 +157,7 @@ export default function ProductsClient() {
             staggerDelay={0.03}
             enableAnimations={true}
             animateOnViewport={false}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+            className="grid gap-4 md:gap-6 grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))]"
           >
             {Array.from({ length: 8 }).map((_, index) => (
               <ProductCardSkeleton key={index} />
@@ -189,7 +189,7 @@ export default function ProductsClient() {
                 staggerDelay={0.05}
                 enableAnimations={true}
                 animateOnViewport={true}
-                className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+                className="grid gap-4 md:gap-6 grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))]"
               >
                 {pagedProducts.map((p) => (
                 <ProductCard
