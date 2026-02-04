@@ -104,9 +104,8 @@ export default function ProductsClient() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Breadcrumbs */}
       <div className="border-b border-border">
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 md:px-6 py-4 max-w-6xl">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
             <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1">
               <Home className="w-3.5 h-3.5" />
@@ -131,18 +130,15 @@ export default function ProductsClient() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6 md:py-8">
-        {/* Title */}
-        <h1 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-6 md:mb-8 leading-tight">
+      <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-6xl">
+        <h1 className="font-heading text-xl md:text-2xl font-semibold text-foreground mb-6 md:mb-8">
           {searchParams.get('filter') === 'combos' ? 'Combos' : 'Productos'}
         </h1>
 
-        {/* Filtros */}
         <ProductFilters categories={categories} />
 
-        {/* Contador de resultados */}
         {!loading && (
-          <div className="mb-4 text-sm text-gray-600">
+          <div className="mb-4 text-sm text-muted-foreground">
             {totalResults === 0
               ? 'No se encontraron productos'
               : totalResults === 1
@@ -214,7 +210,6 @@ export default function ProductsClient() {
               </AnimatedList>
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <nav className="flex items-center justify-center gap-2 mt-10" aria-label="Paginación" aria-live="polite">
                 <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)} aria-label="Página anterior">

@@ -1,7 +1,6 @@
 "use client"
 
 import { useRef, useState, useEffect } from "react"
-import { motion } from "framer-motion"
 import { ProductCard } from "@/components/product/product-card"
 import Link from "next/link"
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons/streamline-icons"
@@ -91,20 +90,15 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
   if (!products || products.length === 0) return null
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 28 }}
-      animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
-      transition={{ type: "spring", stiffness: 80, damping: 20 }}
-      className={`py-12 md:py-20 dark:py-14 dark:md:py-24 ${className ?? ""}`}
-    >
-      <div className="container mx-auto px-4">
+    <section className={`py-16 md:py-24 ${className ?? ""}`}>
+      <div className="container mx-auto px-4 md:px-6 max-w-6xl">
         <div className="flex items-center justify-between mb-8 md:mb-10">
-          <h2 className="font-heading text-2xl md:text-4xl font-bold text-foreground leading-tight">{title}</h2>
+          <h2 className="font-heading text-xl md:text-2xl font-semibold text-foreground">{title}</h2>
           {viewAllLink && (
             <Link
               href={viewAllLink}
               aria-label={`Ver todos los productos de ${title}`}
-              className="px-4 md:px-5 py-2 md:py-2.5 bg-primary text-primary-foreground text-xs md:text-sm font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-primary/20"
+              className="text-sm font-medium text-primary hover:underline transition-opacity duration-200"
             >
               Ver todo
             </Link>
@@ -115,34 +109,26 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
           <button
             onClick={() => scroll("left")}
             aria-label="Desplazar carrusel hacia la izquierda"
-            className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 bg-card border border-border shadow-xl rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 -translate-x-2 group-hover:translate-x-0"
+            className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2.5 bg-card border border-border rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           >
             <ChevronLeftIcon className="w-5 h-5" />
           </button>
           <button
             onClick={() => scroll("right")}
             aria-label="Desplazar carrusel hacia la derecha"
-            className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 bg-card border border-border shadow-xl rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 translate-x-2 group-hover:translate-x-0"
+            className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2.5 bg-card border border-border rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           >
             <ChevronRightIcon className="w-5 h-5" />
           </button>
 
           <div
             ref={scrollRef}
-            className="flex gap-4 md:gap-6 dark:gap-5 dark:md:gap-8 overflow-x-auto scrollbar-hide scroll-smooth pb-4 -mx-2 px-2"
+            className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-2 -mx-2 px-2"
           >
             {products.map((product, index) => {
               const badge = getBadge(index)
               return (
-                <div
-                  key={product.id}
-                  className="flex-shrink-0 w-[160px] md:w-[240px] transition-all duration-500"
-                  style={{
-                    transitionDelay: `${index < 5 ? index * 0.08 : 0.35 + (index - 5) * 0.02}s`,
-                    opacity: isVisible ? 1 : 0,
-                    transform: isVisible ? "translateY(0)" : "translateY(20px)",
-                  }}
-                >
+                <div key={product.id} className="shrink-0 w-[160px] md:w-[240px]">
                   <ProductCard product={product} badge={badge?.text} badgeColor={badge?.color} priority={index < 4} />
                 </div>
               )
@@ -150,6 +136,6 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
           </div>
         </div>
       </div>
-    </motion.section>
+    </section>
   )
 }

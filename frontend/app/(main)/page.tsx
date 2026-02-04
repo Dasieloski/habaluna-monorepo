@@ -119,7 +119,6 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Banner */}
       <HeroBanner banners={banners} />
 
       <ProductCarousel
@@ -131,28 +130,22 @@ export default async function Home() {
         className="pt-16 md:pt-24"
       />
 
-      {/* Category Cards */}
       <CategoryGrid categories={displayCategories} variant="cards" />
 
-      {/* Top Sales (mejores vendidos desde backend o destacados como fallback) */}
-      <TopSales products={bestSellers} className="pb-16 md:pb-24" />
+      <TopSales products={bestSellers} className="pb-16 md:pb-20" />
 
-      {/* More Products */}
       <ProductCarousel
         title="Productos Destacados"
         products={(featuredProducts.length > 0 ? featuredProducts : allProducts).slice(0, 8)}
         viewAllLink="/products?filter=top"
         badgeType="personalized"
-        className="pt-20 md:pt-28"
+        className="pt-16 md:pt-24"
       />
 
-      {/* Circle Categories */}
       <CategoryGrid categories={circleCategories} variant="circles" title="Explora por Categoría" />
 
-      {/* Banner Categories */}
       <CategoryGrid categories={bannerCategories} variant="banners" />
 
-      {/* Benefits */}
       <BenefitsBar />
     </div>
   )

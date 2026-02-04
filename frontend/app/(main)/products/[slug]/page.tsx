@@ -11,16 +11,52 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  // Si falla el fetch, igual devolvemos algo razonable
+
   try {
     const response = await api.get(`/products/slug/${encodeURIComponent(slug)}`)
     const product: any = response.data
+
+    // Generar descripción rica y evitar que sea vacía
+    const description = product?.shortDescription
+      || product?.description?.substring(0, 160)
+      || `Compra ${product?.name} en Habaluna. Calidad garantizada, precios competitivos y envío a toda Cuba.`
+
+    // Construir URL de imagen absoluta
+    const imageUrl = product?.images?.[0]
+      ? (product.images[0].startsWith('http') ? product.images[0] : `${process.env.NEXT_PUBLIC_API_URL}${product.images[0]}`)
+      : undefined
+
+    const url = `/products/${slug}`
+
     return {
-      title: product?.name ? `${product.name} | Habaluna` : "Producto | Habaluna",
-      description: product?.shortDescription || product?.description || undefined,
+      title: `${product?.name || 'Producto'} | Habaluna`,
+      description,
+      alternates: {
+        canonical: url,
+      },
+      openGraph: {
+        title: product?.name,
+        description,
+        url,
+        images: imageUrl ? [{ url: imageUrl }] : [],
+        type: 'website',
+        siteName: 'Habaluna',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: product?.name,
+        description,
+        images: imageUrl ? [imageUrl] : [],
+      },
     }
   } catch {
-    return { title: "Producto | Habaluna" }
+    return {
+      title: "Producto | Habaluna",
+      robots: {
+        index: false, // Si falla la carga, no indexar producto roto
+        follow: true
+      }
+    }
   }
 }
 

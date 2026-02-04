@@ -1,5 +1,6 @@
 'use client'
 
+import { ProductSchema } from "./product-schema"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { ProductCard } from "@/components/product/product-card"
@@ -115,7 +116,7 @@ export function ProductClient({
   const stockLabel = stock <= 0 ? "Agotado" : stock < 5 ? `Quedan ${stock}` : "En stock"
   const reviewCount = initialReviewsMeta?.total ?? product?.reviewCount ?? 0
   const avgRating = product?.averageRating != null ? Number(product.averageRating).toFixed(1) : null
-  
+
   // Calcular adultsOnly: producto o combo con al menos un ítem +18
   const adultsOnly = useMemo(() => {
     return !!(product?.adultsOnly ?? (product?.comboItems || []).some((ci: any) => ci.product?.adultsOnly))
@@ -217,6 +218,7 @@ export function ProductClient({
 
   return (
     <>
+      <ProductSchema product={product} />
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 py-3 md:py-4">
         <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
@@ -255,11 +257,10 @@ export function ProductClient({
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all relative ${
-                      selectedImage === idx
-                        ? "border-accent ring-2 ring-accent/30"
-                        : "border-transparent hover:border-border"
-                    }`}
+                    className={`shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all relative ${selectedImage === idx
+                      ? "border-accent ring-2 ring-accent/30"
+                      : "border-transparent hover:border-border"
+                      }`}
                   >
                     <SmartImage
                       src={img || ""}
@@ -424,11 +425,10 @@ export function ProductClient({
                         key={v.id}
                         type="button"
                         onClick={() => setSelectedVariantId(v.id)}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
-                          selectedVariantId === v.id
-                            ? "border-accent bg-accent/10 text-accent"
-                            : "border-border hover:border-accent/50 text-foreground"
-                        }`}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all ${selectedVariantId === v.id
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-border hover:border-accent/50 text-foreground"
+                          }`}
                       >
                         {v.name}
                       </button>
@@ -528,9 +528,8 @@ export function ProductClient({
                   if (!isFavorite) toast({ title: "Añadido a favoritos", description: "En tu lista de deseos" })
                 }}
                 aria-label={isFavorite ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
-                className={`heart-btn p-3.5 md:p-4 rounded-xl border transition-all ${
-                  isFavorite ? "bg-red-500/10 border-red-400 text-red-500" : "border-border hover:bg-muted text-muted-foreground hover:text-foreground"
-                }`}
+                className={`heart-btn p-3.5 md:p-4 rounded-xl border transition-all ${isFavorite ? "bg-red-500/10 border-red-400 text-red-500" : "border-border hover:bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={isFavorite} />
               </button>

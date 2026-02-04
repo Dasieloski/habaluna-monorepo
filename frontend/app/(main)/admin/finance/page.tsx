@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge"D
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { DollarSign, TrendingUp, CreditCard, AlertCircle, Printer } from "lucide-react"

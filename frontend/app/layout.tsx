@@ -13,11 +13,12 @@ const Analytics = process.env.VERCEL
 export const metadata: Metadata = {
   metadataBase: new URL((process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "")),
   title: {
-    default: "Habaluna - Tu tienda de productos originales",
+    default: "Habaluna - Tienda online de productos únicos en Cuba",
     template: "%s | Habaluna",
   },
   description:
-    "Descubre productos únicos: alimentos, materiales y mucho más. Calidad y originalidad en cada compra.",
+    "Compra online en Cuba: alimentos gourmet, bebidas premium, materiales de construcción y más. Envíos a toda la isla. ¡Calidad garantizada!",
+  keywords: ["tienda online cuba", "envios a cuba", "alimentos gourmet cuba", "materiales construccion cuba", "habaluna"],
   icons: {
     icon: [{ url: "/uploads/logo.png", type: "image/png" }],
     shortcut: "/uploads/logo.png",
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Habaluna",
-    title: "Habaluna - Tu tienda de productos originales",
+    title: "Habaluna - Tienda online de productos únicos en Cuba",
     description:
       "Descubre productos únicos: alimentos, materiales y mucho más. Calidad y originalidad en cada compra.",
   },

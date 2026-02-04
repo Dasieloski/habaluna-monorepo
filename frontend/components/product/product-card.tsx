@@ -45,7 +45,6 @@ interface ProductCardProps {
   priority?: boolean
 }
 
-const TRANSITION_MS = 250
 const badgeColorClasses = {
   coral: "bg-red-500/90 text-white",
   blue: "bg-primary text-primary-foreground",
@@ -242,8 +241,7 @@ function ProductCardContent({
     <>
       <Link
         href={`/products/${product.slug}`}
-        className="group block h-full rounded-xl md:rounded-2xl overflow-hidden border border-border bg-card text-left shadow-sm hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] transition-all duration-200 ease-out hover:-translate-y-0.5"
-        style={{ transitionDuration: `${TRANSITION_MS}ms` }}
+        className="group block h-full rounded-xl overflow-hidden border border-border bg-card text-left shadow-sm hover-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99]"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

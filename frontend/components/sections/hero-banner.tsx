@@ -127,7 +127,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
           {displayBanners.map((banner, index) => (
             <div
               key={banner.id}
-              className={`absolute inset-0 transition-opacity duration-300 ease-out ${
+              className={`absolute inset-0 transition-opacity duration-200 ease-out ${
                 index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
               }`}
             >
@@ -146,27 +146,13 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                 {/* Overlay sutil directamente sobre la imagen - degradado suave, opacidad baja */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/12 to-transparent pointer-events-none" />
                 
-                <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12">
+                <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16">
                   <div className="max-w-xl relative z-10">
-                    <h1
-                      className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-2 md:mb-4 tracking-tight leading-tight"
-                      style={{
-                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2), 0 0 0 0.5px rgba(0, 0, 0, 0.25)',
-                        WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.2)',
-                        paintOrder: 'stroke fill'
-                      }}
-                    >
+                    <h1 className="font-heading text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4 tracking-tight leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                       {banner.title}
                     </h1>
                     {banner.subtitle && (
-                      <p 
-                        className="text-base md:text-xl text-white mb-4 md:mb-6 font-light"
-                        style={{
-                          textShadow: '0 1px 2px rgba(0, 0, 0, 0.45), 0 2px 4px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.25), 0 0 0 0.5px rgba(0, 0, 0, 0.2)',
-                          WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.15)',
-                          paintOrder: 'stroke fill'
-                        }}
-                      >
+                      <p className="text-base md:text-lg text-white/95 mb-6 md:mb-8 font-normal drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
                         {banner.subtitle}
                       </p>
                     )}
@@ -174,10 +160,10 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                       <a
                         href={banner.link || "#"}
                         aria-label={banner.buttonText}
-                        className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md text-white px-5 md:px-6 py-2.5 md:py-3 rounded-xl font-medium hover:bg-white/30 transition-all duration-300 text-sm md:text-base border border-white/30 shadow-lg"
+                        className="inline-flex items-center gap-2 bg-white text-foreground px-5 py-2.5 rounded-lg font-medium hover:bg-white/90 transition-colors duration-200 text-sm"
                       >
                         {banner.buttonText}
-                        <ChevronRightIcon className="w-4 h-4 md:w-5 md:h-5" />
+                        <ChevronRightIcon className="w-4 h-4" />
                       </a>
                     )}
                   </div>
@@ -189,15 +175,15 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
 
         {/* Dots - sin botones de navegación lateral */}
         {displayBanners.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 md:gap-3">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
             {displayBanners.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
                 aria-label={`Ir a slide ${index + 1}`}
                 aria-current={index === currentSlide ? "true" : "false"}
-                className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide ? "bg-white w-6 md:w-8 scale-110" : "bg-white/50 hover:bg-white/70"
+                className={`h-1.5 rounded-full transition-all duration-200 ${
+                  index === currentSlide ? "bg-white w-6" : "bg-white/50 w-1.5 hover:bg-white/70"
                 }`}
               />
             ))}

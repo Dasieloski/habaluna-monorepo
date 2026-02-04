@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { HeartIcon } from "@/components/icons/streamline-icons"
 import { toNumber } from "@/lib/money"
@@ -34,27 +34,8 @@ interface TopSalesProps {
 
 export function TopSales({ products, className }: TopSalesProps) {
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
-  const [isVisible, setIsVisible] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
   const addToCart = useCartStore((s) => s.addToCart)
   const { toast, showAddToCart } = useToast()
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.1 },
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.preventDefault()
@@ -106,34 +87,30 @@ export function TopSales({ products, className }: TopSalesProps) {
   const getComparePrice = (product: Product) => toNumber(product.variants?.[0]?.comparePriceUSD ?? product.comparePriceUSD)
 
   return (
-    <section ref={sectionRef} className={`py-12 md:py-20 dark:py-14 dark:md:py-24 bg-background ${className ?? ""}`}>
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div
-          className={`flex items-center justify-between mb-8 md:mb-10 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-        >
-          <h2 className="font-heading text-2xl md:text-4xl font-bold text-foreground leading-tight">Top Ventas</h2>
+    <section className={`py-16 md:py-24 bg-background ${className ?? ""}`}>
+      <div className="container mx-auto px-4 md:px-6 max-w-6xl">
+        <div className="flex items-center justify-between mb-8 md:mb-10">
+          <h2 className="font-heading text-xl md:text-2xl font-semibold text-foreground">Top Ventas</h2>
           <Link
             href="/products?filter=top"
-            className="px-4 md:px-5 py-2 md:py-2.5 bg-primary text-primary-foreground text-xs md:text-sm font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg shadow-primary/20"
+            className="text-sm font-medium text-primary hover:underline transition-opacity duration-200"
           >
             Ver todo
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6 dark:gap-4 dark:md:gap-8">
-          {/* Featured product */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
           <Link
             href={`/products/${featuredProduct.slug}`}
-            className={`col-span-2 lg:row-span-2 group transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            className="col-span-2 lg:row-span-2 group"
           >
-            <div className="relative h-full bg-card rounded-xl md:rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-border">
+            <div className="relative h-full bg-card rounded-xl overflow-hidden border border-border hover-card">
               <div className="aspect-[4/3] lg:aspect-auto lg:h-full relative overflow-hidden">
                 <SmartImage
                   src={featuredProduct.images?.[0] || ''}
                   alt={featuredProduct.name}
                   fill
-                  className="p-4 md:p-8 group-hover:scale-110 transition-transform duration-700 lg:object-contain"
+                  className="p-4 md:p-8 object-cover transition-transform duration-200 group-hover:scale-105 lg:object-contain"
                   sizes="(max-width: 1024px) 66vw, 40vw"
                   objectFit="cover"
                   priority
@@ -141,17 +118,17 @@ export function TopSales({ products, className }: TopSalesProps) {
                 <button
                   onClick={(e) => toggleFavorite(featuredProduct.id, e)}
                   aria-label={favorites.has(featuredProduct.id) ? `Quitar ${featuredProduct.name} de favoritos` : `Agregar ${featuredProduct.name} a favoritos`}
-                  className={`heart-btn absolute top-3 right-3 p-2 md:p-3 rounded-xl transition-all duration-300 ${
+                  className={`heart-btn absolute top-3 right-3 p-2 md:p-3 rounded-lg transition-colors duration-200 ${
                     favorites.has(featuredProduct.id)
-                      ? "bg-red-500/10 text-red-500 scale-110"
-                      : "bg-card/90 backdrop-blur-sm text-muted-foreground hover:bg-card hover:text-foreground"
+                      ? "bg-red-500/10 text-red-500"
+                      : "bg-card/80 backdrop-blur-sm text-muted-foreground hover:bg-card hover:text-foreground"
                   }`}
                 >
                   <HeartIcon className="w-5 h-5 md:w-6 md:h-6" filled={favorites.has(featuredProduct.id)} />
                 </button>
                 <button
                   onClick={(e) => handleAddToCart(featuredProduct, e)}
-                  className="cart-btn absolute bottom-3 right-3 md:bottom-4 md:right-4 p-2.5 md:p-3 rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300"
+                  className="cart-btn absolute bottom-3 right-3 md:bottom-4 md:right-4 p-2.5 md:p-3 rounded-lg bg-card/80 backdrop-blur-sm text-foreground hover:bg-card transition-colors duration-200"
                   aria-label={`Añadir ${featuredProduct.name} al carrito`}
                   type="button"
                 >
@@ -176,35 +153,29 @@ export function TopSales({ products, className }: TopSalesProps) {
                 </div>
               </div>
               <div className="p-4 md:p-5">
-                <h3 className="text-xs md:text-lg font-medium text-foreground line-clamp-2 group-hover:text-accent transition-colors">
+                <h3 className="text-sm md:text-base font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-200">
                   {featuredProduct.name}
                 </h3>
-                <p className="text-lg md:text-2xl font-bold text-primary mt-2 md:mt-3">
+                <p className="text-base md:text-lg font-semibold text-primary mt-2">
                   ${getPrice(featuredProduct).toFixed(2)}
                 </p>
               </div>
             </div>
           </Link>
 
-          {/* Other products - 2 columnas en móvil debajo del destacado */}
-          {otherProducts.map((product, index) => (
-            <Link
-              key={product.id}
-              href={`/products/${product.slug}`}
-              className={`group transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-              style={{ transitionDelay: `${(index + 1) * 0.1}s` }}
-            >
-              <div className="relative bg-card rounded-xl md:rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full border border-border">
+          {otherProducts.map((product) => (
+            <Link key={product.id} href={`/products/${product.slug}`} className="group">
+              <div className="relative bg-card rounded-xl overflow-hidden h-full border border-border hover-card">
                 <div className="aspect-square relative overflow-hidden">
                   <SmartImage
                     src={product.images?.[0] || ''}
                     alt={product.name}
                     fill
-                    className="p-3 md:p-4 group-hover:scale-110 transition-transform duration-500"
+                    className="object-cover p-3 md:p-4 transition-transform duration-200 group-hover:scale-105"
                     sizes="(max-width: 1024px) 33vw, 20vw"
                     objectFit="cover"
                   />
-                  <div className="absolute top-2 left-2 flex flex-wrap gap-1.5 z-[1]">
+                  <div className="absolute top-2 left-2 flex flex-wrap gap-1.5 z-10">
                     {product.adultsOnly && (
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -221,17 +192,17 @@ export function TopSales({ products, className }: TopSalesProps) {
                   <button
                     onClick={(e) => toggleFavorite(product.id, e)}
                     aria-label={favorites.has(product.id) ? `Quitar ${product.name} de favoritos` : `Agregar ${product.name} a favoritos`}
-                    className={`heart-btn absolute top-2 right-2 p-1.5 md:p-2 rounded-lg md:rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100 ${
+                    className={`heart-btn absolute top-2 right-2 p-2 rounded-lg transition-colors duration-200 ${
                       favorites.has(product.id)
-                        ? "bg-red-500/10 text-red-500 opacity-100 scale-110"
-                        : "bg-card/90 backdrop-blur-sm text-muted-foreground hover:bg-card hover:text-foreground"
+                        ? "bg-red-500/10 text-red-500"
+                        : "bg-card/80 backdrop-blur-sm text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-card hover:text-foreground"
                     }`}
                   >
                     <HeartIcon className="w-4 h-4 md:w-5 md:h-5" filled={favorites.has(product.id)} />
                   </button>
                   <button
                     onClick={(e) => handleAddToCart(product, e)}
-                    className="cart-btn absolute bottom-2 right-2 p-2 rounded-lg md:rounded-xl bg-card/90 backdrop-blur-sm text-foreground hover:bg-card transition-all duration-300 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                    className="cart-btn absolute bottom-2 right-2 p-2 rounded-lg bg-card/80 backdrop-blur-sm text-foreground hover:bg-card transition-colors duration-200 md:opacity-0 md:group-hover:opacity-100"
                     aria-label={`Añadir ${product.name} al carrito`}
                     type="button"
                   >
@@ -239,7 +210,7 @@ export function TopSales({ products, className }: TopSalesProps) {
                   </button>
                 </div>
                 <div className="p-3 md:p-4">
-                  <h3 className="text-[11px] md:text-sm font-medium text-foreground line-clamp-2 group-hover:text-accent transition-colors">
+                  <h3 className="text-xs md:text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-200">
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-1 md:gap-2 mt-1.5 md:mt-2">

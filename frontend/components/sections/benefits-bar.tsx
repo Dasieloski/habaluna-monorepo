@@ -1,30 +1,10 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { PersonalizeIcon, ReturnIcon, TruckIcon } from "@/components/icons/streamline-icons"
 import { api } from "@/lib/api"
 
 export function BenefitsBar() {
-  const [isVisible, setIsVisible] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.1 },
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
   const defaultBenefits = [
     {
       icon: PersonalizeIcon,
@@ -69,21 +49,17 @@ export function BenefitsBar() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-24 md:py-28 dark:py-28 dark:md:py-32 bg-background dark:bg-card border-y border-border">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-20 dark:gap-14 dark:md:gap-22">
+    <section className="py-16 md:py-24 border-y border-border bg-muted/30">
+      <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-24">
           {benefits.map((benefit, index) => {
             const IconComponent = benefit.icon
             return (
-              <div
-                key={index}
-                className={`text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-                style={{ transitionDelay: `${index * 0.15}s` }}
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 mb-5 text-accent bg-background dark:bg-card border border-border dark:border-accent rounded-2xl transition-all duration-300 hover:scale-110 hover:bg-muted dark:hover:bg-muted">
-                  <IconComponent className="w-8 h-8" />
+              <div key={index} className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-6 text-primary rounded-lg bg-card border border-border">
+                  <IconComponent className="w-6 h-6" />
                 </div>
-                <h3 className="font-heading text-xl md:text-2xl font-bold dark:font-extrabold text-foreground tracking-wider mb-3 leading-tight">{benefit.title}</h3>
+                <h3 className="font-heading text-lg font-semibold text-foreground mb-2">{benefit.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">{benefit.description}</p>
               </div>
             )

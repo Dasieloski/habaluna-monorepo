@@ -203,40 +203,38 @@ export function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 bg-background dark:bg-card shadow-sm transition-transform duration-500 ease-out ${
+        className={`sticky top-0 z-50 bg-background dark:bg-card shadow-sm transition-transform duration-200 ease-out ${
           isHidden ? "-translate-y-full" : "translate-y-0"
         }`}
       >
       <div
-        className={`border-b text-foreground text-xs md:text-sm py-2.5 text-center bg-background dark:bg-card ${
+        className={`border-b text-foreground text-xs md:text-sm py-3 md:py-3.5 text-center bg-background dark:bg-card ${
           ui.announcementVariant === "promo"
             ? "border-accent"
             : "border-border"
         }`}
       >
-        <p className="animate-fade-in">{ui.announcement}</p>
+        <p>{ui.announcement}</p>
       </div>
 
-      {/* Main header */}
       <div className="relative z-20 border-b border-border/50 bg-background dark:bg-card">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Mobile menu button */}
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-between h-16 md:h-18">
             <button
-              className="md:hidden p-2 -ml-2 hover:bg-secondary rounded-xl transition-colors duration-300"
+              className="md:hidden p-2 -ml-2 hover:bg-muted rounded-lg transition-colors duration-200"
               onClick={() => setMobileMenuOpen((v) => !v)}
             >
               {mobileMenuOpen ? <CloseIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
             </button>
 
-            <Link href="/" className="flex items-center group shrink-0">
-              <span className="font-logo text-2xl md:text-5xl text-foreground transition-transform duration-300 group-hover:scale-105">
+            <Link href="/" className="flex items-center shrink-0">
+              <span className="font-logo text-2xl md:text-4xl text-foreground">
                 Habaluna
               </span>
             </Link>
 
             {/* Búsqueda desktop: centrada en la fila principal */}
-            <div className="hidden md:flex flex-1 min-w-0 mx-2 md:mx-8 md:max-w-lg">
+            <div className="hidden md:flex flex-1 min-w-0 mx-4 md:mx-8 md:max-w-md">
               <SearchAutocomplete
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -248,17 +246,17 @@ export function Header() {
             </div>
 
             {/* Right icons */}
-            <div className="flex items-center gap-1 md:gap-3 shrink-0">
+            <div className="flex items-center gap-1 md:gap-2 shrink-0">
               <ThemeToggle className="shrink-0" />
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105"
+                  className="p-2.5 hover:bg-muted rounded-lg transition-colors duration-200"
                 >
                   <UserIcon className="w-5 h-5" />
                 </button>
                 {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-popover rounded-2xl shadow-xl border border-border overflow-hidden animate-fade-in-up z-50">
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-popover rounded-xl shadow-lg border border-border overflow-hidden z-50 animate-fade-in">
                     {authed && user ? (
                       <>
                         <div className="p-4 bg-card border-b border-border">
@@ -270,7 +268,7 @@ export function Header() {
                         <div className="p-2">
                           <Link
                             href="/profile"
-                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-secondary rounded-xl transition-all duration-300"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors duration-200"
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
@@ -290,7 +288,7 @@ export function Header() {
                           </Link>
                           <Link
                             href="/orders"
-                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-secondary rounded-xl transition-all duration-300"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors duration-200"
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
@@ -309,11 +307,11 @@ export function Header() {
                             Mis pedidos
                           </Link>
                           {user.role === 'ADMIN' && (
-                            <Link
-                              href="/admin"
-                              className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-secondary rounded-xl transition-all duration-300"
-                              onClick={() => setUserMenuOpen(false)}
-                            >
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors duration-200"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
                               <svg
                                 className="w-5 h-5 text-accent"
                                 fill="none"
@@ -333,7 +331,7 @@ export function Header() {
                           )}
                           <button
                             onClick={handleLogout}
-                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-card rounded-xl transition-all duration-300 w-full text-left text-destructive"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors duration-200 w-full text-left text-destructive"
                           >
                             <svg
                               className="w-5 h-5"
@@ -361,7 +359,7 @@ export function Header() {
                         <div className="p-2">
                           <Link
                             href="/auth/login"
-                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-secondary rounded-xl transition-all duration-300"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors duration-200"
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
@@ -381,7 +379,7 @@ export function Header() {
                           </Link>
                           <Link
                             href="/auth/register"
-                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-secondary rounded-xl transition-all duration-300"
+                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-muted rounded-lg transition-colors duration-200"
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <svg
@@ -407,14 +405,14 @@ export function Header() {
               </div>
               <Link
                 href="/wishlist"
-                className="heart-btn p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 hidden md:flex text-red-500"
+                className="heart-btn p-2.5 hover:bg-muted rounded-lg transition-colors duration-200 hidden md:flex text-red-500"
               >
                 <HeartIcon className="w-5 h-5" />
               </Link>
               <Link
                 href="/cart"
                 data-contextual-toast-cart
-                className={`cart-btn p-2.5 hover:bg-secondary rounded-xl transition-all duration-300 hover:scale-105 relative text-foreground ${cartBounce ? 'animate-bounce' : ''}`}
+                className={`cart-btn p-2.5 hover:bg-muted rounded-lg transition-colors duration-200 relative text-foreground ${cartBounce ? 'animate-bounce' : ''}`}
               >
                 <CartIcon className="w-5 h-5" />
                 {mounted && cartCount > 0 && (
@@ -426,8 +424,7 @@ export function Header() {
             </div>
           </div>
 
-          {/* Móvil: barra de búsqueda en fila propia debajo (mejor jerarquía y área táctil) */}
-          <div className="md:hidden pt-2 pb-3 border-t border-border/30">
+          <div className="md:hidden pt-3 pb-4 border-t border-border/30">
             <SearchAutocomplete
               value={searchQuery}
               onChange={setSearchQuery}
@@ -441,8 +438,8 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:block border-t border-border/30">
-          <div className="container mx-auto px-4">
-            <ul className="flex items-center justify-center gap-1">
+          <div className="container mx-auto px-4 md:px-6">
+            <ul className="flex items-center justify-center gap-0">
               {navItems.map((item) => {
                 const itemCategoryId = (item.href.match(/categoryId=([^&]+)/) || [])[1]
                 const currentCategoryId = searchParams?.get("categoryId") ?? null
@@ -451,7 +448,7 @@ export function Header() {
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center gap-1.5 px-5 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 hover:bg-card ${isActive ? "font-semibold text-accent bg-card border-b-2 border-accent" : ""}`}
+                      className={`flex items-center px-5 py-4 text-sm font-medium rounded-lg transition-colors duration-200 hover:bg-muted ${isActive ? "text-primary" : "text-foreground"}`}
                     >
                       {item.name}
                     </Link>
@@ -463,36 +460,24 @@ export function Header() {
         </nav>
       </div>
 
-      <div className="relative z-10 bg-background dark:bg-card py-2.5 md:py-3 border-b border-border font-banner">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-3 md:gap-12 text-[9px] md:text-sm overflow-x-auto scrollbar-hide text-accent">
-            <div
-              className="flex items-center gap-1 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
-              style={{ animationDelay: "0.1s" }}
-            >
-              <TruckIcon className="w-4 h-4 md:w-6 md:h-6 shrink-0" />
-              <span className="font-semibold">{ui.highlights[0]}</span>
+      <div className="relative z-10 bg-muted/50 dark:bg-background py-3 md:py-3.5 border-b border-border">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-center gap-6 md:gap-12 text-xs md:text-sm overflow-x-auto scrollbar-hide text-muted-foreground">
+            <div className="flex items-center gap-2 whitespace-nowrap shrink-0">
+              <TruckIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+              <span>{ui.highlights[0]}</span>
             </div>
-            <div
-              className="flex items-center gap-1 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
-              style={{ animationDelay: "0.2s" }}
-            >
-              <ReturnIcon className="w-3.5 h-3.5 md:w-5 md:h-5 shrink-0" />
-              <span className="font-medium">{ui.highlights[1]}</span>
+            <div className="flex items-center gap-2 whitespace-nowrap shrink-0">
+              <ReturnIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+              <span>{ui.highlights[1]}</span>
             </div>
-            <div
-              className="flex items-center gap-1 md:gap-2 whitespace-nowrap animate-fade-in shrink-0"
-              style={{ animationDelay: "0.3s" }}
-            >
-              <ShieldIcon className="w-3.5 h-3.5 md:w-5 md:h-5 shrink-0" />
-              <span className="font-medium">{ui.highlights[2]}</span>
+            <div className="flex items-center gap-2 whitespace-nowrap shrink-0">
+              <ShieldIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+              <span>{ui.highlights[2]}</span>
             </div>
-            <div
-              className="hidden lg:flex items-center gap-2 whitespace-nowrap animate-fade-in shrink-0"
-              style={{ animationDelay: "0.4s" }}
-            >
+            <div className="hidden lg:flex items-center gap-2 whitespace-nowrap shrink-0">
               <StarIcon className="w-5 h-5 shrink-0" />
-              <span className="font-medium">{ui.highlights[3]}</span>
+              <span>{ui.highlights[3]}</span>
             </div>
           </div>
         </div>
@@ -503,15 +488,14 @@ export function Header() {
     {/* Mobile menu (fuera del header para evitar bugs de `fixed` dentro de elementos con `transform`) */}
     {mobileMenuOpen && (
       <div className="md:hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-sm animate-fade-in">
-        {/* Spacer para no tapar el header sticky (announcement + fila principal + fila búsqueda + highlights) */}
         <div className="h-[200px]" />
-        <nav className="container mx-auto px-4 pb-6">
-          <ul className="space-y-2">
-            {navItems.map((item, index) => (
-              <li key={item.name} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.05}s` }}>
+        <nav className="container mx-auto px-4 pb-8">
+          <ul className="space-y-1">
+            {navItems.map((item) => (
+              <li key={item.name}>
                 <Link
                   href={item.href}
-                  className="flex items-center justify-between px-5 py-4 text-base font-medium hover:bg-secondary rounded-2xl transition-all duration-300"
+                  className="flex items-center px-5 py-4 text-base font-medium hover:bg-muted rounded-lg transition-colors duration-200"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}

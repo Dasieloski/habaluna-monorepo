@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next"
 import { api } from "@/lib/api"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 3600 // Regenerar cada hora
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "")
 
