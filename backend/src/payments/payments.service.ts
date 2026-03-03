@@ -33,6 +33,14 @@ export class PaymentsService {
     return key;
   }
 
+  private getApiSecret(): string {
+    const secret = this.config.get<string>('SUPERNOVA_API_SECRET');
+    if (!secret) {
+      throw new InternalServerErrorException('SUPERNOVA_API_SECRET not configured');
+    }
+    return secret;
+  }
+
   async createIntentForOrder(orderId: string, userId: string): Promise<CreateIntentResult> {
     const order = await this.prisma.order.findFirst({
       where: { id: orderId, userId },
@@ -59,6 +67,7 @@ export class PaymentsService {
 
     const apiBase = this.getApiBaseUrl();
     const apiKey = this.getApiKey();
+    const apiSecret = this.getApiSecret();
 
     const url = `${apiBase}/payment-links`;
 
@@ -87,6 +96,7 @@ export class PaymentsService {
           'Content-Type': 'application/json',
           Accept: 'application/json',
           'X-API-Key': apiKey,
+          'X-API-Secret': apiSecret,
         },
         body: JSON.stringify(body),
       });
