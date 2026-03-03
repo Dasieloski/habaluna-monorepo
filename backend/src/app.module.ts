@@ -30,6 +30,7 @@ import { TransportConfigModule } from './transport-config/transport-config.modul
 import { AuditModule } from './common/services/audit.module';
 import { ThemesModule } from './themes/themes.module';
 import { AdminModule } from './admin/admin.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -107,6 +108,7 @@ import { AdminModule } from './admin/admin.module';
     AuditModule,
     ThemesModule,
     AdminModule,
+    PaymentsModule,
   ],
   providers: [
     HttpExceptionFilter,

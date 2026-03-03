@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { formatPrice } from '@/lib/utils';
-import { SupernovaWidget } from '@/components/payment/supernova-widget';
 import { isCatalogMode } from '@/lib/catalog-mode';
 import { useCartValidation } from '@/hooks/use-cart-validation';
 import { AlertTriangle, Tag, X } from 'lucide-react';
@@ -131,18 +130,21 @@ export default function CheckoutPage() {
       const orderData = {
         shippingAddress: addressForApi,
         billingAddress: addressForApi,
-        offerId: appliedCoupon?.id, // ID del cupón aplicado
+        offerId: appliedCoupon?.id, // ID del cupón aplicado (para trazabilidad)
+        offerCode: appliedCoupon?.code, // Código del cupón: el backend recalcula el descuento
         // No incluimos paymentIntentId todavía, se agregará después del pago exitoso
       };
 
       const response = await api.post('/orders', orderData);
-      setOrderId(response.data.id);
+      const createdOrderId = response.data.id as string;
+      setOrderId(createdOrderId);
       setShippingData(data);
-      setShowPayment(true);
-      showSuccess(
-        '¡Orden lista! ✅',
-        'Todo en orden. Ahora solo falta el pago.'
-      );
+
+      // Crear intento de pago en backend (Supernova payment link)
+      const paymentIntent = await api.createPaymentIntent(createdOrderId);
+
+      // Redirigir al checkout alojado de Supernova
+      window.location.href = paymentIntent.checkoutUrl;
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al crear el pedido';
       setError(errorMessage);
@@ -152,38 +154,8 @@ export default function CheckoutPage() {
     }
   };
 
-  const handlePaymentSuccess = async (data: { transactionId: string; amount: string; currency: string }) => {
-    try {
-      // Actualizar la orden con el transactionId del pago
-      if (orderId) {
-        // Actualizar el paymentIntentId y el estado de la orden
-        await api.patch(`/orders/${orderId}`, {
-          paymentIntentId: data.transactionId,
-        });
-      }
-      
-      clearCart();
-      showSuccess(
-        '¡Pago recibido! 🎉',
-        'Gracias por tu compra. Tu pedido está en camino.'
-      );
-      router.push(`/checkout/success?order=${orderId}`);
-    } catch (err: any) {
-      console.error('Error al actualizar la orden:', err);
-      // Aún así redirigir, el pago ya fue exitoso
-      clearCart();
-      showSuccess(
-        '¡Pago recibido! 🎉',
-        'Gracias por tu compra. Tu pedido está en camino.'
-      );
-      router.push(`/checkout/success?order=${orderId}`);
-    }
-  };
-
-  const handlePaymentError = (error: { error: string }) => {
-    setError(`El pago no se completó: ${error.error}. Revisa los datos o intenta de nuevo.`);
-    setShowPayment(false);
-  };
+  // El flujo de pago ahora ocurre en el checkout alojado de Supernova.
+  // La confirmación real se hará vía webhook en el backend.
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
@@ -261,18 +233,17 @@ export default function CheckoutPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <div className="lg:col-span-2">
-          {!showPayment ? (
-            <Card>
+          <Card>
               <CardHeader>
                 <CardTitle>Información de Envío</CardTitle>
               </CardHeader>
-              <CardContent className="relative">
+            <CardContent className="relative">
                 {loading && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-background/80 backdrop-blur-[1px]" aria-live="polite">
                     <span className="text-sm font-medium text-muted-foreground">Creando pedido...</span>
                   </div>
                 )}
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                   {/* Alertas de validación de stock */}
                   {validation && hasIssues && (
                     <div className="bg-destructive/10 border border-destructive rounded-lg p-4 mb-4">
@@ -321,9 +292,9 @@ export default function CheckoutPage() {
                   {error && <FormError message={error} />}
 
                   {/* Contacto */}
-                  <div className="space-y-4">
+                <div className="space-y-4">
                     <h3 className="text-sm font-semibold text-foreground border-b pb-2">Contacto</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName">Nombre</Label>
                         <Input id="firstName" {...register('firstName')} />
@@ -353,9 +324,9 @@ export default function CheckoutPage() {
                   </div>
 
                   {/* Dirección */}
-                  <div className="space-y-4">
+                <div className="space-y-4">
                     <h3 className="text-sm font-semibold text-foreground border-b pb-2">Dirección</h3>
-                    <div className="space-y-2">
+                  <div className="space-y-2">
                       <Label htmlFor="address">Dirección completa *</Label>
                       <Input 
                         id="address" 
@@ -366,8 +337,8 @@ export default function CheckoutPage() {
                         <FormError message={errors.address.message} />
                       )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
                         <Label htmlFor="country">País *</Label>
                         <Select
                           value={selectedCountry}
@@ -394,7 +365,7 @@ export default function CheckoutPage() {
                         </Select>
                         {errors.country && <FormError message={errors.country.message} />}
                       </div>
-                      <div className="space-y-2">
+                    <div className="space-y-2">
                         <Label htmlFor="municipality">Municipio *</Label>
                         <Select
                           value={watch('municipality') || ''}
@@ -415,7 +386,7 @@ export default function CheckoutPage() {
                           <FormError message={errors.municipality.message} />
                         )}
                       </div>
-                      <div className="space-y-2">
+                    <div className="space-y-2">
                         <Label htmlFor="city">Ciudad *</Label>
                         <Input 
                           id="city" 
@@ -426,7 +397,7 @@ export default function CheckoutPage() {
                           <FormError message={errors.city.message} />
                         )}
                       </div>
-                      <div className="space-y-2">
+                    <div className="space-y-2">
                         <Label htmlFor="reference">Referencia (opcional)</Label>
                         <Input 
                           id="reference" 
@@ -437,38 +408,17 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    size="lg" 
-                    disabled={loading || validationLoading || Boolean(validation && hasIssues)}
-                  >
-                    {loading ? 'Creando pedido...' : validationLoading ? 'Validando...' : (validation && hasIssues) ? 'Resuelve los problemas de stock' : 'Continuar al Pago'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Completa tu Pago</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {error && <FormError message={error} className="mb-4" />}
-                {orderId && (
-                  <SupernovaWidget
-                    amount={total.toFixed(2)}
-                    currency="USD"
-                    orderId={orderId}
-                    description={`Pedido ${orderId}`}
-                    customerEmail={user?.email}
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                  />
-                )}
-              </CardContent>
-            </Card>
-          )}
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  size="lg" 
+                  disabled={loading || validationLoading || Boolean(validation && hasIssues)}
+                >
+                  {loading ? 'Creando pedido...' : validationLoading ? 'Validando...' : (validation && hasIssues) ? 'Resuelve los problemas de stock' : 'Continuar al Pago'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="lg:col-span-1">

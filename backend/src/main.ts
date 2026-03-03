@@ -313,8 +313,13 @@ async function bootstrap() {
 
   // Configurar límites de body para archivos grandes (antes del global prefix)
   // Express body parser para JSON y URL-encoded (aunque multer maneja multipart/form-data)
-  app.use(require('express').json({ limit: '10mb' }));
-  app.use(require('express').urlencoded({ limit: '10mb', extended: true }));
+  const express = require('express');
+
+  // Para el webhook de pagos necesitamos acceder al rawBody para validar la firma HMAC.
+  app.use('/api/payments/webhook', express.raw({ type: '*/*' }));
+
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
   // Global prefix
   app.setGlobalPrefix('api');

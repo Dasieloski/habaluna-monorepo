@@ -406,12 +406,19 @@ model Order {
   subtotal        Decimal       @db.Decimal(10, 2)
   tax             Decimal       @db.Decimal(10, 2)
   shipping        Decimal       @db.Decimal(10, 2)
+  /// Total bruto sin descuentos (para trazabilidad histórica)
   total           Decimal       @db.Decimal(10, 2)
+  /// Descuento total aplicado a la orden (cupones, promociones, etc.)
+  discountTotal   Decimal       @db.Decimal(10, 2) @default(0)
+  /// Total neto realmente cobrado al cliente (subtotal - discountTotal + tax + shipping)
+  grandTotal      Decimal?      @db.Decimal(10, 2)
   shippingAddress Json
   billingAddress  Json
   paymentIntentId String?
   offerId         String?       @map("offer_id") // ID del cupón/offer aplicado
   notes           String?       @db.Text
+  /// Moneda en la que se cobra la orden
+  currency        Currency      @default(USD)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
@@ -420,6 +427,7 @@ model Order {
   items OrderItem[]
   returnRequests ReturnRequest[]
   refunds Refund[]
+  payments Payment[]
 
   @@index([userId])
   @@index([orderNumber])
@@ -591,6 +599,12 @@ model Refund {
   reason          String?
   status          RefundStatus @default(PENDING)
   method          String?      // 'balance', 'original_payment', 'cash'
+  /// Nombre del proveedor de pago utilizado para este reembolso (si aplica)
+  provider        String?
+  /// ID de reembolso devuelto por la pasarela de pago
+  providerRefundId String?
+  /// Relación opcional con el pago original
+  paymentId       String?
   processedAt     DateTime?
   processedBy     String?      // User ID of admin
   createdAt       DateTime     @default(now())
@@ -598,11 +612,36 @@ model Refund {
 
   returnRequest ReturnRequest? @relation(fields: [returnRequestId], references: [id])
   order         Order?         @relation(fields: [orderId], references: [id])
+  payment       Payment?       @relation(fields: [paymentId], references: [id])
 
   @@index([returnRequestId])
   @@index([orderId])
   @@index([status])
   @@map("refunds")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  orderId           String
+  /// Nombre del proveedor/pasarela (ej. 'supernova', 'mi_pasarela')
+  provider          String
+  /// ID de pago/intento devuelto por la pasarela
+  providerPaymentId String
+  status            PaymentStatus @default(PENDING)
+  amount            Decimal       @db.Decimal(10, 2)
+  currency          Currency
+  /// Último payload relevante recibido de la pasarela (creación, webhook, etc.)
+  rawPayload        Json?
+  errorMessage      String?       @db.Text
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  refunds Refund[]
+
+  @@unique([provider, providerPaymentId])
+  @@index([orderId])
+  @@map("payments")
 }
 
 model SystemAlert {

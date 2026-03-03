@@ -76,14 +76,16 @@ function CheckoutSuccessContent() {
       <div className="container mx-auto px-4 max-w-2xl">
         {/* Success Icon & Message */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/20 mb-4">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/20 mb-4 animate-bounce">
             <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-            ¡Pago recibido! 🎉
+            {order.paymentStatus === 'PAID' ? '¡Pago recibido! 🎉' : 'Estamos revisando tu pago'}
           </h1>
           <p className="text-lg text-muted-foreground">
-            Gracias por tu compra. Tu pedido está en camino.
+            {order.paymentStatus === 'PAID'
+              ? 'Gracias por tu compra. Tu pedido está en camino.'
+              : 'Hemos recibido tu pedido y estamos esperando la confirmación final del pago. Te avisaremos en cuanto se procese.'}
           </p>
         </div>
 
@@ -101,9 +103,9 @@ function CheckoutSuccessContent() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Total pagado</p>
+                <p className="text-sm text-muted-foreground mb-1">Total</p>
                 <p className="text-2xl font-bold text-primary">
-                  {formatPrice(Number(order.total) || 0)}
+                  {formatPrice(Number(order.grandTotal ?? order.total) || 0)}
                 </p>
               </div>
               <div>
@@ -125,6 +127,12 @@ function CheckoutSuccessContent() {
                   <br />
                   {order.shippingAddress.address}
                   <br />
+                  {order.shippingAddress.municipality && (
+                    <>
+                      {order.shippingAddress.municipality}
+                      <br />
+                    </>
+                  )}
                   {order.shippingAddress.city}
                   {order.shippingAddress.zipCode && `, ${order.shippingAddress.zipCode}`}
                   <br />

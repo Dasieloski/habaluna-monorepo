@@ -24,6 +24,13 @@ class AddressDto {
   @MaxLength(200)
   address: string;
 
+  @ApiProperty({ description: 'Municipio o distrito' })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(100)
+  municipality: string;
+
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -64,8 +71,11 @@ export class CreateOrderDto {
   @ValidateNested()
   @Type(() => AddressDto)
   billingAddress?: AddressDto;
-
-  @ApiProperty({ required: false })
+  /**
+   * Campo legado. La confirmación real del pago debe hacerse vía webhooks
+   * de la pasarela, no desde el frontend.
+   */
+  @ApiProperty({ required: false, description: 'Solo para compatibilidad; no usar para confirmar pagos' })
   @IsOptional()
   @IsString()
   paymentIntentId?: string;
@@ -79,4 +89,12 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   offerId?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Código de cupón usado por el cliente. Se valida siempre en backend.',
+  })
+  @IsOptional()
+  @IsString()
+  offerCode?: string;
 }

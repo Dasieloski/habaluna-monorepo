@@ -1589,6 +1589,16 @@ export const api = {
     return res.data
   },
 
+  // Payments (Supernova)
+  createPaymentIntent: async (orderId: string) => {
+    const res = await api.post('/payments/intent', { orderId })
+    return res.data as {
+      paymentId: string
+      checkoutUrl: string
+      provider: string
+    }
+  },
+
   /** Búsqueda global admin: productos, clientes y ofertas en paralelo */
   getAdminGlobalSearch: async (query: string, limitPerType: number = 5) => {
     const q = (query || "").trim()

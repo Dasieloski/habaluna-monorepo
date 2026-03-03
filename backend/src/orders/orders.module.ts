@@ -10,5 +10,6 @@ import { TransportConfigModule } from '../transport-config/transport-config.modu
   imports: [CartModule, OffersModule, EmailModule, TransportConfigModule],
   controllers: [OrdersController],
   providers: [OrdersService],
+  exports: [OrdersService],
 })
 export class OrdersModule {}

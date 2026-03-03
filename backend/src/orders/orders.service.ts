@@ -116,7 +116,25 @@ export class OrdersService {
     const itemCount = cart.items.reduce((s, i) => s + i.quantity, 0);
     const transportConfig = await this.transportConfig.getPublic();
     const { shipping } = this.transportConfig.computeShipping(itemCount, transportConfig);
-    const total = subtotal + tax + Number(shipping);
+
+    // Aplicar cupón/offer en backend (si viene código)
+    let discountTotal = 0;
+    let appliedOfferId: string | undefined = createOrderDto.offerId;
+
+    if (createOrderDto.offerCode) {
+      const result = await this.offersService.validateOffer(createOrderDto.offerCode, subtotal);
+      if (!result.valid) {
+        throw new BadRequestException(result.message || 'Invalid offer code');
+      }
+      discountTotal = result.discount;
+      if (result.offer) {
+        appliedOfferId = result.offer.id;
+      }
+    }
+
+    // Total neto realmente a cobrar
+    const grandTotal = subtotal - discountTotal + tax + Number(shipping);
+    const total = grandTotal; // compatibilidad con el campo legacy `total`
 
     // Create order (sin descontar stock ni limpiar carrito - se hará cuando se confirme el pago)
     // Convertir AddressDto a objeto plano para Prisma (espera JSON)
@@ -133,10 +151,12 @@ export class OrdersService {
         tax,
         shipping,
         total,
+        discountTotal,
+        grandTotal,
         shippingAddress: shippingAddressPlain,
         billingAddress: billingAddressPlain,
         paymentIntentId: createOrderDto.paymentIntentId,
-        offerId: createOrderDto.offerId,
+        offerId: appliedOfferId,
         notes: createOrderDto.notes,
         status: 'PENDING', // Estado pendiente hasta que se confirme el pago
         paymentStatus: 'PENDING',
@@ -312,143 +332,16 @@ export class OrdersService {
       throw new NotFoundException('Order not found');
     }
 
-    // Si se está actualizando el paymentIntentId, significa que el pago fue exitoso
-    // En ese caso, confirmamos la orden, descontamos stock y limpiamos el carrito
-    if (updateDto.paymentIntentId && order.status === 'PENDING') {
-      // VALIDAR paymentIntentId con el proveedor de pagos (idempotencia y autenticidad)
-      // Validar que el paymentIntent no fue usado antes (idempotencia)
-      const existingOrder = await this.prisma.order.findFirst({
-        where: { 
-          paymentIntentId: updateDto.paymentIntentId,
-          paymentStatus: 'PAID',
-          id: { not: id } // Excluir la orden actual
-        }
-      });
-      
-      if (existingOrder) {
-        throw new BadRequestException('Payment intent already used');
-      }
-      
-      // Si hay un proveedor de pagos configurado, validar con él
-      const paymentProvider = this.config.get<string>('PAYMENT_PROVIDER');
-      
-      if (paymentProvider === 'stripe') {
-        const stripeSecretKey = this.config.get<string>('STRIPE_SECRET_KEY');
-        if (stripeSecretKey) {
-          try {
-            const stripe = require('stripe')(stripeSecretKey);
-            const paymentIntent = await stripe.paymentIntents.retrieve(updateDto.paymentIntentId);
-            
-            // Validar que el pago fue exitoso
-            if (paymentIntent.status !== 'succeeded') {
-              throw new BadRequestException('Payment not confirmed');
-            }
-            
-            // Validar que el monto coincide (Stripe usa centavos)
-            const expectedAmount = Math.round(Number(order.total) * 100);
-            if (paymentIntent.amount !== expectedAmount) {
-              throw new BadRequestException('Payment amount mismatch');
-            }
-          } catch (error) {
-            if (error instanceof BadRequestException) {
-              throw error;
-            }
-            // Si hay error al validar con Stripe, loguear pero no bloquear
-            // (puede ser que el proveedor no sea Stripe o la key no esté configurada)
-            this.logger.warn(
-              `Error validating payment intent with Stripe: ${error instanceof Error ? error.message : String(error)}`
-            );
-          }
-        }
-      }
-      
-      // Validar stock antes de confirmar
-      for (const item of order.items) {
-        const stock = item.productVariant ? item.productVariant.stock : item.product.stock;
-
-        if (stock < item.quantity) {
-          const itemName = item.productVariant
-            ? `${item.product.name} - ${item.productVariant.name}`
-            : item.product.name;
-          throw new BadRequestException(`Insufficient stock for ${itemName}`);
-        }
-      }
-
-      // Descontar stock
-      for (const item of order.items) {
-        if (item.productVariantId) {
-          await this.prisma.productVariant.update({
-            where: { id: item.productVariantId },
-            data: {
-              stock: {
-                decrement: item.quantity,
-              },
-            },
-          });
-        } else {
-          await this.prisma.product.update({
-            where: { id: item.productId },
-            data: {
-              stock: {
-                decrement: item.quantity,
-              },
-            },
-          });
-        }
-      }
-
-      // Limpiar carrito
-      await this.cartService.clearCart(order.userId);
-
-      // Actualizar orden con paymentIntentId y cambiar estado a PROCESSING
-      const updatedOrder = await this.prisma.order.update({
-        where: { id },
-        data: {
-          paymentIntentId: updateDto.paymentIntentId,
-          status: 'PROCESSING',
-          paymentStatus: 'PAID',
-        },
-        include: {
-          items: {
-            include: {
-              product: true,
-              productVariant: true,
-            },
-          },
-          user: {
-            select: {
-              email: true,
-              firstName: true,
-            },
-          },
-        },
-      });
-
-      // Enviar email de confirmación de pedido
-      try {
-        await this.emailService.sendOrderConfirmationEmail({
-          to: updatedOrder.user.email,
-          orderNumber: updatedOrder.orderNumber,
-          total: Number(updatedOrder.total),
-          firstName: updatedOrder.user.firstName || undefined,
-        });
-      } catch (error) {
-        this.logger.warn(
-          'Error enviando email de confirmación de pedido',
-          error instanceof Error ? error.stack : String(error),
-        );
-        // No fallar la actualización si el email falla
-      }
-
-      return updatedOrder;
+    // Ya no se permite confirmar pagos desde este endpoint.
+    // La confirmación de pago debe realizarse exclusivamente mediante el webhook del proveedor.
+    if (updateDto.paymentIntentId) {
+      throw new BadRequestException('Payment confirmation must come from payment provider webhook');
     }
 
-    // Si solo se actualiza el paymentIntentId sin cambiar el estado
+    // Actualizaciones genéricas de la orden (hoy sólo soportamos paymentIntentId, por compatibilidad futura)
     return this.prisma.order.update({
       where: { id },
-      data: {
-        paymentIntentId: updateDto.paymentIntentId,
-      },
+      data: {},
       include: {
         items: {
           include: {
