@@ -71,22 +71,14 @@ export class PaymentsService {
 
     const url = `${apiBase}/payment-links`;
 
-    const body = {
+    // Imitar exactamente el ejemplo oficial de Supernova (server.js)
+    // Cuerpo mínimo exactamente como en server.js de ejemplo
+    const body: any = {
       amount: Number(order.grandTotal ?? order.total),
-      currency: order.currency,
-      description: `Pedido ${order.orderNumber}`,
-      reference: order.orderNumber,
-      single_use: true,
-      expires_in_hours: 24,
-      customer: order.user
-        ? {
-            name: `${order.user.firstName ?? ''} ${order.user.lastName ?? ''}`.trim() || order.user.email,
-            email: order.user.email,
-            phone: order.user.phone ?? '',
-          }
-        : undefined,
-      metadata: [`orderId:${order.id}`],
+      currency: (order.currency || 'USD').toString().toUpperCase().slice(0, 3),
     };
+    body.description = `Pedido ${order.orderNumber}`;
+    body.reference = order.orderNumber;
 
     let response: Response;
     try {
@@ -94,7 +86,6 @@ export class PaymentsService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Accept: 'application/json',
           'X-API-Key': apiKey,
           'X-API-Secret': apiSecret,
         },
