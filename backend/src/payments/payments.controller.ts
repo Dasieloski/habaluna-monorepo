@@ -39,7 +39,7 @@ export class PaymentsController {
     @Query('per_page') perPage?: string,
     @Query('status') status?: string,
     @Query('search') search?: string,
-  ) {
+  ): Promise<any> {
     return this.paymentsService.getAdminTransactions({
       page: Number(page) || 1,
       perPage: Number(perPage) || 50,
@@ -53,7 +53,7 @@ export class PaymentsController {
   @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get payment reconciliation for a specific order' })
-  async getAdminOrderPaymentReconciliation(@Param('orderId') orderId: string) {
+  async getAdminOrderPaymentReconciliation(@Param('orderId') orderId: string): Promise<any> {
     return this.paymentsService.getAdminOrderPaymentReconciliation(orderId);
   }
 
@@ -62,7 +62,7 @@ export class PaymentsController {
   @Roles('ADMIN')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Resync local order payment status from Supernova' })
-  async resyncAdminOrderPayment(@Param('orderId') orderId: string) {
+  async resyncAdminOrderPayment(@Param('orderId') orderId: string): Promise<any> {
     return this.paymentsService.resyncAdminOrderPayment(orderId);
   }
 

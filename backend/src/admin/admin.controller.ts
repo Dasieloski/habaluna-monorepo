@@ -223,13 +223,13 @@ export class AdminController {
     ]);
 
     // Top productos más vendidos (últimos 30 días)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const recentThirtyDaysAgo = new Date(now);
+    recentThirtyDaysAgo.setDate(recentThirtyDaysAgo.getDate() - 30);
     
     const recentPaidOrders = await this.prisma.order.findMany({
       where: {
         paymentStatus: 'PAID',
-        createdAt: { gte: thirtyDaysAgo },
+        createdAt: { gte: recentThirtyDaysAgo },
       },
       include: {
         items: {
@@ -266,12 +266,12 @@ export class AdminController {
       }));
 
     // Ventas por categoría (últimos 12 meses, órdenes pagadas)
-    const twelveMonthsAgo = new Date();
-    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    const recentTwelveMonthsAgo = new Date(now);
+    recentTwelveMonthsAgo.setMonth(recentTwelveMonthsAgo.getMonth() - 12);
     const ordersForCategory = await this.prisma.order.findMany({
       where: {
         paymentStatus: 'PAID',
-        createdAt: { gte: twelveMonthsAgo },
+        createdAt: { gte: recentTwelveMonthsAgo },
       },
       include: {
         items: {
