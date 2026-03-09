@@ -225,7 +225,6 @@ export default function WishlistPage() {
                         name: p.name,
                         slug: p.slug,
                         priceUSD: p.priceUSD ?? null,
-                        priceMNs: p.priceMNs ?? null,
                         images: Array.isArray(p.images) ? p.images : [],
                       },
                       productVariant: null,

@@ -43,6 +43,7 @@ type CheckoutForm = z.infer<typeof checkoutSchema>;
 export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [syncingCart, setSyncingCart] = useState(true);
   const [showPayment, setShowPayment] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [shippingData, setShippingData] = useState<CheckoutForm | null>(null);
@@ -54,7 +55,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
   const isBootstrapped = useAuthStore((s) => s.isBootstrapped)
-  const { items, subtotal, clearCart, fetchCart } = useCartStore();
+  const { items, subtotal, fetchCart } = useCartStore();
   const { validation, validateCart, isValid, hasIssues, loading: validationLoading } = useCartValidation();
   const { showSuccess, showError } = useToast();
 
@@ -78,28 +79,55 @@ export default function CheckoutPage() {
   const municipalities = getMunicipalitiesByCountry(selectedCountry);
 
   useEffect(() => {
-    // En modo catálogo, redirigir a productos
+    let cancelled = false;
+
+    const syncCheckoutCart = async () => {
+      // En modo catálogo, redirigir a productos
+      if (isCatalogMode()) {
+        router.push('/products');
+        return;
+      }
+
+      // Esperar a que la sesión se bootstrapee (refresh cookie) antes de redirigir
+      if (!isBootstrapped) return;
+
+      if (!isAuthenticated()) {
+        router.push('/auth/login?returnUrl=' + encodeURIComponent('/checkout'));
+        return;
+      }
+
+      setSyncingCart(true);
+      try {
+        await fetchCart();
+        if (cancelled) return;
+
+        const syncedItems = useCartStore.getState().items;
+        if (syncedItems.length === 0) {
+          router.push('/cart');
+          return;
+        }
+
+        await validateCart();
+      } finally {
+        if (!cancelled) {
+          setSyncingCart(false);
+        }
+      }
+    };
+
+    syncCheckoutCart();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchCart, isAuthenticated, isBootstrapped, router, validateCart]);
+
+  useEffect(() => {
     if (isCatalogMode()) {
       router.push('/products');
       return;
     }
-
-    // Esperar a que la sesión se bootstrapee (refresh cookie) antes de redirigir
-    if (!isBootstrapped) return;
-
-    if (!isAuthenticated()) {
-      router.push('/auth/login?returnUrl=' + encodeURIComponent('/checkout'));
-      return;
-    }
-
-    if (items.length === 0) {
-      router.push('/cart');
-      return;
-    }
-
-    // Validar el carrito al entrar al checkout
-    validateCart();
-  }, [isAuthenticated, isBootstrapped, items, router, validateCart]);
+  }, [router]);
 
   // Redirigir si hay problemas de stock
   useEffect(() => {
@@ -114,11 +142,21 @@ export default function CheckoutPage() {
     setError('');
 
     try {
+      // Sincronizar con el carrito real del backend antes de crear la orden.
+      await fetchCart();
+      const syncedItems = useCartStore.getState().items;
+      if (syncedItems.length === 0) {
+        setError('Tu carrito está vacío. Vuelve al carrito para continuar.');
+        setLoading(false);
+        router.push('/cart');
+        return;
+      }
+
       // Validar el carrito antes de proceder
-      await validateCart();
+      const validationResult = await validateCart();
       
       // Si hay problemas de stock, no permitir continuar
-      if (hasIssues) {
+      if (validationResult?.hasIssues) {
         setError('Hay problemas con el stock de algunos productos. Por favor, actualiza tu carrito y vuelve a intentar.');
         setLoading(false);
         return;
@@ -136,7 +174,11 @@ export default function CheckoutPage() {
       };
 
       const response = await api.post('/orders', orderData);
-      const createdOrderId = response.data.id as string;
+      const createdOrder = response.data?.data ?? response.data;
+      const createdOrderId = String(createdOrder?.id ?? '').trim();
+      if (!createdOrderId) {
+        throw new Error('No se recibió un id de orden válido al crear el pedido');
+      }
       setOrderId(createdOrderId);
       setShippingData(data);
 
@@ -412,9 +454,17 @@ export default function CheckoutPage() {
                   type="submit" 
                   className="w-full" 
                   size="lg" 
-                  disabled={loading || validationLoading || Boolean(validation && hasIssues)}
+                  disabled={loading || syncingCart || validationLoading || Boolean(validation && hasIssues)}
                 >
-                  {loading ? 'Creando pedido...' : validationLoading ? 'Validando...' : (validation && hasIssues) ? 'Resuelve los problemas de stock' : 'Continuar al Pago'}
+                  {loading
+                    ? 'Creando pedido...'
+                    : syncingCart
+                      ? 'Sincronizando carrito...'
+                      : validationLoading
+                        ? 'Validando...'
+                        : (validation && hasIssues)
+                          ? 'Resuelve los problemas de stock'
+                          : 'Continuar al Pago'}
                 </Button>
               </form>
             </CardContent>
@@ -504,10 +554,7 @@ export default function CheckoutPage() {
                       )}
                     </div>
                     <span className="shrink-0">
-                      {formatPrice(
-                        item.productVariant?.priceUSD || item.product.priceUSD,
-                        item.productVariant?.priceMNs || item.product.priceMNs
-                      )}
+                      {formatPrice(item.productVariant?.priceUSD || item.product.priceUSD)}
                       {item.quantity > 1 && ` x ${item.quantity}`}
                     </span>
                   </div>

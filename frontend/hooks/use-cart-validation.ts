@@ -39,7 +39,7 @@ export function useCartValidation() {
   const validateCart = useCallback(async () => {
     if (!isAuthenticated() || items.length === 0) {
       setValidation(null);
-      return;
+      return null;
     }
 
     setLoading(true);
@@ -48,10 +48,12 @@ export function useCartValidation() {
     try {
       const response = await api.get<CartValidationResult>('/cart/validate');
       setValidation(response.data);
+      return response.data;
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Error al validar el carrito';
       setError(errorMessage);
       setValidation(null);
+      return null;
     } finally {
       setLoading(false);
     }

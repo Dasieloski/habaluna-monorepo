@@ -187,9 +187,7 @@ export interface BackendProduct {
   description: string
   shortDescription?: string | null
   priceUSD?: string | number | null
-  priceMNs?: string | number | null
   comparePriceUSD?: string | number | null
-  comparePriceMNs?: string | number | null
   stock: number
   isActive: boolean
   isFeatured: boolean
@@ -438,9 +436,7 @@ export interface CreateProductData {
   description: string
   shortDescription?: string
   priceUSD?: number
-  priceMNs?: number
   comparePriceUSD?: number | null
-  comparePriceMNs?: number | null
   stock: number
   isActive?: boolean
   isFeatured?: boolean
@@ -1517,23 +1513,29 @@ export const api = {
 
   // Devoluciones
   getReturnRequests: async () => {
-    const res = await api.get('/admin/returns')
-    return { data: res.data || [] }
+    const res = await api.get('/returns')
+    return {
+      data: Array.isArray(res.data?.data) ? res.data.data : [],
+      meta: res.data?.meta ?? null,
+    }
   },
 
   updateReturnStatus: async (id: string, status: string) => {
-    const res = await api.patch(`/admin/returns/${id}`, { status })
+    const res = await api.patch(`/returns/${id}/status`, { status })
     return res.data
   },
 
   // Reembolsos
   getRefunds: async () => {
-    const res = await api.get('/admin/refunds')
-    return { data: res.data || [] }
+    const res = await api.get('/returns/refunds')
+    return {
+      data: Array.isArray(res.data?.data) ? res.data.data : [],
+      meta: res.data?.meta ?? null,
+    }
   },
 
   processRefund: async (returnId: string, data: { amount: number; method: string; reason: string }) => {
-    const res = await api.post(`/admin/refunds`, { returnId, ...data })
+    const res = await api.post(`/returns/${returnId}/refund`, data)
     return res.data
   },
 
@@ -1591,11 +1593,106 @@ export const api = {
 
   // Payments (Supernova)
   createPaymentIntent: async (orderId: string) => {
-    const res = await api.post('/payments/intent', { orderId })
+    const normalizedOrderId = String(orderId ?? '').trim()
+    if (!normalizedOrderId) {
+      throw new Error('No se pudo iniciar el pago porque no se recibió un id de orden válido.')
+    }
+    const res = await api.post('/payments/intent', { orderId: normalizedOrderId })
     return res.data as {
       paymentId: string
       checkoutUrl: string
       provider: string
+    }
+  },
+
+  getAdminPaymentTransactions: async (params?: {
+    page?: number
+    perPage?: number
+    status?: string
+    search?: string
+  }) => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.perPage) queryParams.append('per_page', params.perPage.toString())
+    if (params?.status) queryParams.append('status', params.status)
+    if (params?.search) queryParams.append('search', params.search)
+    const queryString = queryParams.toString()
+    const res = await api.get(`/payments/admin/transactions${queryString ? `?${queryString}` : ''}`)
+    return res.data as {
+      source: string
+      data: any[]
+      meta: {
+        page: number
+        perPage: number
+        total: number
+        lastPage: number
+      }
+      stats: {
+        totalRevenue: number
+        successfulTransactions: number
+        failedTransactions: number
+        refundedAmount: number
+      }
+    }
+  },
+
+  getAdminOrderPaymentReconciliation: async (orderId: string) => {
+    const res = await api.get(`/payments/admin/orders/${orderId}/reconciliation`)
+    return res.data as {
+      source: string
+      orderId: string
+      orderNumber: string
+      local: {
+        orderStatus: string
+        paymentStatus: string
+        paymentIntentId: string | null
+        latestPayment: any
+      }
+      gateway: {
+        providerTransactionId: string | null
+        status: string | null
+        paymentStatus: string | null
+        amount: number | null
+        approvedAmount: number | null
+        currency: string | null
+        paymentMethodType: string | null
+        paymentMethodUsed: string | null
+        createdAt: string | null
+        processedAt: string | null
+        rawPayload: any
+      }
+      hasGatewayTransaction: boolean
+      hasMismatch: boolean
+    }
+  },
+
+  resyncAdminOrderPayment: async (orderId: string) => {
+    const res = await api.post(`/payments/admin/orders/${orderId}/resync`)
+    return res.data as {
+      source: string
+      orderId: string
+      orderNumber: string
+      local: {
+        orderStatus: string
+        paymentStatus: string
+        paymentIntentId: string | null
+        latestPayment: any
+      }
+      gateway: {
+        providerTransactionId: string | null
+        status: string | null
+        paymentStatus: string | null
+        amount: number | null
+        approvedAmount: number | null
+        currency: string | null
+        paymentMethodType: string | null
+        paymentMethodUsed: string | null
+        createdAt: string | null
+        processedAt: string | null
+        rawPayload: any
+      }
+      hasGatewayTransaction: boolean
+      hasMismatch: boolean
     }
   },
 

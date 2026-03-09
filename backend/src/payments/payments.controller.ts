@@ -1,18 +1,26 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
+  Query,
   Req,
   UseGuards,
   Headers,
   RawBodyRequest,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { IsUUID } from 'class-validator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { PaymentsService } from './payments.service';
 
 class CreatePaymentIntentDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
   orderId: string;
 }
 
@@ -20,6 +28,43 @@ class CreatePaymentIntentDto {
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
+
+  @Get('admin/transactions')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get admin payment transactions directly from Supernova' })
+  async getAdminTransactions(
+    @Query('page') page?: string,
+    @Query('per_page') perPage?: string,
+    @Query('status') status?: string,
+    @Query('search') search?: string,
+  ) {
+    return this.paymentsService.getAdminTransactions({
+      page: Number(page) || 1,
+      perPage: Number(perPage) || 50,
+      status,
+      search,
+    });
+  }
+
+  @Get('admin/orders/:orderId/reconciliation')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get payment reconciliation for a specific order' })
+  async getAdminOrderPaymentReconciliation(@Param('orderId') orderId: string) {
+    return this.paymentsService.getAdminOrderPaymentReconciliation(orderId);
+  }
+
+  @Post('admin/orders/:orderId/resync')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Resync local order payment status from Supernova' })
+  async resyncAdminOrderPayment(@Param('orderId') orderId: string) {
+    return this.paymentsService.resyncAdminOrderPayment(orderId);
+  }
 
   @Post('intent')
   @UseGuards(JwtAuthGuard)

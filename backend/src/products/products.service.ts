@@ -5,6 +5,22 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { LowStockAlertDto } from './dto/low-stock-alert.dto';
 
+const productVariantSelect = {
+  id: true,
+  productId: true,
+  name: true,
+  priceUSD: true,
+  comparePriceUSD: true,
+  sku: true,
+  stock: true,
+  weight: true,
+  unit: true,
+  isActive: true,
+  order: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
 @Injectable()
 export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
@@ -57,14 +73,8 @@ export class ProductsService {
       if (rest.priceUSD !== undefined && rest.priceUSD !== null) {
         productData.priceUSD = rest.priceUSD;
       }
-      if (rest.priceMNs !== undefined && rest.priceMNs !== null) {
-        productData.priceMNs = rest.priceMNs;
-      }
       if (rest.comparePriceUSD !== undefined && rest.comparePriceUSD !== null) {
         productData.comparePriceUSD = rest.comparePriceUSD;
-      }
-      if (rest.comparePriceMNs !== undefined && rest.comparePriceMNs !== null) {
-        productData.comparePriceMNs = rest.comparePriceMNs;
       }
       if (rest.weight !== undefined && rest.weight !== null) {
         productData.weight = rest.weight;
@@ -272,9 +282,7 @@ export class ProductsService {
             description: true,
             shortDescription: true,
             priceUSD: true,
-            priceMNs: true,
             comparePriceUSD: true,
-            comparePriceMNs: true,
             sku: true,
             stock: true,
             isActive: true,
@@ -292,6 +300,7 @@ export class ProductsService {
             variants: {
               where: { isActive: true },
               orderBy: { order: 'asc' },
+              select: productVariantSelect,
             },
             comboItems: { select: { product: { select: { adultsOnly: true } } } },
             // Campos opcionales (pueden no existir si la migración no se ha aplicado)
@@ -318,9 +327,7 @@ export class ProductsService {
                   description: true,
                   shortDescription: true,
                   priceUSD: true,
-                  priceMNs: true,
                   comparePriceUSD: true,
-                  comparePriceMNs: true,
                   sku: true,
                   stock: true,
                   isActive: true,
@@ -338,6 +345,7 @@ export class ProductsService {
                   variants: {
                     where: { isActive: true },
                     orderBy: { order: 'asc' },
+                    select: productVariantSelect,
                   },
                 },
                 orderBy,
@@ -369,6 +377,7 @@ export class ProductsService {
           variants: {
             where: { isActive: true },
             orderBy: { order: 'asc' },
+            select: productVariantSelect,
           },
           comboItems: {
             include: {
@@ -379,9 +388,7 @@ export class ProductsService {
                   slug: true,
                   images: true,
                   priceUSD: true,
-                  priceMNs: true,
                   comparePriceUSD: true,
-                  comparePriceMNs: true,
                   isActive: true,
                   isCombo: true,
                   adultsOnly: true,
@@ -416,7 +423,7 @@ export class ProductsService {
         const product = (await this.prisma.$queryRaw`
           SELECT 
             id, name, slug, description, "shortDescription",
-            "priceUSD", "priceMNs", "comparePriceUSD", "comparePriceMNs",
+            "priceUSD", "comparePriceUSD",
             sku, stock, "isActive", "isFeatured", "isCombo", "adultsOnly",
             images, allergens, "nutritionalInfo", weight, "categoryId",
             "createdAt", "updatedAt"
@@ -434,6 +441,7 @@ export class ProductsService {
           this.prisma.productVariant.findMany({
             where: { productId: id, isActive: true },
             orderBy: { order: 'asc' },
+            select: productVariantSelect,
           }),
           this.prisma.comboItem.findMany({
             where: { comboId: id },
@@ -445,9 +453,7 @@ export class ProductsService {
                   slug: true,
                   images: true,
                   priceUSD: true,
-                  priceMNs: true,
                   comparePriceUSD: true,
-                  comparePriceMNs: true,
                   isActive: true,
                   isCombo: true,
                   adultsOnly: true,
@@ -482,6 +488,7 @@ export class ProductsService {
           variants: {
             where: { isActive: true },
             orderBy: { order: 'asc' },
+            select: productVariantSelect,
           },
           comboItems: {
             include: {
@@ -492,9 +499,7 @@ export class ProductsService {
                   slug: true,
                   images: true,
                   priceUSD: true,
-                  priceMNs: true,
                   comparePriceUSD: true,
-                  comparePriceMNs: true,
                   isActive: true,
                   isCombo: true,
                   adultsOnly: true,
@@ -529,7 +534,7 @@ export class ProductsService {
         const product = (await this.prisma.$queryRaw`
           SELECT 
             id, name, slug, description, "shortDescription",
-            "priceUSD", "priceMNs", "comparePriceUSD", "comparePriceMNs",
+            "priceUSD", "comparePriceUSD",
             sku, stock, "isActive", "isFeatured", "isCombo", "adultsOnly",
             images, allergens, "nutritionalInfo", weight, "categoryId",
             "createdAt", "updatedAt"
@@ -547,6 +552,7 @@ export class ProductsService {
           this.prisma.productVariant.findMany({
             where: { productId: product[0].id, isActive: true },
             orderBy: { order: 'asc' },
+            select: productVariantSelect,
           }),
           this.prisma.comboItem.findMany({
             where: { comboId: product[0].id },
@@ -558,9 +564,7 @@ export class ProductsService {
                   slug: true,
                   images: true,
                   priceUSD: true,
-                  priceMNs: true,
                   comparePriceUSD: true,
-                  comparePriceMNs: true,
                   isActive: true,
                   isCombo: true,
                   adultsOnly: true,
@@ -621,9 +625,7 @@ export class ProductsService {
             description: true,
             shortDescription: true,
             priceUSD: true,
-            priceMNs: true,
             comparePriceUSD: true,
-            comparePriceMNs: true,
             sku: true,
             stock: true,
             isActive: true,
@@ -641,6 +643,7 @@ export class ProductsService {
             variants: {
               where: { isActive: true },
               orderBy: { order: 'asc' },
+              select: productVariantSelect,
             },
             comboItems: { select: { product: { select: { adultsOnly: true } } } },
           },
@@ -665,9 +668,7 @@ export class ProductsService {
                   description: true,
                   shortDescription: true,
                   priceUSD: true,
-                  priceMNs: true,
                   comparePriceUSD: true,
-                  comparePriceMNs: true,
                   sku: true,
                   stock: true,
                   isActive: true,
@@ -685,6 +686,7 @@ export class ProductsService {
                   variants: {
                     where: { isActive: true },
                     orderBy: { order: 'asc' },
+                    select: productVariantSelect,
                   },
                 },
                 orderBy: { createdAt: 'desc' },
@@ -730,9 +732,7 @@ export class ProductsService {
           description: true,
           shortDescription: true,
           priceUSD: true,
-          priceMNs: true,
           comparePriceUSD: true,
-          comparePriceMNs: true,
           sku: true,
           stock: true,
           isActive: true,
@@ -750,6 +750,7 @@ export class ProductsService {
           variants: {
             where: { isActive: true },
             orderBy: { order: 'asc' },
+            select: productVariantSelect,
           },
           comboItems: { select: { product: { select: { adultsOnly: true } } } },
         },
@@ -775,9 +776,7 @@ export class ProductsService {
                 description: true,
                 shortDescription: true,
                 priceUSD: true,
-                priceMNs: true,
                 comparePriceUSD: true,
-                comparePriceMNs: true,
                 sku: true,
                 stock: true,
                 isActive: true,
@@ -795,6 +794,7 @@ export class ProductsService {
                 variants: {
                   where: { isActive: true },
                   orderBy: { order: 'asc' },
+                  select: productVariantSelect,
                 },
               },
             })
@@ -1028,6 +1028,7 @@ export class ProductsService {
               gt: 0,
             },
           },
+          select: productVariantSelect,
           take: 1,
         },
         comboItems: { select: { product: { select: { adultsOnly: true } } } },
@@ -1043,9 +1044,7 @@ export class ProductsService {
         description: product.description,
         shortDescription: product.shortDescription,
         priceUSD: product.priceUSD ? Number(product.priceUSD) : null,
-        priceMNs: product.priceMNs ? Number(product.priceMNs) : null,
         comparePriceUSD: product.comparePriceUSD ? Number(product.comparePriceUSD) : null,
-        comparePriceMNs: product.comparePriceMNs ? Number(product.comparePriceMNs) : null,
         stock: product.stock,
         images: product.images,
         isFeatured: product.isFeatured,
@@ -1055,7 +1054,6 @@ export class ProductsService {
           id: v.id,
           name: v.name,
           priceUSD: v.priceUSD ? Number(v.priceUSD) : null,
-          priceMNs: v.priceMNs ? Number(v.priceMNs) : null,
           stock: v.stock,
         })),
       };

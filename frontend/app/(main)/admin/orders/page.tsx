@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Search, Eye, Filter, Printer } from "lucide-react"
+import { Search, Eye, Filter, Printer, AlertTriangle } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { printTableOnly } from "@/lib/table-export-print"
@@ -59,6 +59,16 @@ const paymentStatusMap: Record<string, { label: string; color: string }> = {
   REFUNDED: { label: "Reembolsado", color: "bg-orange-100 text-orange-800" },
 }
 
+const gatewayStatusMap: Record<string, { label: string; color: string }> = {
+  approved: { label: "Aprobado", color: "bg-green-100 text-green-800" },
+  success: { label: "Exitoso", color: "bg-green-100 text-green-800" },
+  pending: { label: "Pendiente", color: "bg-yellow-100 text-yellow-800" },
+  failed: { label: "Fallido", color: "bg-red-100 text-red-800" },
+  rejected: { label: "Rechazado", color: "bg-red-100 text-red-800" },
+  refunded: { label: "Reembolsado", color: "bg-orange-100 text-orange-800" },
+  partially_refunded: { label: "Parcial", color: "bg-orange-100 text-orange-800" },
+}
+
 export default function AdminOrdersPage() {
   const searchParams = useSearchParams()
   const [orders, setOrders] = useState<any[]>([])
@@ -89,8 +99,50 @@ export default function AdminOrdersPage() {
   const loadOrders = async () => {
     try {
       setLoading(true)
-      const data = await api.getAdminOrders()
-      setOrders(Array.isArray(data) ? data : [])
+      const [ordersResult, transactionsResult] = await Promise.allSettled([
+        api.getAdminOrders(),
+        api.getAdminPaymentTransactions({ perPage: 100 }),
+      ])
+
+      const ordersData =
+        ordersResult.status === "fulfilled" && Array.isArray(ordersResult.value)
+          ? ordersResult.value
+          : []
+      const transactionsData =
+        transactionsResult.status === "fulfilled" ? transactionsResult.value : { data: [] }
+
+      const transactions = Array.isArray(transactionsData?.data) ? transactionsData.data : []
+      const transactionsByOrderId = new Map(
+        transactions
+          .filter((transaction: any) => transaction.orderId)
+          .map((transaction: any) => [transaction.orderId, transaction]),
+      )
+      const transactionsByOrderNumber = new Map(
+        transactions
+          .filter((transaction: any) => transaction.orderNumber)
+          .map((transaction: any) => [transaction.orderNumber, transaction]),
+      )
+
+      const enrichedOrders = ordersData.map((order: any) => {
+        const gatewayTransaction =
+          transactionsByOrderId.get(order.id) ||
+          transactionsByOrderNumber.get(order.orderNumber) ||
+          null
+
+        const gatewayPaymentStatus = gatewayTransaction?.paymentStatus || null
+        const hasGatewayMismatch =
+          Boolean(gatewayPaymentStatus) && gatewayPaymentStatus !== order.paymentStatus
+
+        return {
+          ...order,
+          gatewayTransactionId: gatewayTransaction?.providerTransactionId || null,
+          gatewayStatus: gatewayTransaction?.gatewayStatus || null,
+          gatewayPaymentStatus,
+          hasGatewayMismatch,
+        }
+      })
+
+      setOrders(enrichedOrders)
     } catch (error) {
       console.error("Error loading orders:", error)
     } finally {
@@ -138,7 +190,9 @@ export default function AdminOrdersPage() {
     fecha: o.createdAt,
     cliente: [o.user?.firstName, o.user?.lastName].filter(Boolean).join(" ") || o.user?.email || "—",
     estado: statusMap[o.status]?.label || o.status,
-    pago: paymentStatusMap[o.paymentStatus]?.label || o.paymentStatus,
+    pago: o.hasGatewayMismatch
+      ? `${paymentStatusMap[o.paymentStatus]?.label || o.paymentStatus} / Pasarela: ${gatewayStatusMap[o.gatewayStatus]?.label || o.gatewayStatus}`
+      : paymentStatusMap[o.paymentStatus]?.label || o.paymentStatus,
     total: o.total,
   }))
 
@@ -253,12 +307,27 @@ export default function AdminOrdersPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant="secondary"
-                          className={paymentStatusMap[order.paymentStatus]?.color}
-                        >
-                          {paymentStatusMap[order.paymentStatus]?.label || order.paymentStatus}
-                        </Badge>
+                        <div className="space-y-1">
+                          <Badge
+                            variant="secondary"
+                            className={paymentStatusMap[order.paymentStatus]?.color}
+                          >
+                            {paymentStatusMap[order.paymentStatus]?.label || order.paymentStatus}
+                          </Badge>
+                          {order.gatewayStatus ? (
+                            <div className="flex items-center gap-1">
+                              <Badge
+                                variant="outline"
+                                className={gatewayStatusMap[order.gatewayStatus]?.color || ""}
+                              >
+                                Pasarela: {gatewayStatusMap[order.gatewayStatus]?.label || order.gatewayStatus}
+                              </Badge>
+                              {order.hasGatewayMismatch ? (
+                                <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </div>
                       </TableCell>
                       <TableCell className="text-right font-medium">
                         {formatPrice(order.total)}

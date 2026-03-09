@@ -192,11 +192,12 @@ export function ProductClient({
           name: product.name,
           slug: product.slug,
           priceUSD: product.priceUSD ?? null,
-          priceMNs: product.priceMNs ?? null,
           images: Array.isArray(product.images) ? product.images : [],
           adultsOnly: adultsOnly,
         },
-        productVariant: selectedVariant ? { id: selectedVariant.id, name: selectedVariant.name, priceUSD: selectedVariant.priceUSD ?? null, priceMNs: selectedVariant.priceMNs ?? null } : null,
+        productVariant: selectedVariant
+          ? { id: selectedVariant.id, name: selectedVariant.name, priceUSD: selectedVariant.priceUSD ?? null }
+          : null,
         quantity,
       })
       setAddedFeedback(true)

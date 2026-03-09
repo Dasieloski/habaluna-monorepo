@@ -15,13 +15,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { DollarSign, TrendingUp, CreditCard, AlertCircle, Printer } from "lucide-react"
+import { DollarSign, TrendingUp, CreditCard, AlertCircle, Printer, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { printTableOnly } from "@/lib/table-export-print"
 import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
 
 export default function FinancePage() {
   const [transactions, setTransactions] = useState<any[]>([])
+  const [source, setSource] = useState<string>("supernova")
   const [stats, setStats] = useState({
     totalRevenue: 0,
     successfulTransactions: 0,
@@ -37,30 +38,15 @@ export default function FinancePage() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const orders = await api.getAdminOrders()
-      // Filtrar órdenes que tienen intentos de pago o son relevantes financieramente
-      const relevantOrders = Array.isArray(orders) ? orders.filter((o: any) => o.paymentStatus !== "PENDING" || o.paymentIntentId) : []
-      
-      setTransactions(relevantOrders)
-
-      // Calcular stats
-      const totalRevenue = relevantOrders
-        .filter((o: any) => o.paymentStatus === "PAID")
-        .reduce((sum: number, o: any) => sum + Number(o.total), 0)
-
-      const successfulTransactions = relevantOrders.filter((o: any) => o.paymentStatus === "PAID").length
-      const failedTransactions = relevantOrders.filter((o: any) => o.paymentStatus === "FAILED").length
-      const refundedAmount = relevantOrders
-        .filter((o: any) => o.paymentStatus === "REFUNDED")
-        .reduce((sum: number, o: any) => sum + Number(o.total), 0)
-
-      setStats({
-        totalRevenue,
-        successfulTransactions,
-        failedTransactions,
-        refundedAmount
+      const response = await api.getAdminPaymentTransactions({ perPage: 100 })
+      setTransactions(Array.isArray(response.data) ? response.data : [])
+      setSource(response.source || "supernova")
+      setStats(response.stats || {
+        totalRevenue: 0,
+        successfulTransactions: 0,
+        failedTransactions: 0,
+        refundedAmount: 0,
       })
-
     } catch (error) {
       console.error("Error loading finance data:", error)
     } finally {
@@ -78,12 +64,12 @@ export default function FinancePage() {
   ] as const
 
   const tableData = transactions.map((t) => ({
-    fecha: t.createdAt,
-    orden: t.orderNumber || t.id?.slice(0, 8) || '—',
-    transaccion: t.paymentIntentId || '—',
-    metodo: 'Tarjeta',
-    estado: t.paymentStatus,
-    monto: t.total,
+    fecha: t.processedAt || t.createdAt,
+    orden: t.orderNumber || t.providerReference || '—',
+    transaccion: t.providerTransactionId || '—',
+    metodo: t.paymentMethodLabel || 'Tarjeta',
+    estado: (t.gatewayStatus || t.paymentStatus || 'pending').toUpperCase(),
+    monto: Number(t.approvedAmount ?? t.amount ?? 0),
   }))
 
   const handlePrint = () => {
@@ -99,6 +85,10 @@ export default function FinancePage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Finanzas y Transacciones</h1>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={loadData} disabled={loading}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Actualizar
+          </Button>
           <ExportTableDropdown
             title="Finanzas — Historial de Transacciones"
             filename={`finanzas-${format(new Date(), "yyyy-MM-dd")}`}
@@ -159,7 +149,9 @@ export default function FinancePage() {
       <Card>
         <CardHeader>
           <CardTitle>Historial de Transacciones</CardTitle>
-          <CardDescription>Registro de pagos asociados a órdenes</CardDescription>
+          <CardDescription>
+            Datos obtenidos directamente desde {source === "supernova" ? "Supernova" : source}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -190,34 +182,44 @@ export default function FinancePage() {
                   transactions.map((t) => (
                     <TableRow key={t.id}>
                       <TableCell>
-                        {format(new Date(t.createdAt), "dd MMM HH:mm", { locale: es })}
+                        {t.processedAt || t.createdAt
+                          ? format(new Date(t.processedAt || t.createdAt), "dd MMM HH:mm", { locale: es })
+                          : "-"}
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-mono text-xs text-muted-foreground">
-                            {t.paymentIntentId || "-"}
+                            {t.providerTransactionId || "-"}
                           </span>
                           <span className="text-sm font-medium">
-                            Ord: {t.orderNumber || t.id.slice(0, 8)}
+                            Ord: {t.orderNumber || t.providerReference || "-"}
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell>Stripe/Card</TableCell>
+                      <TableCell>{t.paymentMethodLabel || "Tarjeta"}</TableCell>
                       <TableCell>
                         <Badge
                           variant="outline"
                           className={
-                            t.paymentStatus === "PAID" ? "border-green-500 text-green-600" :
-                            t.paymentStatus === "FAILED" ? "border-red-500 text-red-600" :
-                            t.paymentStatus === "REFUNDED" ? "border-orange-500 text-orange-600" :
-                            ""
+                            t.gatewayStatus === "approved" || t.gatewayStatus === "success"
+                              ? "border-green-500 text-green-600"
+                              : t.gatewayStatus === "failed" || t.gatewayStatus === "rejected"
+                                ? "border-red-500 text-red-600"
+                                : t.gatewayStatus === "refunded" || t.gatewayStatus === "partially_refunded"
+                                  ? "border-orange-500 text-orange-600"
+                                  : ""
                           }
                         >
-                          {t.paymentStatus}
+                          {(t.gatewayStatus || t.paymentStatus || "pending").toUpperCase()}
                         </Badge>
+                        {t.localOrderPaymentStatus && t.localOrderPaymentStatus !== t.paymentStatus ? (
+                          <p className="mt-1 text-xs text-amber-600">
+                            Local: {t.localOrderPaymentStatus}
+                          </p>
+                        ) : null}
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        {formatPrice(t.total)}
+                        {formatPrice(Number(t.approvedAmount ?? t.amount ?? 0))}
                       </TableCell>
                     </TableRow>
                   ))

@@ -61,7 +61,6 @@ export function TopSales({ products, className }: TopSalesProps) {
           name: product.name,
           slug: product.slug,
           priceUSD: product.priceUSD ?? product.variants?.[0]?.priceUSD ?? null,
-          priceMNs: null,
           images: product.images || [],
         },
         productVariant: null,

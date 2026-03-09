@@ -42,21 +42,7 @@ export class CreateProductDto {
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  priceMNs?: number;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
   comparePriceUSD?: number;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  comparePriceMNs?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()

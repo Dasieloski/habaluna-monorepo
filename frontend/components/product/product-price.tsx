@@ -2,9 +2,7 @@ import { toNumber } from "@/lib/money"
 
 interface ProductPriceProps {
   priceUSD?: number
-  priceMNs?: number
   comparePriceUSD?: number
-  comparePriceMNs?: number
   variant?: "default" | "large"
 }
 

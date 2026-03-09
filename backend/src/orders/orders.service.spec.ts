@@ -19,7 +19,6 @@ describe('OrdersService', () => {
     id: 'product-1',
     name: 'Test Product',
     priceUSD: 10.0,
-    priceMNs: null,
     stock: 10,
     isActive: true,
   };

@@ -106,7 +106,6 @@ export default function CartPage() {
           name: product.name,
           slug: product.slug,
           priceUSD: product.priceUSD ?? product.variants?.[0]?.priceUSD ?? null,
-          priceMNs: product.priceMNs ?? product.variants?.[0]?.priceMNs ?? null,
           images: product.images || [],
           adultsOnly: !!(product as any).adultsOnly,
         },
@@ -115,7 +114,6 @@ export default function CartPage() {
               id: product.variants[0].id,
               name: product.variants[0].name || "Variante",
               priceUSD: product.variants[0].priceUSD ?? null,
-              priceMNs: product.variants[0].priceMNs ?? null,
             }
           : null,
         quantity: 1,

@@ -5,10 +5,48 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CartService } from '../cart/cart.service';
-import { convertToUSD } from '../common/utils/currency.utils';
 import { EmailService } from '../common/email/email.service';
 import { OffersService } from '../offers/offers.service';
 import { TransportConfigService } from '../transport-config/transport-config.service';
+
+const orderItemProductSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  description: true,
+  shortDescription: true,
+  priceUSD: true,
+  comparePriceUSD: true,
+  sku: true,
+  stock: true,
+  isActive: true,
+  isFeatured: true,
+  isCombo: true,
+  adultsOnly: true,
+  images: true,
+  allergens: true,
+  nutritionalInfo: true,
+  weight: true,
+  categoryId: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+const orderItemVariantSelect = {
+  id: true,
+  productId: true,
+  name: true,
+  priceUSD: true,
+  comparePriceUSD: true,
+  sku: true,
+  stock: true,
+  weight: true,
+  unit: true,
+  isActive: true,
+  order: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
 
 @Injectable()
 export class OrdersService {
@@ -71,7 +109,7 @@ export class OrdersService {
       // Obtener precio ACTUAL desde BD
       const product = await this.prisma.product.findUnique({
         where: { id: item.productId },
-        select: { priceUSD: true, priceMNs: true }
+        select: { priceUSD: true }
       });
       
       if (!product) {
@@ -81,25 +119,11 @@ export class OrdersService {
       const variant = item.productVariantId 
         ? await this.prisma.productVariant.findUnique({
             where: { id: item.productVariantId },
-            select: { priceUSD: true, priceMNs: true }
+            select: { priceUSD: true }
           })
         : null;
       
-      // Usar precio de variante si existe, sino del producto
-      let priceInUSD = 0;
-      if (variant) {
-        if (variant.priceUSD) {
-          priceInUSD = Number(variant.priceUSD);
-        } else if (variant.priceMNs) {
-          priceInUSD = convertToUSD(Number(variant.priceMNs), 'MNs');
-        }
-      } else {
-        if (product.priceUSD) {
-          priceInUSD = Number(product.priceUSD);
-        } else if (product.priceMNs) {
-          priceInUSD = convertToUSD(Number(product.priceMNs), 'MNs');
-        }
-      }
+      const priceInUSD = Number(variant?.priceUSD ?? product.priceUSD ?? 0);
       
       validatedSubtotal += priceInUSD * item.quantity;
     }
@@ -114,8 +138,7 @@ export class OrdersService {
     const subtotal = validatedSubtotal;
     const tax = 0;
     const itemCount = cart.items.reduce((s, i) => s + i.quantity, 0);
-    const transportConfig = await this.transportConfig.getPublic();
-    const { shipping } = this.transportConfig.computeShipping(itemCount, transportConfig);
+    const { shipping } = await this.transportConfig.estimate(itemCount, subtotal);
 
     // Aplicar cupón/offer en backend (si viene código)
     let discountTotal = 0;
@@ -162,22 +185,7 @@ export class OrdersService {
         paymentStatus: 'PENDING',
         items: {
           create: cart.items.map((item) => {
-            let priceInUSD = 0;
-            if (item.productVariant) {
-              // Priorizar precio USD, si no existe convertir desde MNs
-              if (item.productVariant.priceUSD) {
-                priceInUSD = Number(item.productVariant.priceUSD);
-              } else if (item.productVariant.priceMNs) {
-                priceInUSD = convertToUSD(Number(item.productVariant.priceMNs), 'MNs');
-              }
-            } else {
-              // Priorizar precio USD, si no existe convertir desde MNs
-              if (item.product.priceUSD) {
-                priceInUSD = Number(item.product.priceUSD);
-              } else if (item.product.priceMNs) {
-                priceInUSD = convertToUSD(Number(item.product.priceMNs), 'MNs');
-              }
-            }
+            const priceInUSD = Number(item.productVariant?.priceUSD ?? item.product.priceUSD ?? 0);
             return {
               productId: item.productId,
               productVariantId: item.productVariantId || null,
@@ -191,8 +199,12 @@ export class OrdersService {
       include: {
         items: {
           include: {
-            product: true,
-            productVariant: true,
+            product: {
+              select: orderItemProductSelect,
+            },
+            productVariant: {
+              select: orderItemVariantSelect,
+            },
           },
         },
       },
@@ -215,8 +227,12 @@ export class OrdersService {
       include: {
         items: {
           include: {
-            product: true,
-            productVariant: true,
+            product: {
+              select: orderItemProductSelect,
+            },
+            productVariant: {
+              select: orderItemVariantSelect,
+            },
           },
         },
         user: {
@@ -243,8 +259,12 @@ export class OrdersService {
       include: {
         items: {
           include: {
-            product: true,
-            productVariant: true,
+            product: {
+              select: orderItemProductSelect,
+            },
+            productVariant: {
+              select: orderItemVariantSelect,
+            },
           },
         },
         user: {
@@ -276,8 +296,12 @@ export class OrdersService {
       include: {
         items: {
           include: {
-            product: true,
-            productVariant: true,
+            product: {
+              select: orderItemProductSelect,
+            },
+            productVariant: {
+              select: orderItemVariantSelect,
+            },
           },
         },
         user: {
@@ -316,8 +340,12 @@ export class OrdersService {
       include: {
         items: {
           include: {
-            product: true,
-            productVariant: true,
+            product: {
+              select: orderItemProductSelect,
+            },
+            productVariant: {
+              select: orderItemVariantSelect,
+            },
           },
         },
       },
@@ -345,8 +373,12 @@ export class OrdersService {
       include: {
         items: {
           include: {
-            product: true,
-            productVariant: true,
+            product: {
+              select: orderItemProductSelect,
+            },
+            productVariant: {
+              select: orderItemVariantSelect,
+            },
           },
         },
       },

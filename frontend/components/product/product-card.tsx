@@ -24,9 +24,7 @@ interface ProductCardProps {
     name: string
     images?: string[]
     priceUSD?: number
-    priceMNs?: number
     comparePriceUSD?: number
-    comparePriceMNs?: number
     averageRating?: number | string | null
     reviewCount?: number
     adultsOnly?: boolean
@@ -34,9 +32,7 @@ interface ProductCardProps {
       id?: string
       name?: string
       priceUSD?: number
-      priceMNs?: number
       comparePriceUSD?: number
-      comparePriceMNs?: number
     }>
   }
   badge?: string
@@ -85,7 +81,6 @@ function ProductCardContent({
           name: product.name,
           slug: product.slug,
           priceUSD: product.priceUSD ?? product.variants?.[0]?.priceUSD ?? null,
-          priceMNs: product.priceMNs ?? product.variants?.[0]?.priceMNs ?? null,
           images: product.images || [],
           adultsOnly: product.adultsOnly ?? false,
         },
@@ -94,7 +89,6 @@ function ProductCardContent({
               id: product.variants?.[0]?.id as string,
               name: (product.variants?.[0] as { name?: string })?.name || "Variante",
               priceUSD: (product.variants?.[0] as { priceUSD?: number })?.priceUSD ?? null,
-              priceMNs: (product.variants?.[0] as { priceMNs?: number })?.priceMNs ?? null,
             }
           : null,
         quantity: 1,

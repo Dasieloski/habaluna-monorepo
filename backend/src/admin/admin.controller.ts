@@ -6,6 +6,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { ContentService } from '../content/content.service';
+import { PaymentsService } from '../payments/payments.service';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -16,65 +17,198 @@ export class AdminController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly contentService: ContentService,
+    private readonly paymentsService: PaymentsService,
   ) {}
 
   @Get('dashboard/stats')
   @ApiOperation({ summary: 'Get dashboard statistics' })
   async getDashboardStats() {
-    // Calcular estadísticas reales desde la BD
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const sixtyDaysAgo = new Date(now);
+    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+    const sixMonthsAgo = new Date(now);
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const twelveMonthsAgo = new Date(now);
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    const thisYearStart = new Date(now.getFullYear(), 0, 1);
+    const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
+
     const [
-      totalOrders,
-      totalRevenue,
       totalUsers,
       totalProducts,
-      ordersWithPayment,
+      totalOrders,
+      totalPaidOrders,
+      totalRevenueAgg,
       recentOrders,
+      ordersCurrentPeriod,
+      ordersPreviousPeriod,
+      paidOrdersCurrentPeriod,
+      paidOrdersPreviousPeriod,
+      recurringCurrent,
+      recurringPrevious,
+      newCustomersCurrent,
+      newCustomersPrevious,
+      subscriberSources,
+      paidOrdersForSalesChart,
+      ordersThisYear,
+      ordersLastYear,
     ] = await Promise.all([
-      this.prisma.order.count({
-        where: { paymentStatus: 'PAID' },
-      }),
+      this.prisma.user.count(),
+      this.prisma.product.count({ where: { isActive: true } }),
+      this.prisma.order.count(),
+      this.prisma.order.count({ where: { paymentStatus: 'PAID' } }),
       this.prisma.order.aggregate({
         where: { paymentStatus: 'PAID' },
         _sum: { total: true },
-      }),
-      this.prisma.user.count(),
-      this.prisma.product.count({ where: { isActive: true } }),
-      this.prisma.order.findMany({
-        where: { paymentStatus: 'PAID' },
-        take: 100,
-        orderBy: { createdAt: 'desc' },
-        include: { user: { select: { email: true, firstName: true, lastName: true } } },
       }),
       this.prisma.order.findMany({
         take: 10,
         orderBy: { createdAt: 'desc' },
         include: { user: { select: { email: true, firstName: true, lastName: true } } },
       }),
+      this.prisma.order.count({
+        where: {
+          createdAt: { gte: thirtyDaysAgo },
+        },
+      }),
+      this.prisma.order.count({
+        where: {
+          createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
+        },
+      }),
+      this.prisma.order.findMany({
+        where: {
+          paymentStatus: 'PAID',
+          createdAt: { gte: thirtyDaysAgo },
+        },
+        select: {
+          userId: true,
+          total: true,
+          createdAt: true,
+        },
+      }),
+      this.prisma.order.findMany({
+        where: {
+          paymentStatus: 'PAID',
+          createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
+        },
+        select: {
+          userId: true,
+          total: true,
+          createdAt: true,
+        },
+      }),
+      this.prisma.order.groupBy({
+        by: ['userId'],
+        where: {
+          paymentStatus: 'PAID',
+          createdAt: { gte: thirtyDaysAgo },
+        },
+        _count: { userId: true },
+      }),
+      this.prisma.order.groupBy({
+        by: ['userId'],
+        where: {
+          paymentStatus: 'PAID',
+          createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
+        },
+        _count: { userId: true },
+      }),
+      this.prisma.user.count({
+        where: {
+          createdAt: { gte: thirtyDaysAgo },
+        },
+      }),
+      this.prisma.user.count({
+        where: {
+          createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo },
+        },
+      }),
+      this.prisma.newsletterSubscriber.groupBy({
+        by: ['source'],
+        _count: { source: true },
+      }),
+      this.prisma.order.findMany({
+        where: {
+          paymentStatus: 'PAID',
+          createdAt: { gte: sixMonthsAgo },
+        },
+        select: {
+          total: true,
+          createdAt: true,
+        },
+      }),
+      this.prisma.order.findMany({
+        where: {
+          paymentStatus: 'PAID',
+          createdAt: { gte: thisYearStart },
+        },
+        select: {
+          total: true,
+          createdAt: true,
+        },
+      }),
+      this.prisma.order.findMany({
+        where: {
+          paymentStatus: 'PAID',
+          createdAt: { gte: lastYearStart, lt: thisYearStart },
+        },
+        select: {
+          total: true,
+          createdAt: true,
+        },
+      }),
     ]);
 
-    // Calcular ventas por mes (últimos 6 meses)
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-    
-    const monthlyOrders = await this.prisma.order.findMany({
-      where: {
-        paymentStatus: 'PAID',
-        createdAt: { gte: sixMonthsAgo },
-      },
-      select: {
-        total: true,
-        createdAt: true,
-      },
-    });
+    const totalRevenue = Number(totalRevenueAgg._sum.total) || 0;
 
-    // Agrupar por mes y contar pedidos
-    const salesByMonth = monthlyOrders.reduce((acc: any, order: any) => {
-      const month = new Date(order.createdAt).toLocaleString('es-ES', { month: 'short', year: 'numeric' });
-      if (!acc[month]) {
-        acc[month] = { month, revenue: 0, orders: 0 };
+    const currentPeriodRevenue = paidOrdersCurrentPeriod.reduce(
+      (sum, order: any) => sum + Number(order.total || 0),
+      0,
+    );
+    const previousPeriodRevenue = paidOrdersPreviousPeriod.reduce(
+      (sum, order: any) => sum + Number(order.total || 0),
+      0,
+    );
+
+    const avgOrderValue = totalPaidOrders > 0 ? totalRevenue / totalPaidOrders : 0;
+    const previousAvgOrderValue =
+      paidOrdersPreviousPeriod.length > 0
+        ? previousPeriodRevenue / paidOrdersPreviousPeriod.length
+        : 0;
+    const currentAvgOrderValue =
+      paidOrdersCurrentPeriod.length > 0
+        ? currentPeriodRevenue / paidOrdersCurrentPeriod.length
+        : avgOrderValue;
+
+    const conversionRate =
+      ordersCurrentPeriod > 0 ? (paidOrdersCurrentPeriod.length / ordersCurrentPeriod) * 100 : 0;
+    const previousConversionRate =
+      ordersPreviousPeriod > 0 ? (paidOrdersPreviousPeriod.length / ordersPreviousPeriod) * 100 : 0;
+
+    const returningCustomers = recurringCurrent.filter(
+      (entry: any) => Number(entry._count.userId) > 1,
+    ).length;
+    const previousReturningCustomers = recurringPrevious.filter(
+      (entry: any) => Number(entry._count.userId) > 1,
+    ).length;
+
+    const salesByMonthMap = paidOrdersForSalesChart.reduce((acc: any, order: any) => {
+      const monthKey = new Date(order.createdAt).toISOString().slice(0, 7);
+      if (!acc[monthKey]) {
+        acc[monthKey] = {
+          month: new Date(order.createdAt).toLocaleString('es-ES', {
+            month: 'short',
+            year: 'numeric',
+          }),
+          revenue: 0,
+          orders: 0,
+        };
       }
-      acc[month].revenue += Number(order.total) || 0;
-      acc[month].orders += 1;
+      acc[monthKey].revenue += Number(order.total) || 0;
+      acc[monthKey].orders += 1;
       return acc;
     }, {});
 
@@ -166,49 +300,80 @@ export class AdminController {
       color: ['#7dd3fc', '#fb923c', '#fcd34d', '#a78bfa', '#6ee7b7', '#f472b6', '#94a3b8', '#f87171'][Object.keys(categoryRevenue).indexOf(c.name) % 8],
     }));
 
-    // Comparativa anual: este año vs año anterior por mes
-    const now = new Date();
-    const thisYearStart = new Date(now.getFullYear(), 0, 1);
-    const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const ordersThisYear = await this.prisma.order.findMany({
-      where: { paymentStatus: 'PAID', createdAt: { gte: thisYearStart } },
-      select: { total: true, createdAt: true },
-    });
-    const ordersLastYear = await this.prisma.order.findMany({
-      where: { paymentStatus: 'PAID', createdAt: { gte: lastYearStart, lt: thisYearStart } },
-      select: { total: true, createdAt: true },
-    });
     const byMonthThis: Record<number, number> = {};
     const byMonthLast: Record<number, number> = {};
-    monthNames.forEach((_, i) => {
-      byMonthThis[i] = 0;
-      byMonthLast[i] = 0;
+    monthNames.forEach((_, index) => {
+      byMonthThis[index] = 0;
+      byMonthLast[index] = 0;
     });
-    ordersThisYear.forEach((o: any) => {
-      const m = new Date(o.createdAt).getMonth();
-      byMonthThis[m] = (byMonthThis[m] || 0) + Number(o.total);
+
+    ordersThisYear.forEach((order: any) => {
+      const month = new Date(order.createdAt).getMonth();
+      byMonthThis[month] = (byMonthThis[month] || 0) + Number(order.total || 0);
     });
-    ordersLastYear.forEach((o: any) => {
-      const m = new Date(o.createdAt).getMonth();
-      byMonthLast[m] = (byMonthLast[m] || 0) + Number(o.total);
+    ordersLastYear.forEach((order: any) => {
+      const month = new Date(order.createdAt).getMonth();
+      byMonthLast[month] = (byMonthLast[month] || 0) + Number(order.total || 0);
     });
-    const monthlyComparison = monthNames.map((month, i) => ({
-      month,
-      thisYear: Math.round(byMonthThis[i] || 0),
-      lastYear: Math.round(byMonthLast[i] || 0),
-    }));
+
+    const rawTrafficSources = subscriberSources
+      .map((entry: any) => ({
+        source: entry.source || 'Desconocido',
+        visits: Number(entry._count.source || 0),
+      }))
+      .filter((entry: any) => entry.visits > 0)
+      .sort((a: any, b: any) => b.visits - a.visits);
+
+    const totalTrafficSignals =
+      rawTrafficSources.reduce((sum: number, entry: any) => sum + entry.visits, 0) || 1;
+
+    const trafficSources = rawTrafficSources.length
+      ? rawTrafficSources.map((entry: any) => ({
+          source: entry.source,
+          visits: entry.visits,
+          percentage: Math.round((entry.visits / totalTrafficSignals) * 100),
+        }))
+      : [{ source: 'Sin datos', visits: 0, percentage: 0 }];
+
+    const percentageDelta = (current: number, previous: number) => {
+      if (!previous) {
+        return current > 0 ? 100 : 0;
+      }
+      return ((current - previous) / previous) * 100;
+    };
 
     return {
       overview: {
-        totalRevenue: Number(totalRevenue._sum.total) || 0,
+        totalRevenue,
         totalOrders,
         totalUsers,
         totalProducts,
+        refundedAmount: 0,
+        financialSource: 'ordenes-pagadas-conciliadas',
+        successfulTransactions: totalPaidOrders,
+        failedTransactions: Math.max(totalOrders - totalPaidOrders, 0),
       },
-      salesByMonth: Object.values(salesByMonth),
+      performance: {
+        avgOrderValue: Number(currentAvgOrderValue.toFixed(2)),
+        avgOrderValueChange: Number(percentageDelta(currentAvgOrderValue, previousAvgOrderValue).toFixed(1)),
+        conversionRate: Number(conversionRate.toFixed(1)),
+        conversionRateChange: Number(percentageDelta(conversionRate, previousConversionRate).toFixed(1)),
+        newCustomers: newCustomersCurrent,
+        newCustomersChange: newCustomersCurrent - newCustomersPrevious,
+        returningCustomers,
+        returningCustomersChange: Number(
+          percentageDelta(returningCustomers, previousReturningCustomers).toFixed(1),
+        ),
+      },
+      salesByMonth: Object.values(salesByMonthMap),
       salesByCategory,
-      monthlyComparison,
+      monthlyComparison: monthNames.map((month, index) => ({
+        month,
+        thisYear: Math.round(byMonthThis[index] || 0),
+        lastYear: Math.round(byMonthLast[index] || 0),
+      })),
+      trafficSources,
       inventory: {
         lowStockCount,
         outOfStockCount,
@@ -287,32 +452,6 @@ export class AdminController {
   async markAlertResolved(@Param('id') id: string) {
     // En una implementación real, esto actualizaría el estado en BD
     return { id, status: 'RESOLVED' };
-  }
-
-  @Get('returns')
-  @ApiOperation({ summary: 'Get return requests' })
-  async getReturnRequests() {
-    // Por ahora retornar array vacío (implementar cuando haya tabla de returns)
-    return [];
-  }
-
-  @Patch('returns/:id')
-  @ApiOperation({ summary: 'Update return status' })
-  async updateReturnStatus(@Param('id') id: string, @Body() body: { status: string }) {
-    return { id, status: body.status };
-  }
-
-  @Get('refunds')
-  @ApiOperation({ summary: 'Get refunds' })
-  async getRefunds() {
-    // Por ahora retornar array vacío (implementar cuando haya tabla de refunds)
-    return [];
-  }
-
-  @Post('refunds')
-  @ApiOperation({ summary: 'Process refund' })
-  async processRefund(@Body() body: { returnId: string; amount: number; method: string; reason: string }) {
-    return { id: `refund-${Date.now()}`, ...body, status: 'PROCESSED', createdAt: new Date() };
   }
 
   @Get('carts/abandoned')

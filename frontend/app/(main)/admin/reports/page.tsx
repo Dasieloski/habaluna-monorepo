@@ -51,7 +51,12 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <BarChart3 className="h-8 w-8 text-muted-foreground" />
-        <h1 className="text-3xl font-bold tracking-tight">Reportes y Analytics</h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Reportes y Analytics</h1>
+          <p className="text-sm text-muted-foreground">
+            Ingresos sincronizados desde {stats.overview?.financialSource || "supernova"}
+          </p>
+        </div>
       </div>
       
       {/* KPIs */}
@@ -63,7 +68,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatPrice(stats.overview?.totalRevenue || 0)}</div>
-            <p className="text-xs text-muted-foreground">Ventas históricas</p>
+            <p className="text-xs text-muted-foreground">Ventas históricas según la pasarela</p>
           </CardContent>
         </Card>
         <Card>

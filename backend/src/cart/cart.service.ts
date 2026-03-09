@@ -2,7 +2,22 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service';
 import { AddToCartDto } from './dto/add-to-cart.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
-import { convertToUSD } from '../common/utils/currency.utils';
+
+const productVariantSelect = {
+  id: true,
+  productId: true,
+  name: true,
+  priceUSD: true,
+  comparePriceUSD: true,
+  sku: true,
+  stock: true,
+  weight: true,
+  unit: true,
+  isActive: true,
+  order: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
 
 @Injectable()
 export class CartService {
@@ -21,9 +36,7 @@ export class CartService {
               description: true,
               shortDescription: true,
               priceUSD: true,
-              priceMNs: true,
               comparePriceUSD: true,
-              comparePriceMNs: true,
               sku: true,
               stock: true,
               isActive: true,
@@ -46,7 +59,9 @@ export class CartService {
               },
             },
           },
-          productVariant: true,
+          productVariant: {
+            select: productVariantSelect,
+          },
         },
       })
       .catch(async (error) => {
@@ -67,9 +82,7 @@ export class CartService {
                   description: true,
                   shortDescription: true,
                   priceUSD: true,
-                  priceMNs: true,
                   comparePriceUSD: true,
-                  comparePriceMNs: true,
                   sku: true,
                   stock: true,
                   isActive: true,
@@ -92,7 +105,9 @@ export class CartService {
                   },
                 },
               },
-              productVariant: true,
+              productVariant: {
+                select: productVariantSelect,
+              },
             },
           });
         }
@@ -100,23 +115,7 @@ export class CartService {
       });
 
     const subtotal = cartItems.reduce((sum, item) => {
-      // Usar precio de la variante si existe, sino el precio del producto
-      let priceInUSD = 0;
-      if (item.productVariant) {
-        // Priorizar precio USD, si no existe convertir desde MNs
-        if (item.productVariant.priceUSD) {
-          priceInUSD = Number(item.productVariant.priceUSD);
-        } else if (item.productVariant.priceMNs) {
-          priceInUSD = convertToUSD(Number(item.productVariant.priceMNs), 'MNs');
-        }
-      } else {
-        // Priorizar precio USD, si no existe convertir desde MNs
-        if (item.product.priceUSD) {
-          priceInUSD = Number(item.product.priceUSD);
-        } else if (item.product.priceMNs) {
-          priceInUSD = convertToUSD(Number(item.product.priceMNs), 'MNs');
-        }
-      }
+      const priceInUSD = Number(item.productVariant?.priceUSD ?? item.product.priceUSD ?? 0);
       return sum + priceInUSD * item.quantity;
     }, 0);
 
@@ -138,9 +137,7 @@ export class CartService {
           description: true,
           shortDescription: true,
           priceUSD: true,
-          priceMNs: true,
           comparePriceUSD: true,
-          comparePriceMNs: true,
           sku: true,
           stock: true,
           isActive: true,
@@ -176,9 +173,7 @@ export class CartService {
               description: true,
               shortDescription: true,
               priceUSD: true,
-              priceMNs: true,
               comparePriceUSD: true,
-              comparePriceMNs: true,
               sku: true,
               stock: true,
               isActive: true,
@@ -263,9 +258,7 @@ export class CartService {
       description: true,
       shortDescription: true,
       priceUSD: true,
-      priceMNs: true,
       comparePriceUSD: true,
-      comparePriceMNs: true,
       sku: true,
       stock: true,
       isActive: true,
@@ -298,7 +291,9 @@ export class CartService {
             product: {
               select: productSelect,
             },
-            productVariant: true,
+            productVariant: {
+              select: productVariantSelect,
+            },
           },
         })
         .catch(async (error) => {
@@ -316,7 +311,9 @@ export class CartService {
                 product: {
                   select: productSelect,
                 },
-                productVariant: true,
+                productVariant: {
+                  select: productVariantSelect,
+                },
               },
             });
           }
@@ -336,7 +333,9 @@ export class CartService {
           product: {
             select: productSelect,
           },
-          productVariant: true,
+          productVariant: {
+            select: productVariantSelect,
+          },
         },
       })
       .catch(async (error) => {
@@ -356,7 +355,9 @@ export class CartService {
               product: {
                 select: productSelect,
               },
-              productVariant: true,
+              productVariant: {
+                select: productVariantSelect,
+              },
             },
           });
         }
@@ -367,7 +368,12 @@ export class CartService {
   async updateCartItem(userId: string, itemId: string, updateDto: UpdateCartItemDto) {
     const item = await this.prisma.cartItem.findFirst({
       where: { id: itemId, userId },
-      include: { product: true, productVariant: true },
+      include: {
+        product: true,
+        productVariant: {
+          select: productVariantSelect,
+        },
+      },
     });
 
     if (!item) {
@@ -423,9 +429,7 @@ export class CartService {
       description: true,
       shortDescription: true,
       priceUSD: true,
-      priceMNs: true,
       comparePriceUSD: true,
-      comparePriceMNs: true,
       sku: true,
       stock: true,
       isActive: true,
@@ -455,7 +459,9 @@ export class CartService {
           product: {
             select: productSelect,
           },
-          productVariant: true,
+          productVariant: {
+            select: productVariantSelect,
+          },
         },
       })
       .catch(async (error) => {
@@ -471,7 +477,9 @@ export class CartService {
               product: {
                 select: productSelect,
               },
-              productVariant: true,
+              productVariant: {
+                select: productVariantSelect,
+              },
             },
           });
         }
@@ -511,9 +519,7 @@ export class CartService {
       description: true,
       shortDescription: true,
       priceUSD: true,
-      priceMNs: true,
       comparePriceUSD: true,
-      comparePriceMNs: true,
       sku: true,
       stock: true,
       isActive: true,
@@ -543,7 +549,9 @@ export class CartService {
           product: {
             select: productSelect,
           },
-          productVariant: true,
+          productVariant: {
+            select: productVariantSelect,
+          },
         },
       })
       .catch(async (error) => {
@@ -558,7 +566,9 @@ export class CartService {
               product: {
                 select: productSelect,
               },
-              productVariant: true,
+              productVariant: {
+                select: productVariantSelect,
+              },
             },
           });
         }

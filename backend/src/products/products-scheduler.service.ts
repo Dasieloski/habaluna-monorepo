@@ -4,6 +4,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../common/email/email.service';
 import { ConfigService } from '@nestjs/config';
 
+const lowStockVariantSelect = {
+  id: true,
+  name: true,
+  stock: true,
+} as const;
+
 @Injectable()
 export class ProductsSchedulerService {
   private readonly logger = new Logger(ProductsSchedulerService.name);
@@ -53,6 +59,7 @@ export class ProductsSchedulerService {
                 lte: threshold,
               },
             },
+            select: lowStockVariantSelect,
           },
         },
         orderBy: {

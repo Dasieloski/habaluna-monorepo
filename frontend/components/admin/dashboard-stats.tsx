@@ -80,44 +80,50 @@ export function DashboardStats({ isLoaded }: DashboardStatsProps) {
       color: "bg-accent" 
     },
   ]
+  const financialSource = stats.overview?.financialSource || "supernova"
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-      {statsData.map((stat, index) => (
-        <Card
-          key={stat.label}
-          className={cn(
-            "border-0 shadow-md overflow-hidden transition-all duration-500 hover-lift",
-            isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-          )}
-          style={{ transitionDelay: `${100 + index * 100}ms` }}
-        >
-          <CardContent className="p-5">
-            <div className="flex items-start justify-between">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground font-medium">{stat.label}</p>
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                <div className="flex items-center gap-1.5">
-                  {stat.trend === "up" ? (
-                    <TrendingUp className="w-4 h-4 text-primary" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4 text-destructive" />
-                  )}
-                  <span className={cn("text-sm font-medium", stat.trend === "up" ? "text-primary" : "text-destructive")}>
-                    {stat.change}
-                  </span>
-                  <span className="text-xs text-muted-foreground">vs mes anterior</span>
+    <div className="space-y-2">
+      <p className="text-xs text-muted-foreground">
+        Ingresos y transacciones sincronizados desde {financialSource}
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {statsData.map((stat, index) => (
+          <Card
+            key={stat.label}
+            className={cn(
+              "border-0 shadow-md overflow-hidden transition-all duration-500 hover-lift",
+              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+            )}
+            style={{ transitionDelay: `${100 + index * 100}ms` }}
+          >
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground font-medium">{stat.label}</p>
+                  <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                  <div className="flex items-center gap-1.5">
+                    {stat.trend === "up" ? (
+                      <TrendingUp className="w-4 h-4 text-primary" />
+                    ) : (
+                      <TrendingDown className="w-4 h-4 text-destructive" />
+                    )}
+                    <span className={cn("text-sm font-medium", stat.trend === "up" ? "text-primary" : "text-destructive")}>
+                      {stat.change}
+                    </span>
+                    <span className="text-xs text-muted-foreground">vs mes anterior</span>
+                  </div>
+                </div>
+                <div
+                  className={cn("w-12 h-12 rounded-xl flex items-center justify-center", stat.color)}
+                >
+                  <stat.icon className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <div
-                className={cn("w-12 h-12 rounded-xl flex items-center justify-center", stat.color)}
-              >
-                <stat.icon className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   )
 }

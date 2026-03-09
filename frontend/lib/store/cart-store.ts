@@ -10,7 +10,6 @@ export interface CartItem {
     name: string;
     slug: string;
     priceUSD?: number | string | null;
-    priceMNs?: number | string | null;
     images: string[];
     adultsOnly?: boolean;
   };
@@ -18,7 +17,6 @@ export interface CartItem {
     id: string;
     name: string;
     priceUSD?: number | string | null;
-    priceMNs?: number | string | null;
   } | null;
   quantity: number;
 }
@@ -43,7 +41,9 @@ function toNumber(value: any): number {
 
 function computeSubtotal(items: CartItem[]): number {
   return items.reduce((sum, item) => {
-    const price = item.productVariant ? toNumber(item.productVariant.priceUSD ?? item.productVariant.priceMNs) : toNumber(item.product.priceUSD ?? item.product.priceMNs);
+    const price = item.productVariant
+      ? toNumber(item.productVariant.priceUSD)
+      : toNumber(item.product.priceUSD);
     return sum + price * item.quantity;
   }, 0);
 }

@@ -15,13 +15,23 @@ import {
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, Truck, CreditCard, User, MapPin, Calendar, Mail, Printer } from "lucide-react"
+import { ArrowLeft, Truck, CreditCard, User, MapPin, Calendar, Mail, Printer, RefreshCw } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import { printTableOnly } from "@/lib/table-export-print"
 import { ExportTableDropdown } from "@/components/admin/export-table-dropdown"
+
+const gatewayStatusMap: Record<string, { label: string; color: string }> = {
+  approved: { label: "Aprobado", color: "border-green-500 text-green-600" },
+  success: { label: "Exitoso", color: "border-green-500 text-green-600" },
+  pending: { label: "Pendiente", color: "border-yellow-500 text-yellow-600" },
+  failed: { label: "Fallido", color: "border-red-500 text-red-600" },
+  rejected: { label: "Rechazado", color: "border-red-500 text-red-600" },
+  refunded: { label: "Reembolsado", color: "border-orange-500 text-orange-600" },
+  partially_refunded: { label: "Parcial", color: "border-orange-500 text-orange-600" },
+}
 
 export default function AdminOrderDetailPage() {
   const { id } = useParams()
@@ -30,6 +40,7 @@ export default function AdminOrderDetailPage() {
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
+  const [syncingPayment, setSyncingPayment] = useState(false)
 
   useEffect(() => {
     if (id) loadOrder()
@@ -41,7 +52,19 @@ export default function AdminOrderDetailPage() {
       const orders = await api.getAdminOrders()
       const found = orders.find((o: any) => o.id === id)
       if (found) {
-        setOrder(found)
+        let reconciliation: any = null
+        try {
+          reconciliation = await api.getAdminOrderPaymentReconciliation(found.id)
+        } catch (error) {
+          console.error("Error loading payment reconciliation:", error)
+        }
+
+        setOrder({
+          ...found,
+          gatewayTransaction: reconciliation?.gateway ?? null,
+          hasGatewayTransaction: reconciliation?.hasGatewayTransaction ?? false,
+          hasGatewayMismatch: reconciliation?.hasMismatch ?? false,
+        })
       } else {
         toast({
           title: "Error",
@@ -54,6 +77,41 @@ export default function AdminOrderDetailPage() {
       console.error("Error loading order:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePaymentResync = async () => {
+    if (!order?.id) return
+
+    try {
+      setSyncingPayment(true)
+      const reconciliation = await api.resyncAdminOrderPayment(order.id)
+
+      setOrder((current: any) =>
+        current
+          ? {
+              ...current,
+              paymentStatus: reconciliation?.local?.paymentStatus ?? current.paymentStatus,
+              paymentIntentId: reconciliation?.local?.paymentIntentId ?? current.paymentIntentId,
+              gatewayTransaction: reconciliation?.gateway ?? current.gatewayTransaction,
+              hasGatewayTransaction: reconciliation?.hasGatewayTransaction ?? current.hasGatewayTransaction,
+              hasGatewayMismatch: reconciliation?.hasMismatch ?? current.hasGatewayMismatch,
+            }
+          : current,
+      )
+
+      toast({
+        title: "Pago resincronizado",
+        description: "Se actualizó el estado del pago desde la pasarela.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo resincronizar el estado del pago.",
+        variant: "destructive",
+      })
+    } finally {
+      setSyncingPayment(false)
     }
   }
 
@@ -73,28 +131,6 @@ export default function AdminOrderDetailPage() {
       toast({
         title: "Error",
         description: "No se pudo actualizar el estado",
-        variant: "destructive",
-      })
-    } finally {
-      setUpdating(false)
-    }
-  }
-
-  const handlePaymentStatusChange = async (newStatus: string) => {
-    try {
-      setUpdating(true)
-      await api.updateOrderStatus(order.id, order.status, newStatus)
-      
-      toast({
-        title: "Estado de pago actualizado",
-        description: `El pago ahora está ${newStatus}`,
-      })
-      
-      loadOrder()
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo actualizar el pago",
         variant: "destructive",
       })
     } finally {
@@ -253,21 +289,68 @@ export default function AdminOrderDetailPage() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Estado del Pago</label>
-                <Select 
-                  value={order.paymentStatus} 
-                  onValueChange={handlePaymentStatusChange}
-                  disabled={updating}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PENDING">Pendiente</SelectItem>
-                    <SelectItem value="PAID">Pagado</SelectItem>
-                    <SelectItem value="FAILED">Fallido</SelectItem>
-                    <SelectItem value="REFUNDED">Reembolsado</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="rounded-md border p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <Badge variant="outline">{order.paymentStatus}</Badge>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        Se sincroniza desde la pasarela
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePaymentResync}
+                        loading={syncingPayment}
+                        loadingText="Sincronizando"
+                      >
+                        {!syncingPayment ? <RefreshCw className="h-4 w-4" /> : null}
+                        Resincronizar
+                      </Button>
+                    </div>
+                  </div>
+                  {order.paymentIntentId ? (
+                    <p className="mt-2 font-mono text-xs text-muted-foreground">
+                      Transacción: {order.paymentIntentId}
+                    </p>
+                  ) : null}
+                  {order.gatewayTransaction ? (
+                    <div className="mt-3 space-y-2 border-t pt-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          Estado en Supernova
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className={gatewayStatusMap[order.gatewayTransaction.gatewayStatus]?.color || ""}
+                        >
+                          {gatewayStatusMap[order.gatewayTransaction.gatewayStatus]?.label ||
+                            order.gatewayTransaction.gatewayStatus}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Monto aprobado: {formatPrice(Number(order.gatewayTransaction.approvedAmount ?? order.gatewayTransaction.amount ?? 0))}
+                      </p>
+                      {order.gatewayTransaction.providerTransactionId ? (
+                        <p className="font-mono text-xs text-muted-foreground">
+                          ID Supernova: {order.gatewayTransaction.providerTransactionId}
+                        </p>
+                      ) : null}
+                      {order.hasGatewayMismatch ? (
+                        <p className="text-xs font-medium text-amber-600">
+                          Hay desfase entre el estado local y el estado real de la pasarela.
+                        </p>
+                      ) : (
+                        <p className="text-xs text-green-600">
+                          Estado local alineado con la pasarela.
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="mt-3 border-t pt-3 text-xs text-muted-foreground">
+                      Aún no hay datos de transacción recuperados desde la pasarela.
+                    </p>
+                  ) : null}
+                </div>
               </div>
             </CardContent>
           </Card>
