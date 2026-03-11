@@ -40,35 +40,36 @@
 }
 
 :root {
-  --background: #eae6dd;
-  --foreground: #323232;
+  --font-premium: "Inter", "Avenir Next", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --background: #f4f7ff;
+  --foreground: #111827;
 
   --card: #ffffff;
-  --card-foreground: #323232;
+  --card-foreground: #0f172a;
   --popover: #ffffff;
-  --popover-foreground: #323232;
+  --popover-foreground: #0f172a;
 
-  --primary: #4d69a5;
+  --primary: #3b82f6;
   --primary-foreground: #ffffff;
 
-  --accent: #5ba8a6;
+  --accent: #8b5cf6;
   --accent-foreground: #ffffff;
 
-  --secondary: #ecd386;
-  --secondary-foreground: #323232;
+  --secondary: #22d3ee;
+  --secondary-foreground: #082f49;
 
-  --muted: #f2f0ea;
-  --muted-foreground: #6b6b6b;
+  --muted: #eef2ff;
+  --muted-foreground: #475569;
 
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
 
-  --highlight: #ecd386;
-  --highlight-foreground: #323232;
+  --highlight: #22d3ee;
+  --highlight-foreground: #082f49;
 
-  --border: rgba(50, 50, 50, 0.14);
-  --input: rgba(50, 50, 50, 0.18);
-  --ring: #4d69a5;
+  --border: rgba(15, 23, 42, 0.12);
+  --input: rgba(15, 23, 42, 0.16);
+  --ring: #3b82f6;
 
   --radius: 0.625rem;
   --radius-xl: 0.875rem;
@@ -83,7 +84,7 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
   --transition: 200ms ease;
-  --font-sans: "Kaluar", system-ui, sans-serif;
+  --font-sans: var(--font-premium), "Kaluar", system-ui, sans-serif;
   --font-display: "The Choed", cursive;
   --font-heading: "Galafera", system-ui, sans-serif;
   --font-banner: "Makira", system-ui, sans-serif;
@@ -99,33 +100,33 @@
 
 .dark {
   --background: #0D0D0D;
-  --foreground: #eae6dd;
+  --foreground: #e2e8f0;
 
-  --card: #323232;
-  --card-foreground: #eae6dd;
-  --popover: #323232;
-  --popover-foreground: #eae6dd;
+  --card: #0f172a;
+  --card-foreground: #e2e8f0;
+  --popover: #0f172a;
+  --popover-foreground: #e2e8f0;
 
-  --primary: #5ba8a6;
-  --primary-foreground: #0D0D0D;
+  --primary: #60a5fa;
+  --primary-foreground: #020617;
 
-  --accent: #ecd386;
-  --accent-foreground: #0D0D0D;
+  --accent: #a78bfa;
+  --accent-foreground: #020617;
 
-  --secondary: #3d3d3d;
-  --secondary-foreground: #eae6dd;
-  --muted: #2a2a2a;
-  --muted-foreground: rgba(234, 230, 221, 0.75);
+  --secondary: #0b2545;
+  --secondary-foreground: #dbeafe;
+  --muted: #0b1120;
+  --muted-foreground: rgba(226, 232, 240, 0.76);
 
   --destructive: #ef4444;
   --destructive-foreground: #0D0D0D;
 
-  --highlight: #ecd386;
-  --highlight-foreground: #323232;
+  --highlight: #22d3ee;
+  --highlight-foreground: #082f49;
 
   --border: rgba(234, 230, 221, 0.16);
-  --input: #323232;
-  --ring: #5ba8a6;
+  --input: #1e293b;
+  --ring: #60a5fa;
 
   --sidebar: #323232;
   --sidebar-foreground: #eae6dd;
@@ -138,7 +139,7 @@
 }
 
 @theme inline {
-  --font-sans: "Kaluar", system-ui, sans-serif;
+  --font-sans: var(--font-premium), "Kaluar", system-ui, sans-serif;
   --font-mono: "Geist Mono", monospace;
   --font-display: "The Choed", cursive;
   --font-heading: "Galafera", system-ui, sans-serif;
