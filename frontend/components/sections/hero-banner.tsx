@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { ChevronRightIcon } from "@/components/icons/streamline-icons"
 import { SmartImage } from "@/components/ui/smart-image"
+import { MoonHero } from "@/components/3d/moon-hero"
 
 interface Banner {
   id: string
@@ -48,8 +49,6 @@ const defaultBanners: Banner[] = [
 export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
-  const touchStartXRef = useRef<number | null>(null)
-  const touchStartYRef = useRef<number | null>(null)
   // Importante:
   // - `banners === undefined` => el componente no recibió datos, usar defaults (modo demo)
   // - `banners` es [] => no hay banners activos/configurados, NO usar defaults hardcodeados
@@ -87,104 +86,99 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
     return null
   }
 
+  const currentBanner = displayBanners[currentSlide]
+
   return (
-    <section className="relative overflow-hidden">
-      <div
-        className="relative transition-colors duration-700 ease-out dark:!bg-background"
-        style={{ backgroundColor: displayBanners[currentSlide]?.backgroundColor || "#e0f2fe" }}
-      >
-        <div
-          className="relative min-h-[450px] md:min-h-[550px]"
-          style={{ touchAction: "pan-y" }}
-          onTouchStart={(e) => {
-            if (displayBanners.length <= 1) return
-            const t = e.touches[0]
-            touchStartXRef.current = t?.clientX ?? null
-            touchStartYRef.current = t?.clientY ?? null
-          }}
-          onTouchEnd={(e) => {
-            if (displayBanners.length <= 1) return
-            const startX = touchStartXRef.current
-            const startY = touchStartYRef.current
-            touchStartXRef.current = null
-            touchStartYRef.current = null
-            if (startX === null || startY === null) return
+    <section className="relative overflow-hidden bg-black text-white">
+      {/* Luna 3D gigante en el fondo */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-80 z-0">
+        <div className="w-[320px] h-[320px] md:w-[480px] md:h-[480px] lg:w-[560px] lg:h-[560px]">
+          <MoonHero />
+        </div>
+      </div>
 
-            const t = e.changedTouches[0]
-            const endX = t?.clientX ?? startX
-            const endY = t?.clientY ?? startY
-            const dx = endX - startX
-            const dy = endY - startY
+      {/* Degradado superior/inferior para integrar con el resto del sitio */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent pointer-events-none z-0" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent pointer-events-none z-0" />
 
-            // Solo swipe horizontal claro, para no interferir con scroll vertical
-            if (Math.abs(dx) < 40) return
-            if (Math.abs(dx) < Math.abs(dy) * 1.2) return
+      <div className="container mx-auto max-w-6xl px-4 md:px-8 py-16 md:py-24 relative z-10">
+        <div className="flex flex-col items-center text-center gap-6 md:gap-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs md:text-sm font-medium tracking-wide uppercase">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Envíos a Cuba sin complicaciones</span>
+          </div>
 
-            if (dx < 0) nextSlide()
-            else prevSlide()
-          }}
-        >
-          {displayBanners.map((banner, index) => (
-            <div
-              key={banner.id}
-              className={`absolute inset-0 transition-opacity duration-200 ease-out ${
-                index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
-              }`}
+          <div className="space-y-4 md:space-y-5 max-w-2xl">
+            <h1 className="font-heading text-3xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight text-balance">
+              {currentBanner?.title || "Compra productos de nuestras marcas seleccionadas"}
+            </h1>
+            {currentBanner?.subtitle && (
+              <p className="text-base md:text-lg text-slate-200/90 max-w-xl mx-auto text-pretty">
+                {currentBanner.subtitle}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
+            {currentBanner?.buttonText && (
+              <a
+                href={currentBanner.link || "#"}
+                aria-label={currentBanner.buttonText}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-white text-black px-5 py-2.5 md:px-6 md:py-3 text-sm md:text-base font-medium shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:bg-slate-100 transition-colors"
+              >
+                {currentBanner.buttonText}
+                <ChevronRightIcon className="w-4 h-4" />
+              </a>
+            )}
+            <a
+              href="/products"
+              className="text-sm md:text-base font-medium text-slate-100/85 hover:text-white underline-offset-4 hover:underline"
             >
-              <div className="relative h-full min-h-[450px] md:min-h-[550px]">
-                {banner.image && (
-                  <SmartImage
-                    src={banner.image}
-                    alt={banner.title}
-                    fill
-                    className="object-cover"
-                    sizes="100vw"
-                    objectFit="cover"
-                    priority
-                  />
-                )}
-                {/* Overlay sutil directamente sobre la imagen - degradado suave, opacidad baja */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/12 to-transparent pointer-events-none" />
-                
-                <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-16">
-                  <div className="max-w-xl relative z-10">
-                    <h1 className="font-heading text-3xl md:text-5xl font-bold text-white mb-3 md:mb-4 tracking-tight leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
-                      {banner.title}
-                    </h1>
-                    {banner.subtitle && (
-                      <p className="text-base md:text-lg text-white/95 mb-6 md:mb-8 font-normal drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
-                        {banner.subtitle}
-                      </p>
-                    )}
-                    {banner.buttonText && (
-                      <a
-                        href={banner.link || "#"}
-                        aria-label={banner.buttonText}
-                        className="inline-flex items-center gap-2 bg-white text-foreground px-5 py-2.5 rounded-lg font-medium hover:bg-white/90 transition-colors duration-200 text-sm"
-                      >
-                        {banner.buttonText}
-                        <ChevronRightIcon className="w-4 h-4" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
+              Ver catálogo completo
+            </a>
+          </div>
+
+          {/* Info de carrusel: indicador + descripción breve */}
+          {displayBanners.length > 1 && (
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs md:text-sm text-slate-300/80">
+              <span className="rounded-full bg-white/5 px-3 py-1 border border-white/10">
+                {currentSlide + 1} / {displayBanners.length}
+              </span>
+              <span className="hidden sm:inline">
+                Desliza o selecciona una categoría para ver más.
+              </span>
             </div>
-          ))}
+          )}
         </div>
 
-        {/* Dots - sin botones de navegación lateral */}
+        {/* Tarjeta del carrusel sobre la luna */}
+        {currentBanner?.image && (
+          <div className="mt-10 md:mt-14 flex justify-center">
+            <div className="relative w-[260px] h-[160px] md:w-[360px] md:h-[200px] lg:w-[420px] lg:h-[220px] rounded-3xl bg-black/60 border border-white/15 shadow-[0_0_40px_rgba(255,255,255,0.05)] backdrop-blur-xl overflow-hidden aspect-video">
+              <SmartImage
+                src={currentBanner.image}
+                alt={currentBanner.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 80vw, 40vw"
+                objectFit="cover"
+                priority
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Dots de navegación del carrusel */}
         {displayBanners.length > 1 && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-            {displayBanners.map((_, index) => (
+          <div className="mt-10 flex items-center justify-center gap-2">
+            {displayBanners.map((banner, index) => (
               <button
-                key={index}
+                key={banner.id}
                 onClick={() => goToSlide(index)}
                 aria-label={`Ir a slide ${index + 1}`}
                 aria-current={index === currentSlide ? "true" : "false"}
-                className={`h-1.5 rounded-full transition-all duration-200 ${
-                  index === currentSlide ? "bg-white w-6" : "bg-white/50 w-1.5 hover:bg-white/70"
-                }`}
+                className={`h-1.5 rounded-full transition-all duration-200 ${index === currentSlide ? "bg-white w-6" : "bg-white/40 w-1.5 hover:bg-white/70"
+                  }`}
               />
             ))}
           </div>

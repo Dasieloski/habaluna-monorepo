@@ -22,6 +22,7 @@ const nextConfig = {
 
     const connectSrc = [
       "'self'",
+      'blob:',
       'https://*.railway.app',
       'https://*.vercel.app',
       'https://vercel.live',
@@ -74,7 +75,8 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value:
               "default-src 'self'; " +
-              "script-src 'self' 'unsafe-inline' https://vercel.live; " +
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://vercel.live https://ajax.googleapis.com; " +
+              "worker-src 'self' blob:; " +
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
               "font-src 'self' https://fonts.gstatic.com data:; " +
               "img-src 'self' data: https: http: blob:; " +
