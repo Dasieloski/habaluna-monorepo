@@ -118,7 +118,8 @@ export default async function Home() {
   const featuredProducts = allProducts.filter((p: any) => !!p?.isFeatured)
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f8faff_0%,#f4f7ff_34%,#eef4ff_100%)] dark:bg-[linear-gradient(180deg,#020617_0%,#030712_45%,#01040d_100%)]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_18%,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_86%_12%,rgba(139,92,246,0.16),transparent_34%),radial-gradient(circle_at_54%_75%,rgba(34,211,238,0.1),transparent_38%)]" />
       <HeroBanner banners={banners} />
 
       <ProductCarousel

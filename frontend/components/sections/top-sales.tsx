@@ -86,24 +86,24 @@ export function TopSales({ products, className }: TopSalesProps) {
   const getComparePrice = (product: Product) => toNumber(product.variants?.[0]?.comparePriceUSD ?? product.comparePriceUSD)
 
   return (
-    <section className={`py-16 md:py-24 bg-background ${className ?? ""}`}>
+    <section className={`py-20 md:py-24 ${className ?? ""}`}>
       <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-        <div className="flex items-center justify-between mb-8 md:mb-10">
-          <h2 className="font-heading text-xl md:text-2xl font-semibold text-foreground">Top Ventas</h2>
+        <div className="mb-8 md:mb-10 flex items-end justify-between gap-4">
+          <div className="space-y-2"><p className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Best sellers</p><h2 className="font-heading text-2xl md:text-3xl font-semibold tracking-tight text-foreground">Top Ventas</h2></div>
           <Link
             href="/products?filter=top"
-            className="text-sm font-medium text-primary hover:underline transition-opacity duration-200"
+            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:-translate-y-0.5 hover:border-sky-300 hover:text-sky-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-cyan-300/60 dark:hover:text-cyan-300"
           >
             Ver todo
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 gap-5 rounded-[2rem] border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/70 p-4 shadow-[0_25px_70px_rgba(15,23,42,0.1)] sm:grid-cols-2 lg:grid-cols-5 md:gap-6 dark:border-white/10 dark:from-white/[0.07] dark:to-white/[0.02]">
           <Link
             href={`/products/${featuredProduct.slug}`}
             className="col-span-2 lg:row-span-2 group"
           >
-            <div className="relative h-full bg-card rounded-xl overflow-hidden border border-border hover-card">
+            <div className="relative h-full overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.1)] transition duration-300 group-hover:-translate-y-1.5 group-hover:shadow-[0_28px_64px_rgba(99,102,241,0.2)] dark:border-white/10 dark:bg-white/[0.03]">
               <div className="aspect-[4/3] lg:aspect-auto lg:h-full relative overflow-hidden">
                 <SmartImage
                   src={featuredProduct.images?.[0] || ''}
@@ -164,7 +164,7 @@ export function TopSales({ products, className }: TopSalesProps) {
 
           {otherProducts.map((product) => (
             <Link key={product.id} href={`/products/${product.slug}`} className="group">
-              <div className="relative bg-card rounded-xl overflow-hidden h-full border border-border hover-card">
+              <div className="relative h-full overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.1)] transition duration-300 group-hover:-translate-y-1.5 group-hover:shadow-[0_28px_64px_rgba(14,165,233,0.2)] dark:border-white/10 dark:bg-white/[0.03]">
                 <div className="aspect-square relative overflow-hidden">
                   <SmartImage
                     src={product.images?.[0] || ''}

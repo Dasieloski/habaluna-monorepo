@@ -17,41 +17,26 @@ interface CategoryGridProps {
   title?: string
 }
 
-// Eliminadas imágenes estáticas - solo usar imágenes de la BD o placeholder
-
 export function CategoryGrid({ categories, variant = "cards", title }: CategoryGridProps) {
-  if (!categories || categories.length === 0) return null
+  if (!categories?.length) return null
 
   if (variant === "circles") {
     return (
-      <section className="py-16 md:py-24 bg-background">
-        <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          {title && (
-            <h2 className="font-heading text-xl md:text-2xl font-semibold text-foreground text-center mb-10 md:mb-12">
-              {title}
-            </h2>
-          )}
-          <div className="grid grid-cols-3 md:flex md:flex-wrap md:justify-center gap-8 md:gap-12">
-            {categories.slice(0, 6).map((category) => (
+      <section className="py-20 md:py-24">
+        <div className="container mx-auto max-w-6xl px-4 md:px-6">
+          {title && <h2 className="mb-12 text-center font-heading text-2xl md:text-3xl font-semibold tracking-tight">{title}</h2>}
+          <div className="grid grid-cols-3 gap-8 md:flex md:flex-wrap md:justify-center md:gap-12">
+            {categories.slice(0, 6).map((category, index) => (
               <Link
                 key={category.id}
                 href={`/products?categoryId=${category.id}`}
-                aria-label={`Ver productos de ${category.name}`}
-                className="group flex flex-col items-center"
+                className="group flex flex-col items-center gap-3 animate-fade-in-up"
+                style={{ animationDelay: `${index * 60}ms` }}
               >
-                <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden bg-card mb-3 border border-border hover-card relative">
-                  <SmartImage
-                    src={getImageUrl(category.image) || ''}
-                    alt={category.name}
-                    fill
-                    className="object-cover transition-transform duration-200 group-hover:scale-105"
-                    sizes="(max-width: 768px) 33vw, 200px"
-                    objectFit="cover"
-                  />
+                <div className="relative h-20 w-20 overflow-hidden rounded-full border border-slate-200/90 bg-white shadow-[0_12px_30px_rgba(15,23,42,0.08)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_18px_38px_rgba(14,165,233,0.2)] md:h-28 md:w-28 dark:border-white/10 dark:bg-white/[0.04]">
+                  <SmartImage src={getImageUrl(category.image) || ""} alt={category.name} fill className="object-cover transition-transform duration-500 group-hover:scale-110" sizes="(max-width: 768px) 33vw, 180px" objectFit="cover" />
                 </div>
-                <span className="text-xs md:text-sm font-medium text-foreground text-center group-hover:text-primary transition-colors duration-200 line-clamp-1">
-                  {category.name}
-                </span>
+                <span className="line-clamp-1 text-center text-xs font-medium text-foreground/90 transition-colors group-hover:text-sky-600 md:text-sm dark:group-hover:text-cyan-300">{category.name}</span>
               </Link>
             ))}
           </div>
@@ -62,28 +47,21 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
 
   if (variant === "banners") {
     return (
-      <section className="py-16 md:py-24 bg-muted/30">
-        <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {categories.slice(0, 4).map((category) => (
+      <section className="py-20 md:py-24">
+        <div className="container mx-auto max-w-6xl px-4 md:px-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {categories.slice(0, 4).map((category, index) => (
               <Link
                 key={category.id}
                 href={`/products?categoryId=${category.id}`}
-                aria-label={`Ver productos de ${category.name}`}
-                className="group relative aspect-[3/4] rounded-xl overflow-hidden bg-card border border-border hover-card"
+                className="group relative aspect-[3/4] overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.12)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(14,165,233,0.2)] dark:border-white/10 dark:bg-white/[0.03] animate-fade-in-up"
+                style={{ animationDelay: `${index * 70}ms` }}
               >
-                <SmartImage
-                  src={getImageUrl(category.image) || ''}
-                  alt={category.name}
-                  fill
-                  className="object-cover transition-transform duration-200 group-hover:scale-105"
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                  objectFit="cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 z-10">
-                  <h3 className="text-white text-sm md:text-base font-semibold drop-shadow-md">{category.name}</h3>
-                  <span className="text-white/90 text-xs mt-1 inline-block">Ver más</span>
+                <SmartImage src={getImageUrl(category.image) || ""} alt={category.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 768px) 90vw, 25vw" objectFit="cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#060812]/78 via-[#060812]/20 to-transparent" />
+                <div className="absolute bottom-5 left-5 right-5">
+                  <h3 className="text-lg font-semibold text-white">{category.name}</h3>
+                  <span className="mt-1 inline-block text-[11px] uppercase tracking-[0.16em] text-slate-200">Ver más</span>
                 </div>
               </Link>
             ))}
@@ -94,28 +72,21 @@ export function CategoryGrid({ categories, variant = "cards", title }: CategoryG
   }
 
   return (
-    <section className="py-16 md:py-24 bg-background">
-      <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {categories.slice(0, 4).map((category) => (
+    <section className="py-20 md:py-24">
+      <div className="container mx-auto max-w-6xl px-4 md:px-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {categories.slice(0, 4).map((category, index) => (
             <Link
               key={category.id}
               href={`/products?categoryId=${category.id}`}
-              aria-label={`Ver productos de ${category.name}`}
-              className="group relative aspect-[4/5] md:aspect-square rounded-xl overflow-hidden bg-card border border-border hover-card"
+              className="group relative aspect-[4/5] overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_14px_40px_rgba(15,23,42,0.12)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(99,102,241,0.2)] md:aspect-square dark:border-white/10 dark:bg-white/[0.03] animate-fade-in-up"
+              style={{ animationDelay: `${index * 70}ms` }}
             >
-              <SmartImage
-                src={getImageUrl(category.image) || ''}
-                alt={category.name}
-                fill
-                className="object-cover transition-transform duration-200 group-hover:scale-105"
-                sizes="(max-width: 768px) 50vw, 25vw"
-                objectFit="cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 z-10">
-                <h3 className="text-white text-base md:text-lg font-semibold drop-shadow-md">{category.name}</h3>
-                <span className="text-white/90 text-xs mt-1 inline-block">Explorar</span>
+              <SmartImage src={getImageUrl(category.image) || ""} alt={category.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 768px) 90vw, 25vw" objectFit="cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#060812]/72 via-[#060812]/18 to-transparent" />
+              <div className="absolute bottom-5 left-5 right-5">
+                <h3 className="text-xl font-semibold text-white">{category.name}</h3>
+                <span className="mt-1 inline-block text-[11px] uppercase tracking-[0.16em] text-slate-200">Explorar</span>
               </div>
             </Link>
           ))}

@@ -145,14 +145,14 @@ function ProductCardContent({
   const cardInner = (
     <>
       {/* Imagen: aspecto cuadrado, marco interior redondeado (estilo material/glass) */}
-      <div className="relative aspect-square overflow-hidden rounded-t-xl md:rounded-t-2xl bg-muted">
-        <div className="absolute inset-2 md:inset-3 rounded-lg md:rounded-xl bg-card overflow-hidden shadow-inner">
+      <div className="relative aspect-square overflow-hidden rounded-t-[1.35rem] bg-gradient-to-br from-slate-100 to-slate-200/70 dark:from-slate-900 dark:to-slate-950">
+        <div className="absolute inset-2.5 md:inset-3 rounded-xl bg-white/95 dark:bg-slate-950 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.26)]">
           <SmartImage
             src={currentImage}
             alt={product.name}
             fill
             priority={priority}
-            className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             objectFit="cover"
           />
@@ -197,7 +197,7 @@ function ProductCardContent({
       </div>
 
       {/* Detalles: título > precio > acciones, padding consistente */}
-      <div className="flex flex-col flex-1 min-w-0 p-3 md:p-4 gap-2 md:gap-3 bg-card rounded-b-xl md:rounded-b-2xl">
+      <div className="flex flex-col flex-1 min-w-0 p-4 md:p-5 gap-2.5 md:gap-3.5 bg-white dark:bg-slate-950 rounded-b-[1.35rem]">
         <h3 className="font-medium text-foreground text-sm md:text-base line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-200">
           {product.name}
         </h3>
@@ -210,7 +210,7 @@ function ProductCardContent({
         )}
         <div className="mt-auto flex items-end justify-between gap-2 flex-wrap">
           <div className="flex items-baseline gap-1.5 md:gap-2">
-            <span className="text-base md:text-lg font-bold text-primary">${price.toFixed(2)}</span>
+            <span className="text-base md:text-lg font-bold text-primary tracking-tight">${price.toFixed(2)}</span>
             {hasDiscount && (
               <span className="text-xs md:text-sm text-muted-foreground line-through">${comparePrice!.toFixed(2)}</span>
             )}
@@ -235,7 +235,7 @@ function ProductCardContent({
     <>
       <Link
         href={`/products/${product.slug}`}
-        className="group block h-full rounded-xl overflow-hidden border border-border bg-card text-left shadow-sm hover-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99]"
+        className="group block h-full overflow-hidden rounded-[1.35rem] border border-slate-200/80 bg-white text-left shadow-[0_18px_48px_rgba(30,64,175,0.12)] transition-all duration-300 hover:-translate-y-2 hover:border-blue-200 hover:shadow-[0_30px_70px_rgba(59,130,246,0.2)] dark:border-white/10 dark:bg-slate-950 dark:hover:border-cyan-300/30 dark:hover:shadow-[0_24px_56px_rgba(59,130,246,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99]"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

@@ -25,6 +25,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle"
 export function Header() {
   const router = useRouter()
   const pathname = usePathname()
+  const isHome = pathname === "/"
   const searchParams = useSearchParams()
   const { user, logout } = useAuthStore()
   const authed = useAuthStore((s) => s.user !== null && !!s.accessToken)
@@ -203,38 +204,32 @@ export function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 bg-background dark:bg-card shadow-sm transition-transform duration-200 ease-out ${
-          isHidden ? "-translate-y-full" : "translate-y-0"
-        }`}
+        className={`sticky top-0 z-50 transition-transform duration-300 ease-out ${isHome ? "backdrop-blur-2xl bg-white/70 dark:bg-slate-950/70 border-b border-slate-200/70 dark:border-white/10 shadow-[0_18px_50px_rgba(30,64,175,0.16)]" : "bg-background dark:bg-card shadow-sm"} ${isHidden ? "-translate-y-full" : "translate-y-0"}`}
       >
       <div
-        className={`border-b text-foreground text-xs md:text-sm py-3 md:py-3.5 text-center bg-background dark:bg-card ${
-          ui.announcementVariant === "promo"
-            ? "border-accent"
-            : "border-border"
-        }`}
+        className={`text-foreground text-xs md:text-sm py-3 text-center ${isHome ? "bg-gradient-to-r from-slate-950 via-blue-950 to-violet-950 text-slate-100 border-b border-slate-800/80" : "bg-background dark:bg-card border-b " + (ui.announcementVariant === "promo" ? "border-accent" : "border-border")}`}
       >
         <p>{ui.announcement}</p>
       </div>
 
-      <div className="relative z-20 border-b border-border/50 bg-background dark:bg-card">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between h-16 md:h-18">
+      <div className={`relative z-20 ${isHome ? "bg-transparent" : "border-b border-border/50 bg-background dark:bg-card"}`}>
+        <div className={`container mx-auto px-4 md:px-6 ${isHome ? "max-w-6xl" : ""}`}>
+          <div className={`flex items-center justify-between ${isHome ? "h-[84px]" : "h-16 md:h-18"}`}>
             <button
-              className="md:hidden p-2 -ml-2 hover:bg-muted rounded-lg transition-colors duration-200"
+              className="md:hidden p-2 -ml-2 hover:bg-muted/80 rounded-xl transition-all duration-200"
               onClick={() => setMobileMenuOpen((v) => !v)}
             >
               {mobileMenuOpen ? <CloseIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
             </button>
 
             <Link href="/" className="flex items-center shrink-0">
-              <span className="font-logo text-2xl md:text-4xl text-foreground">
+              <span className={`font-logo ${isHome ? "text-3xl md:text-4xl tracking-tight" : "text-2xl md:text-4xl"} text-foreground drop-shadow-[0_2px_10px_rgba(59,130,246,0.18)]`}>
                 Habaluna
               </span>
             </Link>
 
             {/* Búsqueda desktop: centrada en la fila principal */}
-            <div className="hidden md:flex flex-1 min-w-0 mx-4 md:mx-8 md:max-w-md">
+            <div className="hidden md:flex flex-1 min-w-0 mx-4 md:mx-10 md:max-w-xl">
               <SearchAutocomplete
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -246,12 +241,12 @@ export function Header() {
             </div>
 
             {/* Right icons */}
-            <div className="flex items-center gap-1 md:gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 md:gap-2.5 shrink-0">
               <ThemeToggle className="shrink-0" />
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="p-2.5 hover:bg-muted rounded-lg transition-colors duration-200"
+                  className="p-2.5 hover:bg-gradient-to-br hover:from-blue-100/80 hover:to-violet-100/80 dark:hover:from-blue-500/20 dark:hover:to-violet-500/20 rounded-xl transition-all duration-200"
                 >
                   <UserIcon className="w-5 h-5" />
                 </button>
@@ -405,14 +400,14 @@ export function Header() {
               </div>
               <Link
                 href="/wishlist"
-                className="heart-btn p-2.5 hover:bg-muted rounded-lg transition-colors duration-200 hidden md:flex text-red-500"
+                className="heart-btn hidden md:flex p-2.5 rounded-xl text-red-500 transition-all duration-200 hover:bg-muted/80 hover:-translate-y-0.5"
               >
                 <HeartIcon className="w-5 h-5" />
               </Link>
               <Link
                 href="/cart"
                 data-contextual-toast-cart
-                className={`cart-btn p-2.5 hover:bg-muted rounded-lg transition-colors duration-200 relative text-foreground ${cartBounce ? 'animate-bounce' : ''}`}
+                className={`cart-btn p-2.5 rounded-xl transition-all duration-200 relative text-foreground hover:bg-muted/80 hover:-translate-y-0.5 ${cartBounce ? 'animate-bounce' : ''}`}
               >
                 <CartIcon className="w-5 h-5" />
                 {mounted && cartCount > 0 && (
@@ -437,9 +432,9 @@ export function Header() {
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:block border-t border-border/30">
+        <nav className={`hidden md:block ${isHome ? "" : "border-t border-border/30"}`}>
           <div className="container mx-auto px-4 md:px-6">
-            <ul className="flex items-center justify-center gap-0">
+            <ul className="flex items-center justify-center gap-1">
               {navItems.map((item) => {
                 const itemCategoryId = (item.href.match(/categoryId=([^&]+)/) || [])[1]
                 const currentCategoryId = searchParams?.get("categoryId") ?? null
@@ -448,7 +443,7 @@ export function Header() {
                   <li key={item.name}>
                     <Link
                       href={item.href}
-                      className={`flex items-center px-5 py-4 text-sm font-medium rounded-lg transition-colors duration-200 hover:bg-muted ${isActive ? "text-primary" : "text-foreground"}`}
+                      className={`flex items-center px-5 py-3.5 text-sm font-semibold rounded-full transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-violet-50 dark:hover:from-blue-500/15 dark:hover:to-violet-500/15 hover:-translate-y-0.5 ${isActive ? "text-primary bg-primary/10" : "text-foreground"}`}
                     >
                       {item.name}
                     </Link>
@@ -460,7 +455,7 @@ export function Header() {
         </nav>
       </div>
 
-      <div className="relative z-10 bg-muted/50 dark:bg-background py-3 md:py-3.5 border-b border-border">
+      <div className={`relative z-10 py-3 md:py-3.5 ${isHome ? "bg-white/70 dark:bg-slate-950/58 border-y border-slate-200/80 dark:border-white/10 backdrop-blur-xl" : "bg-muted/50 dark:bg-background border-b border-border"}`}>
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-center gap-6 md:gap-12 text-xs md:text-sm overflow-x-auto scrollbar-hide text-muted-foreground">
             <div className="flex items-center gap-2 whitespace-nowrap shrink-0">
