@@ -383,7 +383,6 @@ function ProductCardContent({
             VER PRODUCTO
           </div>
         )}
-      >
         <article className="flex flex-col h-full">
           {cardInner}
         </article>
