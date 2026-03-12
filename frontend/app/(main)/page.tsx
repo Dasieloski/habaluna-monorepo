@@ -119,33 +119,64 @@ export default async function Home() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f8faff_0%,#f4f7ff_34%,#eef4ff_100%)] dark:bg-[linear-gradient(180deg,#020617_0%,#030712_45%,#01040d_100%)]">
+      <style>{`
+        @keyframes sectionSlideInEnhanced {
+          0% {
+            opacity: 0;
+            transform: translateY(48px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .section-fade-in {
+          animation: sectionSlideInEnhanced 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+          animation-timeline: view();
+          animation-range: entry 0% cover 30%;
+        }
+      `}</style>
+      
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_18%,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_86%_12%,rgba(139,92,246,0.16),transparent_34%),radial-gradient(circle_at_54%_75%,rgba(34,211,238,0.1),transparent_38%)]" />
       <HeroBanner banners={banners} />
 
-      <ProductCarousel
-        title="Ofertas del Día"
-        products={offersOfDay.slice(0, 8)}
-        viewAllLink="/products?filter=offers"
-        badgeType="sale"
-        autoSlide={true}
-        className="pt-16 md:pt-24"
-      />
+      <div className="section-fade-in">
+        <ProductCarousel
+          title="Ofertas del Día"
+          products={offersOfDay.slice(0, 8)}
+          viewAllLink="/products?filter=offers"
+          badgeType="sale"
+          autoSlide={true}
+          className="pt-16 md:pt-24"
+        />
+      </div>
 
-      <CategoryGrid categories={displayCategories} variant="cards" />
+      <div className="section-fade-in">
+        <CategoryGrid categories={displayCategories} variant="cards" />
+      </div>
 
-      <TopSales products={bestSellers} className="pb-16 md:pb-20" />
+      <div className="section-fade-in">
+        <TopSales products={bestSellers} className="pb-16 md:pb-20" />
+      </div>
 
-      <ProductCarousel
-        title="Productos Destacados"
-        products={(featuredProducts.length > 0 ? featuredProducts : allProducts).slice(0, 8)}
-        viewAllLink="/products?filter=top"
-        badgeType="personalized"
-        className="pt-16 md:pt-24"
-      />
+      <div className="section-fade-in">
+        <ProductCarousel
+          title="Productos Destacados"
+          products={(featuredProducts.length > 0 ? featuredProducts : allProducts).slice(0, 8)}
+          viewAllLink="/products?filter=top"
+          badgeType="personalized"
+          className="pt-16 md:pt-24"
+        />
+      </div>
 
-      <CategoryGrid categories={circleCategories} variant="circles" title="Explora por Categoría" />
+      <div className="section-fade-in">
+        <CategoryGrid categories={circleCategories} variant="circles" title="Explora por Categoría" />
+      </div>
 
-      <CategoryGrid categories={bannerCategories} variant="banners" />
+      <div className="section-fade-in">
+        <CategoryGrid categories={bannerCategories} variant="banners" />
+      </div>
 
       <BenefitsBar />
     </div>

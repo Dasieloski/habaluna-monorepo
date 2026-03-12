@@ -350,7 +350,7 @@ function ProductCardContent({
     <>
       <Link
         href={`/products/${product.slug}`}
-        className="group block h-full overflow-hidden rounded-2xl text-left transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98]"
+        className="group block h-full overflow-hidden rounded-2xl text-left transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] relative"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {
           setIsHovered(false)
@@ -366,7 +366,23 @@ function ProductCardContent({
           boxShadow: isHovered
             ? '0 32px 72px rgba(59, 130, 246, 0.25), 0 0 1px rgba(59, 130, 246, 0.2)'
             : '0 12px 32px rgba(59, 130, 246, 0.12), 0 0 1px rgba(59, 130, 246, 0.1)',
+          cursor: isHovered ? 'none' : 'auto',
         }}
+      >
+        {/* Custom cursor on hover */}
+        {isHovered && (
+          <div
+            className="pointer-events-none fixed z-50 text-xs font-bold text-white bg-slate-900/90 px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap shadow-lg"
+            style={{
+              left: `${mouseX}px`,
+              top: `${mouseY - 24}px`,
+              transform: 'translate(-50%, -50%)',
+              animation: 'fadeSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+          >
+            VER PRODUCTO
+          </div>
+        )}
       >
         <article className="flex flex-col h-full">
           {cardInner}

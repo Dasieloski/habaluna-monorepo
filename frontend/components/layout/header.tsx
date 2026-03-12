@@ -434,9 +434,15 @@ export function Header() {
                 href="/cart"
                 className="cart-btn relative flex p-2.5 rounded-xl transition-all duration-300 hover:bg-white/20 dark:hover:bg-white/10 active:scale-95 hover:shadow-lg group"
               >
-                <CartIcon className={`w-5 h-5 transition-all duration-300 group-hover:scale-110 ${cartBounce ? "scale-125" : "scale-100"}`} />
+                <CartIcon 
+                  className={`w-5 h-5 transition-all duration-300 group-hover:scale-110 ${
+                    cartBounce ? "animate-cart-bounce" : "scale-100"
+                  }`}
+                />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 inline-flex items-center justify-center h-5 w-5 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-bold shadow-lg animate-pulse">
+                  <span className={`absolute -top-1.5 -right-1.5 inline-flex items-center justify-center h-5 w-5 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-bold shadow-lg ${
+                    cartBounce ? "animate-cart-bounce" : "animate-pulse"
+                  }`}>
                     {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
