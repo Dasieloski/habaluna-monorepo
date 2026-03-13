@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { ChevronRightIcon } from "@/components/icons/streamline-icons"
 import { SmartImage } from "@/components/ui/smart-image"
-import { MoonHero } from "@/components/3d/moon-hero"
 
 interface Banner {
   id: string
@@ -49,14 +48,19 @@ const defaultBanners: Banner[] = [
 export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
   const displayBanners = banners === undefined ? defaultBanners : banners.length > 0 ? banners : []
+
+  useEffect(() => {
+    setIsLoaded(true)
+  }, [])
 
   const goToSlide = useCallback(
     (index: number) => {
       if (isAnimating) return
       setIsAnimating(true)
       setCurrentSlide(index)
-      setTimeout(() => setIsAnimating(false), 500)
+      setTimeout(() => setIsAnimating(false), 700)
     },
     [isAnimating],
   )
@@ -69,7 +73,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
     if (displayBanners.length > 1) {
       const timer = setInterval(() => {
         nextSlide()
-      }, 5000)
+      }, 7000)
       return () => clearInterval(timer)
     }
   }, [displayBanners.length, nextSlide])
@@ -79,94 +83,126 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
   const currentBanner = displayBanners[currentSlide]
 
   return (
-    <section className="relative overflow-hidden border-b border-white/10 bg-[#030712] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(59,130,246,0.32),transparent_34%),radial-gradient(circle_at_84%_14%,rgba(139,92,246,0.34),transparent_38%),radial-gradient(circle_at_60%_75%,rgba(34,211,238,0.24),transparent_40%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,7,16,0.45),rgba(5,7,16,0.9))]" />
+    <section className="relative w-full overflow-hidden text-white" style={{ height: "clamp(400px, 80vh, 900px)" }}
+    >
+      {/* Full-width carousel background with gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-950/95" />
+      
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-1/4 w-96 h-96 rounded-full bg-blue-500/15 blur-3xl animate-float" />
+        <div className="absolute -bottom-40 right-1/4 w-96 h-96 rounded-full bg-violet-500/10 blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+      </div>
 
-      <div className="pointer-events-none absolute -left-24 top-20 hidden h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl lg:block" />
-      <div className="pointer-events-none absolute -right-24 top-32 hidden h-72 w-72 rounded-full bg-violet-500/20 blur-3xl lg:block" />
+      {/* Main carousel container - full width image with overlayed content */}
+      <div className="relative h-full w-full overflow-hidden">
+        {/* Image carousel - fills entire container */}
+        {currentBanner?.image && (
+          <div 
+            className="absolute inset-0 transition-opacity duration-700"
+            style={{
+              opacity: isAnimating ? 0 : 1,
+            }}
+          >
+            <SmartImage
+              src={currentBanner.image}
+              alt={currentBanner.title}
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+              objectFit="cover"
+            />
+            {/* Dark overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-slate-900/30 to-slate-950/60" />
+          </div>
+        )}
 
-      <div className="container relative z-10 mx-auto max-w-6xl px-4 md:px-6 py-18 md:py-24 lg:py-32">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
-          <div className="space-y-7 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-[11px] font-semibold tracking-[0.18em] uppercase backdrop-blur-xl">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 animate-pulse" />
-              Shop premium experience
-            </div>
-
-            <div className="space-y-4">
-              <h1 className="font-heading text-4xl font-semibold leading-[0.98] tracking-tight md:text-6xl lg:text-7xl xl:text-[5.2rem] text-balance">
-                {currentBanner?.title || "Compra productos de nuestras marcas seleccionadas"}
+        {/* Content overlay - centered text and CTAs */}
+        <div className="relative z-10 h-full w-full flex flex-col items-center justify-center px-3 sm:px-4 md:px-8 py-8">
+          <div className="max-w-2xl sm:max-w-3xl w-full text-center space-y-4 sm:space-y-6 md:space-y-8">
+            {/* Headline */}
+            <div className="space-y-2 sm:space-y-3 md:space-y-4">
+              <h1 
+                className={`font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight sm:leading-[1.1] tracking-tight text-white text-balance transition-all duration-700 ${
+                  isLoaded && !isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+              >
+                {currentBanner?.title || "Compra productos premium"}
               </h1>
+
+              {/* Subtitle */}
               {currentBanner?.subtitle && (
-                <p className="mx-auto max-w-2xl text-base leading-relaxed text-slate-200/90 md:text-xl lg:mx-0 text-pretty">
+                <p 
+                  className={`text-sm sm:text-base md:text-lg lg:text-xl text-white/80 leading-snug sm:leading-relaxed transition-all duration-700 ${
+                    isLoaded && !isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                  }`}
+                  style={{
+                    transitionDelay: "0.1s",
+                  }}
+                >
                   {currentBanner.subtitle}
                 </p>
               )}
             </div>
 
-            <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
+            {/* CTA Buttons */}
+            <div 
+              className={`flex flex-col xs:flex-row gap-2 sm:gap-3 md:gap-4 justify-center transition-all duration-700 w-full ${
+                isLoaded && !isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+              style={{
+                transitionDelay: "0.2s",
+              }}
+            >
               {currentBanner?.buttonText && (
                 <a
                   href={currentBanner.link || "#"}
                   aria-label={currentBanner.buttonText}
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 via-blue-300 to-violet-300 px-6 py-3 text-sm font-semibold text-slate-900 shadow-[0_22px_50px_rgba(59,130,246,0.34)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_60px_rgba(99,102,241,0.36)]"
+                  className="group inline-flex items-center justify-center gap-1 sm:gap-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base font-semibold text-slate-900 transition-all duration-300 hover:scale-105 hover:shadow-[0_24px_48px_rgba(59,130,246,0.35)] active:scale-95 w-full xs:w-auto"
                 >
                   {currentBanner.buttonText}
-                  <ChevronRightIcon className="h-4 w-4" />
+                  <ChevronRightIcon className="h-4 sm:h-5 w-4 sm:w-5 transition-transform group-hover:translate-x-1" />
                 </a>
               )}
               <a
                 href="/products"
-                className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white/90 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/15 hover:text-white"
+                className="inline-flex items-center justify-center gap-1 sm:gap-2 rounded-lg sm:rounded-xl border border-white/40 bg-white/10 backdrop-blur-xl px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base font-semibold text-white transition-all duration-300 hover:bg-white/20 hover:border-white/60 hover:scale-105 active:scale-95 w-full xs:w-auto"
               >
-                Ver catálogo completo
+                Ver Catálogo
               </a>
             </div>
 
+            {/* Slide indicators - bottom of hero */}
             {displayBanners.length > 1 && (
-              <div className="flex items-center justify-center gap-2 lg:justify-start">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mt-4 sm:mt-6 md:mt-8">
                 {displayBanners.map((banner, index) => (
                   <button
                     key={banner.id}
                     onClick={() => goToSlide(index)}
                     aria-label={`Ir a slide ${index + 1}`}
-                    className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide ? "w-9 bg-white" : "w-2 bg-white/45 hover:bg-white/75"}`}
+                    className={`transition-all duration-500 rounded-full ${
+                      index === currentSlide 
+                        ? "w-6 sm:w-8 h-1.5 sm:h-2 bg-gradient-to-r from-cyan-400 to-blue-400" 
+                        : "w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white/70"
+                    }`}
                   />
                 ))}
               </div>
             )}
           </div>
-
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-55">
-              <div className="h-[280px] w-[280px] md:h-[380px] md:w-[380px] lg:h-[460px] lg:w-[460px]">
-                <MoonHero />
-              </div>
-            </div>
-
-            {currentBanner?.image && (
-              <div className="relative z-10 overflow-hidden rounded-[2rem] border border-white/20 bg-black/35 shadow-[0_35px_90px_rgba(37,99,235,0.34)] backdrop-blur-2xl">
-                <div className="relative aspect-[16/10]">
-                  <SmartImage
-                    src={currentBanner.image}
-                    alt={currentBanner.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 95vw, 45vw"
-                    objectFit="cover"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050710]/70 via-[#050710]/20 to-transparent" />
-                </div>
-                <div className="absolute bottom-4 left-4 rounded-2xl border border-white/20 bg-black/45 px-4 py-2 text-xs text-white/90 backdrop-blur-xl md:text-sm">
-                  Slide {currentSlide + 1} / {displayBanners.length}
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+        .animate-float {
+          animation: float 8s ease-in-out infinite;
+        }
+      `}</style>
     </section>
   )
 }

@@ -130,8 +130,8 @@ export default function ProductsClient() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-6xl">
-        <h1 className="font-heading text-xl md:text-2xl font-semibold text-foreground mb-6 md:mb-8">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 lg:py-12 max-w-6xl w-full">
+        <h1 className="font-heading text-lg sm:text-xl md:text-2xl font-semibold text-foreground mb-4 sm:mb-6 md:mb-8">
           {searchParams.get('filter') === 'combos' ? 'Combos' : 'Productos'}
         </h1>
 
@@ -150,10 +150,10 @@ export default function ProductsClient() {
         {/* Loading */}
         {loading ? (
           <AnimatedList
-            staggerDelay={0.03}
+            staggerDelay={0.05}
             enableAnimations={true}
             animateOnViewport={false}
-            className="grid gap-4 md:gap-6 grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))]"
+            className="grid gap-3 sm:gap-4 md:gap-6 lg:gap-8 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           >
             {Array.from({ length: 8 }).map((_, index) => (
               <ProductCardSkeleton key={index} />
@@ -181,33 +181,64 @@ export default function ProductsClient() {
         ) : (
           <>
             <div aria-live="polite" aria-label="Listado de productos">
-              <AnimatedList
-                staggerDelay={0.05}
-                enableAnimations={true}
-                animateOnViewport={true}
-                className="grid gap-4 md:gap-6 grid-cols-[repeat(auto-fill,minmax(min(100%,260px),1fr))]"
-              >
-                {pagedProducts.map((p) => (
-                <ProductCard
-                  key={p.id}
-                  product={{
-                    id: p.id,
-                    slug: p.slug,
-                    name: p.name,
-                    images: p.images,
-                    priceUSD: toNumber(p.variants?.[0]?.priceUSD ?? p.priceUSD) ?? undefined,
-                    comparePriceUSD: toNumber(p.variants?.[0]?.comparePriceUSD ?? p.comparePriceUSD) ?? undefined,
-                    adultsOnly: p.adultsOnly,
-                    variants: p.variants?.map((v: any) => ({
-                      id: v.id,
-                      name: v.name,
-                      priceUSD: v.priceUSD,
-                      comparePriceUSD: v.comparePriceUSD,
-                    })),
-                  }}
-                />
-              ))}
-              </AnimatedList>
+              <style>{`
+                @keyframes fadeInUp {
+                  from {
+                    opacity: 0;
+                    transform: translateY(24px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateY(0);
+                  }
+                }
+                
+                @keyframes fadeInUpStagger {
+                  0% {
+                    opacity: 0;
+                    transform: translateY(24px);
+                  }
+                  100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                  }
+                }
+                
+                .product-grid-item {
+                  animation: fadeInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+                }
+              `}</style>
+              
+              <div className="grid gap-3 sm:gap-4 md:gap-6 lg:gap-8 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {pagedProducts.map((p, index) => (
+                  <div
+                    key={p.id}
+                    className="product-grid-item"
+                    style={{
+                      animationDelay: `${index * 0.08}s`,
+                      animationFillMode: 'both',
+                    }}
+                  >
+                    <ProductCard
+                      product={{
+                        id: p.id,
+                        slug: p.slug,
+                        name: p.name,
+                        images: p.images,
+                        priceUSD: toNumber(p.variants?.[0]?.priceUSD ?? p.priceUSD) ?? undefined,
+                        comparePriceUSD: toNumber(p.variants?.[0]?.comparePriceUSD ?? p.comparePriceUSD) ?? undefined,
+                        adultsOnly: p.adultsOnly,
+                        variants: p.variants?.map((v: any) => ({
+                          id: v.id,
+                          name: v.name,
+                          priceUSD: v.priceUSD,
+                          comparePriceUSD: v.comparePriceUSD,
+                        })),
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
             {totalPages > 1 && (

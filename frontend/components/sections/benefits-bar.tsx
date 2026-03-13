@@ -48,19 +48,47 @@ export function BenefitsBar() {
   }, [])
 
   return (
-    <section className="py-20 md:py-24">
-      <div className="container mx-auto max-w-6xl px-4 md:px-6">
-        <div className="rounded-[2rem] border border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-sky-50/60 p-8 shadow-[0_32px_80px_rgba(15,23,42,0.12)] dark:border-white/10 dark:from-white/[0.07] dark:via-white/[0.03] dark:to-cyan-400/[0.04] md:p-12">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-24">
+      <div className="container mx-auto max-w-6xl px-3 sm:px-4 md:px-6 w-full">
+        <div 
+          className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-12 backdrop-blur-xl"
+          style={{
+            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(200, 230, 255, 0.4) 100%)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            boxShadow: "0 32px 80px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+          }}
+        >
+          <div className="grid grid-cols-1 gap-4 sm:gap-5 md:gap-6 lg:gap-8 md:grid-cols-3">
             {benefits.map((benefit, index) => {
               const IconComponent = benefit.icon
               return (
-                <div key={index} className="rounded-2xl border border-slate-200/70 bg-white/80 p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(99,102,241,0.16)] dark:border-white/10 dark:bg-white/[0.03]">
-                  <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-sky-200/90 bg-gradient-to-br from-sky-100 to-cyan-100 text-sky-700 dark:border-cyan-300/30 dark:from-cyan-300/20 dark:to-indigo-300/20 dark:text-cyan-300">
-                    <IconComponent className="h-6 w-6" />
+                <div 
+                  key={index} 
+                  className="group rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 text-center transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.6)",
+                    backdropFilter: "blur(12px)",
+                    border: "1px solid rgba(255, 255, 255, 0.25)",
+                    boxShadow: "0 8px 32px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+                  }}
+                >
+                  {/* Icon with gradient background */}
+                  <div className="mx-auto mb-2 sm:mb-3 md:mb-4 inline-flex h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 items-center justify-center rounded-lg sm:rounded-2xl transition-all duration-300 group-hover:shadow-lg group-hover:shadow-cyan-500/30"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(34, 211, 238, 0.1) 100%)",
+                      border: "1px solid rgba(59, 130, 246, 0.25)",
+                    }}
+                  >
+                    <IconComponent className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-cyan-600 dark:text-cyan-400" />
                   </div>
-                  <h3 className="mb-2 font-heading text-base font-semibold tracking-tight text-foreground md:text-lg">{benefit.title}</h3>
-                  <p className="mx-auto max-w-xs text-sm leading-relaxed text-muted-foreground">{benefit.description}</p>
+                  
+                  {/* Text content */}
+                  <h3 className="mb-2 sm:mb-2.5 md:mb-3 font-heading text-base sm:text-lg md:text-lg lg:text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors group-hover:text-primary">
+                    {benefit.title}
+                  </h3>
+                  <p className="mx-auto max-w-xs text-xs sm:text-sm leading-snug sm:leading-relaxed text-slate-700 dark:text-slate-400">
+                    {benefit.description}
+                  </p>
                 </div>
               )
             })}

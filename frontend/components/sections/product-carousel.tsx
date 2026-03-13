@@ -66,33 +66,70 @@ export function ProductCarousel({ title, products, viewAllLink, badgeType, autoS
   if (!products?.length) return null
 
   return (
-    <section className={`py-20 md:py-24 ${className ?? ""}`}>
-      <div className="container mx-auto max-w-6xl px-4 md:px-6">
-        <div className="mb-8 md:mb-10 flex items-end justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Selección editorial</p>
-            <h2 className="font-heading text-2xl md:text-3xl font-semibold tracking-tight text-foreground">{title}</h2>
+    <section className={`py-12 sm:py-16 md:py-20 lg:py-24 ${className ?? ""}`}>
+      <div className="container mx-auto max-w-6xl px-3 sm:px-4 md:px-6 w-full">
+        {/* Section header */}
+        <div className="mb-8 sm:mb-10 md:mb-12 lg:mb-14 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div className="space-y-2 sm:space-y-3">
+            <p className="text-xs uppercase tracking-widest font-semibold text-slate-500 dark:text-slate-400">Selección editorial</p>
+            <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">{title}</h2>
           </div>
           {viewAllLink && (
-            <Link href={viewAllLink} aria-label={`Ver todos los productos de ${title}`} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-all hover:-translate-y-0.5 hover:border-sky-300 hover:text-sky-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-cyan-300/60 dark:hover:text-cyan-300">
+            <Link 
+              href={viewAllLink} 
+              aria-label={`Ver todos los productos de ${title}`} 
+              className="rounded-lg sm:rounded-xl border border-slate-200/60 bg-white/70 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-slate-900 transition-all duration-300 hover:scale-105 hover:border-slate-300 hover:bg-white/90 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.05] dark:text-white dark:hover:border-cyan-300/60 dark:hover:bg-white/10 dark:hover:text-cyan-300 w-full sm:w-auto"
+              style={{
+                backdropFilter: "blur(12px)",
+              }}
+            >
               Ver todo
             </Link>
           )}
         </div>
 
-        <div className="group relative rounded-[2rem] border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/70 p-3 shadow-[0_25px_70px_rgba(15,23,42,0.1)] dark:border-white/10 dark:from-white/[0.07] dark:to-white/[0.02]">
-          <button onClick={() => scroll("left")} aria-label="Desplazar carrusel hacia la izquierda" className="absolute left-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full border border-slate-200 bg-white/95 p-2.5 shadow-sm opacity-0 transition group-hover:opacity-100 md:block dark:border-white/10 dark:bg-slate-900/90">
-            <ChevronLeftIcon className="h-5 w-5" />
+        {/* Carousel container with glass panel */}
+        <div 
+          className="group relative rounded-lg sm:rounded-2xl p-2 sm:p-3 md:p-4 transition-all duration-300"
+          style={{
+            background: "linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(200, 230, 255, 0.2) 100%)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            boxShadow: "0 25px 70px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+          }}
+        >
+          {/* Scroll buttons */}
+          <button 
+            onClick={() => scroll("left")} 
+            aria-label="Desplazar carrusel hacia la izquierda" 
+            className="absolute left-2 sm:left-3 top-1/2 z-10 hidden -translate-y-1/2 rounded-lg p-2 sm:p-2.5 opacity-0 transition-all duration-300 group-hover:opacity-100 md:block hover:scale-110 active:scale-95"
+            style={{
+              background: "rgba(255, 255, 255, 0.9)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+            }}
+          >
+            <ChevronLeftIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
-          <button onClick={() => scroll("right")} aria-label="Desplazar carrusel hacia la derecha" className="absolute right-2 top-1/2 z-10 hidden -translate-y-1/2 rounded-full border border-slate-200 bg-white/95 p-2.5 shadow-sm opacity-0 transition group-hover:opacity-100 md:block dark:border-white/10 dark:bg-slate-900/90">
-            <ChevronRightIcon className="h-5 w-5" />
+          <button 
+            onClick={() => scroll("right")} 
+            aria-label="Desplazar carrusel hacia la derecha" 
+            className="absolute right-2 sm:right-3 top-1/2 z-10 hidden -translate-y-1/2 rounded-lg p-2 sm:p-2.5 opacity-0 transition-all duration-300 group-hover:opacity-100 md:block hover:scale-110 active:scale-95"
+            style={{
+              background: "rgba(255, 255, 255, 0.9)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+            }}
+          >
+            <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
 
-          <div ref={scrollRef} className="-mx-2 flex gap-4 overflow-x-auto px-2 pb-2 scrollbar-hide md:gap-6">
+          {/* Scrollable products */}
+          <div ref={scrollRef} className="-mx-1 sm:-mx-2 flex gap-2 sm:gap-3 md:gap-4 lg:gap-6 overflow-x-auto px-1 sm:px-2 pb-1 sm:pb-2 scrollbar-hide">
             {products.map((product, index) => {
               const badge = getBadge(index)
               return (
-                <div key={product.id} className={`shrink-0 w-[175px] md:w-[248px] transition duration-500 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}>
+                <div key={product.id} className={`shrink-0 w-32 sm:w-40 md:w-48 lg:w-60 transition duration-500 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}>
                   <ProductCard product={product} badge={badge?.text} badgeColor={badge?.color} priority={index < 4} />
                 </div>
               )
