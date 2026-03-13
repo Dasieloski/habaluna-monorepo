@@ -130,8 +130,8 @@ export default function ProductsClient() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 max-w-6xl">
-        <h1 className="font-heading text-xl md:text-2xl font-semibold text-foreground mb-6 md:mb-8">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 lg:py-12 max-w-6xl w-full">
+        <h1 className="font-heading text-lg sm:text-xl md:text-2xl font-semibold text-foreground mb-4 sm:mb-6 md:mb-8">
           {searchParams.get('filter') === 'combos' ? 'Combos' : 'Productos'}
         </h1>
 
@@ -153,7 +153,7 @@ export default function ProductsClient() {
             staggerDelay={0.05}
             enableAnimations={true}
             animateOnViewport={false}
-            className="grid gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            className="grid gap-3 sm:gap-4 md:gap-6 lg:gap-8 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           >
             {Array.from({ length: 8 }).map((_, index) => (
               <ProductCardSkeleton key={index} />
@@ -209,7 +209,7 @@ export default function ProductsClient() {
                 }
               `}</style>
               
-              <div className="grid gap-6 md:gap-8 lg:gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-3 sm:gap-4 md:gap-6 lg:gap-8 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {pagedProducts.map((p, index) => (
                   <div
                     key={p.id}

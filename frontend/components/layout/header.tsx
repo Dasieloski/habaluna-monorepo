@@ -447,18 +447,6 @@ export function Header() {
                   </span>
                 )}
               </Link>
-              <Link
-                href="/cart"
-                data-contextual-toast-cart
-                className={`cart-btn p-2.5 rounded-xl transition-all duration-200 relative text-foreground hover:bg-muted/80 hover:-translate-y-0.5 ${cartBounce ? 'animate-bounce' : ''}`}
-              >
-                <CartIcon className="w-5 h-5" />
-                {mounted && cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 bg-accent text-accent-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {cartCount > 99 ? "99+" : cartCount}
-                </span>
-                )}
-              </Link>
             </div>
           </div>
 

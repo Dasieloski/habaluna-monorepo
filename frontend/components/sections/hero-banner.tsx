@@ -83,7 +83,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
   const currentBanner = displayBanners[currentSlide]
 
   return (
-    <section className="relative h-screen max-h-[900px] min-h-[500px] overflow-hidden text-white"
+    <section className="relative w-full overflow-hidden text-white" style={{ height: "clamp(400px, 80vh, 900px)" }}
     >
       {/* Full-width carousel background with gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-950/95" />
@@ -119,12 +119,12 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
         )}
 
         {/* Content overlay - centered text and CTAs */}
-        <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 md:px-8">
-          <div className="max-w-3xl text-center space-y-8">
+        <div className="relative z-10 h-full w-full flex flex-col items-center justify-center px-3 sm:px-4 md:px-8 py-8">
+          <div className="max-w-2xl sm:max-w-3xl w-full text-center space-y-4 sm:space-y-6 md:space-y-8">
             {/* Headline */}
-            <div className="space-y-4">
+            <div className="space-y-2 sm:space-y-3 md:space-y-4">
               <h1 
-                className={`font-heading text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight text-white text-balance transition-all duration-700 ${
+                className={`font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight sm:leading-[1.1] tracking-tight text-white text-balance transition-all duration-700 ${
                   isLoaded && !isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
               >
@@ -134,7 +134,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
               {/* Subtitle */}
               {currentBanner?.subtitle && (
                 <p 
-                  className={`text-lg md:text-xl text-white/80 leading-relaxed transition-all duration-700 ${
+                  className={`text-sm sm:text-base md:text-lg lg:text-xl text-white/80 leading-snug sm:leading-relaxed transition-all duration-700 ${
                     isLoaded && !isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                   }`}
                   style={{
@@ -148,7 +148,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
 
             {/* CTA Buttons */}
             <div 
-              className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-700 ${
+              className={`flex flex-col xs:flex-row gap-2 sm:gap-3 md:gap-4 justify-center transition-all duration-700 w-full ${
                 isLoaded && !isAnimating ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
               style={{
@@ -159,15 +159,15 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                 <a
                   href={currentBanner.link || "#"}
                   aria-label={currentBanner.buttonText}
-                  className="group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 px-8 py-4 text-base font-semibold text-slate-900 transition-all duration-300 hover:scale-105 hover:shadow-[0_24px_48px_rgba(59,130,246,0.35)] active:scale-95"
+                  className="group inline-flex items-center justify-center gap-1 sm:gap-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base font-semibold text-slate-900 transition-all duration-300 hover:scale-105 hover:shadow-[0_24px_48px_rgba(59,130,246,0.35)] active:scale-95 w-full xs:w-auto"
                 >
                   {currentBanner.buttonText}
-                  <ChevronRightIcon className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  <ChevronRightIcon className="h-4 sm:h-5 w-4 sm:w-5 transition-transform group-hover:translate-x-1" />
                 </a>
               )}
               <a
                 href="/products"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/40 bg-white/10 backdrop-blur-xl px-8 py-4 text-base font-semibold text-white transition-all duration-300 hover:bg-white/20 hover:border-white/60 hover:scale-105 active:scale-95"
+                className="inline-flex items-center justify-center gap-1 sm:gap-2 rounded-lg sm:rounded-xl border border-white/40 bg-white/10 backdrop-blur-xl px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base font-semibold text-white transition-all duration-300 hover:bg-white/20 hover:border-white/60 hover:scale-105 active:scale-95 w-full xs:w-auto"
               >
                 Ver Catálogo
               </a>
@@ -175,7 +175,7 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
 
             {/* Slide indicators - bottom of hero */}
             {displayBanners.length > 1 && (
-              <div className="flex items-center justify-center gap-3 mt-8">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mt-4 sm:mt-6 md:mt-8">
                 {displayBanners.map((banner, index) => (
                   <button
                     key={banner.id}
@@ -183,8 +183,8 @@ export function HeroBanner({ banners = defaultBanners }: HeroBannerProps) {
                     aria-label={`Ir a slide ${index + 1}`}
                     className={`transition-all duration-500 rounded-full ${
                       index === currentSlide 
-                        ? "w-8 h-2 bg-gradient-to-r from-cyan-400 to-blue-400" 
-                        : "w-2 h-2 bg-white/40 hover:bg-white/70"
+                        ? "w-6 sm:w-8 h-1.5 sm:h-2 bg-gradient-to-r from-cyan-400 to-blue-400" 
+                        : "w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white/70"
                     }`}
                   />
                 ))}
